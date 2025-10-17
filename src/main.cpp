@@ -17,7 +17,7 @@ unordered_map<string, string> txt_colors{
     {"Blue", "\033[94m"},
     {"Green", "\033[92m"},
     {"Red", "\033[91m"},
-    {"Yelllow", "\033[93m"},
+    {"Yellow", "\033[93m"},
     {"Black", "\033[90m"},
 };
 
@@ -25,18 +25,22 @@ class Card{
 public:
     string color;
     string effect;
-};
 
-class Player
-{
-    public:
-    string name;
-    vector<Card> hand;
-
-    void add_card(vector<Card> cards){
-        for(Card card: cards){
-            hand.push_back(card);
+    bool operator < (Card card){
+        if (color < card.color) return true;
+        if (color > card.color) return false;
+        else {
+            if (effect < card.effect) return true;
+            else return false;
         }
+    }
+
+    bool is_compatible(Card card){
+        if (color == "black") return true;
+        if (color == card.color) return true;
+        if (effect == card.effect) return true;
+
+        return false;
     }
 };
 
@@ -45,8 +49,12 @@ class Deck
     vector<Card> cards;
 public:
 
-    void add_card(Card card, int quantity){
+    void add_card(Card card, int quantity = 1){
         for(;quantity>0; quantity--) {cards.push_back(card);}
+    }
+
+    void remove_top(){
+        cards.pop_back();
     }
 
     //return the last played card.
@@ -59,11 +67,38 @@ public:
         shuffle(cards.begin(), cards.end(), g);
     }
 
-    Player draw_cards(Player player, int quantity){
-        vector<Card> cards_drawn{cards.end() - quantity, cards.end()};
-        player.add_card(cards_drawn);
+    vector<Card> get_cards(const int quantity){
+        vector<Card> cards_get {cards.end() - quantity, cards.end()};
+        cards = {cards.begin(), cards.end() - quantity};
+        return cards_get;
+    }
+};
 
-        return player;
+class Player
+{
+    public:
+    string name;
+    vector<Card> hand;
+
+    //add a list of cards in players.hand
+    void add_card(vector<Card>& cards){
+        for(Card card: cards){
+            hand.push_back(card);
+        }
+    }
+
+    void play_card(int index, Deck& deck){
+        deck.add_card(hand[index]);
+        hand.erase(hand.begin() + index);
+    }
+
+    void sort_hand(){
+        sort(hand.begin(), hand.end());
+    }
+
+    void draw_cards(Deck& deck, const int quantity){
+        vector<Card> cards = deck.get_cards(quantity);
+        add_card(cards);
     }
 };
 
@@ -105,9 +140,8 @@ Deck load_cards(){
     return deck;
 }
 
-//Distribute
-
-void display(Player player, Deck deck){
+void display(Player& player, Deck& deck){
+    cout << endl << "#--------------------#" << endl;
     Card top_card =  deck.top();
     cout << "Top card: " << txt_colors[top_card.color] << top_card.effect << "\033[0m" << endl;
 
@@ -120,14 +154,54 @@ void display(Player player, Deck deck){
     cout << endl;
 }
 
-void start(){
-    Player player {"Wesley", {}};
+Player start(){
+    vector<Player> players { {"Wesley", {} },{"Zé", {} } };
+    //vector<Player> players {{"wesley", {}}};
     Deck deck = load_cards();
-    player = deck.draw_cards(player, 7);
-    display(player, deck);
+    Deck discard_deck;
+    discard_deck.add_card(deck.top(), 1);
+    deck.remove_top();
+
+    //initial setup
+    for (Player& player : players){
+        player.draw_cards(deck, 7);
+    }
+
+    while(true){
+        for (Player& player: players){
+            int chosen = 0;
+            bool drawn = false;
+
+            while(true) {
+                player.sort_hand();
+                display(player, discard_deck);
+
+                //chose witch card will be played
+                while(!(cin >> chosen)){
+                    cout << "Invalid input." << endl;
+                    display(player, discard_deck);
+                    cin.clear();
+                    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+                //0 for draw or skip
+                if (chosen == 0){
+                    if(drawn == false) player.draw_cards(deck, 1);
+                    else break;
+                }
+                //check if card chosen is compatible
+                else if (player.hand[chosen - 1].is_compatible(discard_deck.top())){
+                    player.play_card(chosen - 1, discard_deck);
+                    if (size(player.hand) <= 0) return player;
+                    break;
+                }
+            }
+
+        }
+    }
 }
 
 int main(){
-    start();
+    Player winner = start();
+    cout << winner.name << " wins!" << endl;
     return 0;
 }
