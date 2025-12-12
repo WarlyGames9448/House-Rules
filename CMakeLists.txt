@@ -13,7 +13,7 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_executable(um_game ${MY_SOURCES} libs/glad/src/glad.c)
+add_executable(um_game ${MY_SOURCES} libs/glad/src/glad.c src/game.cpp)
 
 target_include_directories(um_game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/glad/include)
 
@@ -23,3 +23,6 @@ target_link_libraries(um_game PRIVATE
     glfw
     OpenGL::GL
 )
+
+target_include_directories(um_game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+

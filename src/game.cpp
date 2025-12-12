@@ -20,30 +20,7 @@ unordered_map<string, string> txt_colors{
     {"Yellow", "\033[93m"},
     {"Black", "\033[90m"},
 };
-
-class Card{
-public:
-    string color;
-    string effect;
-
-    bool operator < (Card card){
-        if (color < card.color) return true;
-        if (color > card.color) return false;
-        else {
-            if (effect < card.effect) return true;
-            else return false;
-        }
-    }
-
-    bool is_compatible(Card card){
-        if (color == "black") return true;
-        if (color == card.color) return true;
-        if (effect == card.effect) return true;
-
-        return false;
-    }
-};
-
+/*
 class Deck
 {
     vector<Card> cards;
@@ -71,34 +48,6 @@ public:
         vector<Card> cards_get {cards.end() - quantity, cards.end()};
         cards = {cards.begin(), cards.end() - quantity};
         return cards_get;
-    }
-};
-
-class Player
-{
-    public:
-    string name;
-    vector<Card> hand;
-
-    //add a list of cards in players.hand
-    void add_card(vector<Card>& cards){
-        for(Card card: cards){
-            hand.push_back(card);
-        }
-    }
-
-    void play_card(int index, Deck& deck){
-        deck.add_card(hand[index]);
-        hand.erase(hand.begin() + index);
-    }
-
-    void sort_hand(){
-        sort(hand.begin(), hand.end());
-    }
-
-    void draw_cards(Deck& deck, const int quantity){
-        vector<Card> cards = deck.get_cards(quantity);
-        add_card(cards);
     }
 };
 
@@ -200,3 +149,4 @@ Player start(){
     }
 }
 
+*/

@@ -1,13 +1,12 @@
 #include <iostream>
 
 #include <GLFW/glfw3native.h>
-
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
 
-int main() {
+#include "Card.hpp"
 
+void init() {
     // Initialize GLFW
     glfwInit();
 
@@ -26,7 +25,6 @@ int main() {
     if (window == NULL) {
         std::cerr << "Error to create window." << std::endl;
         glfwTerminate();
-        return -1;
     }
 
     glfwMakeContextCurrent(window);
@@ -44,5 +42,11 @@ int main() {
 
     //Finish GLFW
     glfwTerminate();
+}
+
+int main() {
+    Card card {"green", "1"};
+    std::cout << card.get_color() << std::endl;
+
     return 0;
 }
