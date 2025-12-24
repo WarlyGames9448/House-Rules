@@ -9,10 +9,6 @@
 
 using namespace std;
 
-vector<string> colors = {"Blue", "Green", "Red", "Yellow"};
-vector<string> effects = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "block", "reverse", "+2"};
-vector<string> black_effects = {"wild", "+4"};
-
 unordered_map<string, string> txt_colors{
     {"Blue", "\033[94m"},
     {"Green", "\033[92m"},
@@ -21,73 +17,6 @@ unordered_map<string, string> txt_colors{
     {"Black", "\033[90m"},
 };
 /*
-class Deck
-{
-    vector<Card> cards;
-public:
-
-    void add_card(Card card, int quantity = 1){
-        for(;quantity>0; quantity--) {cards.push_back(card);}
-    }
-
-    void remove_top(){
-        cards.pop_back();
-    }
-
-    //return the last played card.
-    Card top() {return cards.back();}
-
-    void shuffle_cards(){
-        random_device rd;
-        mt19937 g(rd());
-
-        shuffle(cards.begin(), cards.end(), g);
-    }
-
-    vector<Card> get_cards(const int quantity){
-        vector<Card> cards_get {cards.end() - quantity, cards.end()};
-        cards = {cards.begin(), cards.end() - quantity};
-        return cards_get;
-    }
-};
-
-void save_cards(){
-    fstream file;
-    file.open("../saves/cards_setup.txt", ios::out);
-    if (file.is_open()) {
-        for (string color : colors){
-            for (string effect: effects){
-                file << color << " " << effect << endl;
-            }
-        }
-
-        for (string effect : black_effects){
-            file << "Black " << effect << endl;
-        }
-        file.close();
-    }
-}
-
-Deck load_cards(){
-    Deck deck;
-    fstream file;
-    file.open("../saves/cards_setup.txt", ios::in);
-    if (file.is_open()) {
-        string line;
-        while(getline(file, line)){
-            istringstream iss(line);
-            string color, effect;
-            iss >> color >> effect;
-            Card card{color, effect};
-            deck.add_card(card, 4);
-        }
-        file.close();
-    }
-
-    deck.shuffle_cards();
-
-    return deck;
-}
 
 void display(Player& player, Deck& deck){
     cout << endl << "#--------------------#" << endl;

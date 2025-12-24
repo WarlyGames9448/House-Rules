@@ -1,11 +1,30 @@
-#include "CardMaker.h"
+#include "CardMaker.hpp"
+#include "Card.hpp"
 
-CardMaker::CardMaker()
-{
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iostream>
+
+void CardMaker::save(){
 
 }
+//TODO: safe default setup
+std::vector<Card> CardMaker::load(std::string path){
+    std::vector<Card> cards;
+    std::fstream file;
+    file.open("../saves/" + path + "\"" , std::ios::in);
+    if (file.is_open()) {
+        std::string color, effect;
+        int quantity;
 
-CardMaker::~CardMaker()
-{
+        while(file >> color >> effect >> quantity){
+            Card card{color, effect};
 
+            for(int i = 0; i<quantity; i++){ cards.push_back(card);}
+
+
+        }
+    }
+    return cards;
 }
