@@ -1,12 +1,10 @@
-#include <vector>
-#include <random>
-#include <algorithm>
-
-#include <Deck.hpp>
 #include <Card.hpp>
+#include <Deck.hpp>
+#include <algorithm>
+#include <random>
+#include <vector>
 
-
-void Deck::shuffle(){
+void Deck::shuffle() {
     std::random_device rd;
     std::mt19937 g(rd());
 

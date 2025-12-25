@@ -1,16 +1,17 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include <string>
-#include <vector>
 #include "Card.hpp"
 
+#include <string>
+#include <vector>
+
 class Player {
-private:
+  private:
     std::string _name;
     std::vector<Card> _hand;
 
-public:
+  public:
     Player(std::string name) : _name(std::move(name)) {}
 
     void add_card(const Card& card);

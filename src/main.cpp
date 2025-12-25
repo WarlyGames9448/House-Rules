@@ -1,10 +1,8 @@
-#include <iostream>
-
-#include <GLFW/glfw3native.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "Card.hpp"
+
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <iostream>
 
 void init() {
     // Initialize GLFW
@@ -32,20 +30,20 @@ void init() {
     // Principal Loop
     while (!glfwWindowShouldClose(window)) {
         // Limpa a tela com uma cor
-        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT);
+        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT);
 
         // Processa eventos e troca os buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    //Finish GLFW
+    // Finish GLFW
     glfwTerminate();
 }
 
 int main() {
-    Card card {"green", "1"};
+    Card card{"green", "1"};
     std::cout << card.get_color() << std::endl;
 
     return 0;

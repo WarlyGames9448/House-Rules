@@ -2,17 +2,14 @@
 #define CARDMAKER_HPP
 
 #include <Card.hpp>
-
-#include <vector>
 #include <string>
+#include <vector>
 
-class CardMaker
-{
-private:
-
-public:
-    void save(); //TODO
-    std::vector<Card> load(std::string path="default.txt");
+class CardMaker {
+  private:
+  public:
+    void save(); // TODO
+    std::vector<Card> load(std::string path = "default.txt");
 };
 
 #endif

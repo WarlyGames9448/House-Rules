@@ -1,15 +1,14 @@
 #include "Player.hpp"
 
-#include <string>
-#include <vector>
 #include <algorithm>
+#include <vector>
 
-void Player::add_card(const Card& card){
+void Player::add_card(const Card& card) {
     _hand.push_back(card);
 }
-void Player::remove_card(int index){
+void Player::remove_card(int index) {
     _hand.erase(_hand.begin() + index);
 }
-void Player::sort_hand(){
+void Player::sort_hand() {
     sort(_hand.begin(), _hand.end());
 }

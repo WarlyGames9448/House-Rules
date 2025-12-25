@@ -3,19 +3,18 @@
 
 #include <string>
 
-class Card
-{
-private:
+class Card {
+  private:
     std::string _color;
     std::string _effect;
 
-public:
+  public:
     Card(std::string color, std::string effect);
-    bool operator < (const Card& card) const;
+    bool operator<(const Card& card) const;
     bool is_compatible(const Card& card) const;
 
-    std::string get_color() const {return _color;}
-    std::string get_effect() const {return _effect;}
+    std::string get_color() const { return _color; }
+    std::string get_effect() const { return _effect; }
 };
 
 #endif

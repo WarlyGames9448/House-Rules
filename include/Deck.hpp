@@ -1,20 +1,20 @@
 #ifndef DECK_HPP
 #define DECK_HPP
 
-#include <vector>
-
 #include "Card.hpp"
 
+#include <vector>
+
 class Deck {
-private:
+  private:
     std::vector<Card> _cards;
-public:
+
+  public:
     void shuffle();
 
-    void add_card(const Card& card){ _cards.push_back(card);}
-    void remove_top(){ _cards.pop_back(); }
+    void add_card(const Card& card) { _cards.push_back(card); }
+    void remove_top() { _cards.pop_back(); }
     Card top() const { return _cards.back(); }
-
 };
 
 #endif
