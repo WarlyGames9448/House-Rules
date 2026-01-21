@@ -7,7 +7,7 @@
     APIs: gl=3.3
     Profile: core
     Extensions:
-        
+
     Loader: True
     Local files: False
     Omit khrplatform: False
@@ -24,7 +24,7 @@
 #define __glad_h_
 
 #ifdef __gl_h_
-#error OpenGL header already included, remove this include, glad already provides it
+#error Already include
 #endif
 #define __gl_h_
 

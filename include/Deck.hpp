@@ -11,10 +11,11 @@ class Deck {
 
   public:
     void shuffle();
+    void add_card(const std::vector<Card> cards);
 
     void add_card(const Card& card) { _cards.push_back(card); }
     void remove_top() { _cards.pop_back(); }
-    Card top() const { return _cards.back(); }
+    Card top() const;
 };
 
 #endif

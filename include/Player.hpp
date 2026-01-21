@@ -19,6 +19,8 @@ class Player {
     void sort_hand();
 
     std::string get_name() const { return _name; }
+    std::vector<Card> get_hand() const { return _hand; }
+    int get_hand_size() const {return get_hand().size();}
 };
 
 #endif

@@ -9,7 +9,7 @@ class CardMaker {
   private:
   public:
     void save(); // TODO
-    std::vector<Card> load(std::string path = "default.txt");
+    std::vector<Card> load(std::string path = "default.txt") const;
 };
 
 #endif

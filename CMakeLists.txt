@@ -11,9 +11,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
+#for windows
+if(WIN32)
+    link_directories(${CMAKE_SOURCE_DIR}/lib)
+endif()
+
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_executable(um_game ${MY_SOURCES} libs/glad/src/glad.c src/game.cpp)
+add_executable(um_game ${MY_SOURCES} libs/glad/src/glad.c)
 
 target_include_directories(um_game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/glad/include)
 

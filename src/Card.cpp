@@ -1,5 +1,7 @@
 #include "Card.hpp"
 
+//#include "Game.hpp"
+
 #include <string>
 
 Card::Card(std::string color, std::string effect) {
@@ -26,4 +28,8 @@ bool Card::is_compatible(const Card& card) const {
     if (get_effect() == card.get_effect()) return true;
 
     return false;
+}
+
+void Card::play(){
+
 }

@@ -9,10 +9,10 @@
 
 void CardMaker::save() {}
 // TODO: safe default setup
-std::vector<Card> CardMaker::load(std::string path) {
+std::vector<Card> CardMaker::load(std::string path) const{
     std::vector<Card> cards;
     std::fstream file;
-    file.open("../saves/" + path + "\"", std::ios::in);
+    file.open("../saves/" + path, std::ios::in);
     if (file.is_open()) {
         std::string color, effect;
         int quantity;

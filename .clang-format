@@ -20,12 +20,13 @@ BraceWrapping:
   AfterEnum: false
   AfterFunction: false   # Quebra linha antes da { da função main()?
   AfterNamespace: false
-  BeforeElse: false     # O } else { fica na mesma linha?
+  BeforeElse: true     # O } else { fica na mesma linha?
 
 ColumnLimit: 120        # Máximo de caracteres por linha (0 = infinito)
-BinPackArguments: false  # Tenta colocar argumentos na mesma linha se couber (false = um por linha)
-BinPackParameters: true # Mesmo que acima, mas para declaração de funções
+BinPackArguments: true  # Tenta colocar argumentos na mesma linha se couber (false = um por linha)
+BinPackParameters: false # Mesmo que acima, mas para declaração de funções
 AlignAfterOpenBracket: Align # Alinha argumentos verticais após o '('
+MaxEmptyLinesToKeep: 5
 
 # Left   -> int* ptr
 # Right  -> int *ptr
@@ -35,7 +36,8 @@ PointerAlignment: Left
 AllowShortFunctionsOnASingleLine: Inline # Opções: None, Inline, Empty, All
 AllowShortIfStatementsOnASingleLine: WithoutElse # Permite 'if (x) return;'
 AllowShortLoopsOnASingleLine: true      # Permite 'while(true) continue;'
+Cpp11BracedListStyle: true
 
-SortIncludes: true              # Ordena seus #include alfabeticamente
+SortIncludes: false              # Ordena seus #include alfabeticamente
 FixNamespaceComments: true      # Adiciona // namespace foo ao final da chave }
 IncludeBlocks: Regroup          # Agrupa includes (separa C++ libs de libs locais)
