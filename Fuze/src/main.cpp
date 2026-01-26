@@ -91,9 +91,3 @@ int init() {
     glfwTerminate();
     return 0;
 }
-
-int main() {
-    init();
-
-    return 0;
-}
