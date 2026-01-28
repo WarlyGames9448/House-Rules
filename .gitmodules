@@ -1,0 +1,3 @@
+[submodule "Fuze/vendor/spdlog"]
+	path = Fuze/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
