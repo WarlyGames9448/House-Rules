@@ -39,5 +39,5 @@ AllowShortLoopsOnASingleLine: true      # Permite 'while(true) continue;'
 Cpp11BracedListStyle: true
 
 SortIncludes: false              # Ordena seus #include alfabeticamente
-FixNamespaceComments: true      # Adiciona // namespace foo ao final da chave }
+FixNamespaceComments: false      # Adiciona // namespace foo ao final da chave }
 IncludeBlocks: Regroup          # Agrupa includes (separa C++ libs de libs locais)

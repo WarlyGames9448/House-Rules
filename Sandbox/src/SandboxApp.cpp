@@ -1,4 +1,4 @@
-#include "Fuze.hpp"
+#include "Fuze.h"
 
 class Sandbox : public Fuze::Application
 {

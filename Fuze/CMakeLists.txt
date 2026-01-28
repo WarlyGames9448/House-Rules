@@ -1,12 +1,14 @@
 add_library(Fuze SHARED
     src/main.cpp
     src/Application.cpp
+    src/Log.cpp
     vendor/glad/src/glad.c)
 
 target_include_directories(Fuze
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
 )
 
 target_compile_definitions(Fuze
