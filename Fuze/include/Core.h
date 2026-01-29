@@ -7,5 +7,7 @@
         #define FUZE_API
     #endif
 #else
-    static_assert("Fuze only works on Linux.");
+static_assert("Fuze only works on Linux.");
 #endif
+
+#define BIT(X) (1 << X)

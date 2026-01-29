@@ -1,1 +1,2 @@
 - Wrap Spdlog for the possibility to replace it
+- Events Types

@@ -3,9 +3,9 @@
 
 namespace Fuze {
 
-    class Application
-    {
-    public:
+    class FUZE_API Application {
+
+      public:
         Application();
         virtual ~Application();
 
@@ -13,5 +13,5 @@ namespace Fuze {
     };
 
     // Definido pelo CLIENTE (Sandbox)
-    Application* CreateApplication();
-}
+    Application *CreateApplication();
+} // namespace Fuze

@@ -1,43 +1,18 @@
-Language: Cpp
 BasedOnStyle: LLVM
-AccessModifierOffset: -2 # Recuo de 'public/private' (geralmente -2 ou -4)
 
-IndentWidth: 4          # Tamanho da indentação (Ex: 2 ou 4)
-TabWidth: 4             # Tamanho visual do TAB
-UseTab: Never           # Opções: Never (usa espaços), Always, ForIndentation
-ContinuationIndentWidth: 4 # Indentação quando uma linha continua na próxima
+IndentWidth: 4
+ColumnLimit: 120
 
-# Define onde a chave abre.
-# Attach: Mesma linha (Java style)
-# Allman: Próxima linha (Visual Studio style)
-# Linux: Mesma linha para tudo, exceto funções.
-BreakBeforeBraces: Custom
-
-# Se você usar 'Custom' acima, pode configurar granularmente:
-BraceWrapping:
-  AfterClass: false     # Quebra linha antes da { da classe?
-  AfterControlStatement: false # Quebra linha antes da { do if/for/while?
-  AfterEnum: false
-  AfterFunction: false   # Quebra linha antes da { da função main()?
-  AfterNamespace: false
-  BeforeElse: true     # O } else { fica na mesma linha?
-
-ColumnLimit: 120        # Máximo de caracteres por linha (0 = infinito)
-BinPackArguments: true  # Tenta colocar argumentos na mesma linha se couber (false = um por linha)
-BinPackParameters: false # Mesmo que acima, mas para declaração de funções
-AlignAfterOpenBracket: Align # Alinha argumentos verticais após o '('
-MaxEmptyLinesToKeep: 5
-
-# Left   -> int* ptr
-# Right  -> int *ptr
-# Middle -> int * ptr
 PointerAlignment: Left
 
-AllowShortFunctionsOnASingleLine: Inline # Opções: None, Inline, Empty, All
-AllowShortIfStatementsOnASingleLine: WithoutElse # Permite 'if (x) return;'
-AllowShortLoopsOnASingleLine: true      # Permite 'while(true) continue;'
-Cpp11BracedListStyle: true
+BinPackArguments: true
+BinPackParameters: true
 
-SortIncludes: false              # Ordena seus #include alfabeticamente
-FixNamespaceComments: false      # Adiciona // namespace foo ao final da chave }
-IncludeBlocks: Regroup          # Agrupa includes (separa C++ libs de libs locais)
+IndentPPDirectives: BeforeHash
+PPIndentWidth: 4
+
+BreakBeforeBraces: Attach
+AllowShortEnumsOnASingleLine: true
+
+NamespaceIndentation: All
+FixNamespaceComments: false

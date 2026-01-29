@@ -6,7 +6,7 @@
 #include <memory>
 
 namespace Fuze {
-class Log {
+class FUZE_API Log {
   public:
     static void init();
     inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_Core_Logger; }
@@ -23,8 +23,7 @@ class Log {
 #define FUZE_CORE_INFO(...)          ::Fuze::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define FUZE_CORE_WARN(...)          ::Fuze::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define FUZE_CORE_ERROR(...)         ::Fuze::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define FUZE_CORE_CRITICAL(...)      ::Fuze::Log::GetCoreLogger()->critical(__VA_ARGS__)
-
+#define FUZE_CORE_CRITICAL(...)      ::Fuze::Log::GetCoreLogger()->critical(__VA_ARGS__)F
 // App Logger
 #define FUZE_TRACE(...)         ::Fuze::Log::GetClientLogger()->trace(__VA_ARGS__)
 #define FUZE_INFO(...)          ::Fuze::Log::GetClientLogger()->info(__VA_ARGS__)
