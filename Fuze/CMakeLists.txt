@@ -1,7 +1,9 @@
 add_library(Fuze SHARED
     src/main.cpp
     src/Application.cpp
-    src/Log.cpp)
+    src/Log.cpp
+    src/Plataform/Linux/LinuxWindow.cpp
+)
 
 add_library(glad STATIC
     vendor/glad/src/glad.c

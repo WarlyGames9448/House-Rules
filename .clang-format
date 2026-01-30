@@ -16,3 +16,6 @@ AllowShortEnumsOnASingleLine: true
 
 NamespaceIndentation: All
 FixNamespaceComments: false
+
+SortIncludes: false
+IncludeBlocks: Preserve

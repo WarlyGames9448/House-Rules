@@ -1,10 +1,12 @@
 #include "fuzepch.h"
+#include "Window.h"
 #include "Application.h"
 
 namespace Fuze {
 
     Application::Application()
     {
+        m_Window = std::unique_ptr<Window>(Window::Create());
     }
 
     Application::~Application()
@@ -13,7 +15,8 @@ namespace Fuze {
 
     void Application::Run()
     {
-        std::cout << "Running Application..." << std::endl;
-        while (true);
+        while(m_Running){
+            m_Window->OnUpdate();
+        }
     }
 }
