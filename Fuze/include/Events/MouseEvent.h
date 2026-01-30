@@ -3,9 +3,9 @@
 #include "Event.h"
 
 namespace Fuze {
-    class FUZE_API JoystickMovedEvent : public Event {
+    class FUZE_API MouseMovedEvent : public Event {
       public:
-        JoystickMovedEvent(float mouseX, float mouseY) : m_MouseX(mouseX), m_MouseY(mouseY) {}
+        MouseMovedEvent(float mouseX, float mouseY) : m_MouseX(mouseX), m_MouseY(mouseY) {}
 
         float GetX() const { return m_MouseX; }
         float GetY() const { return m_MouseY; }

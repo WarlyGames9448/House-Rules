@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Application.h"
-#include "Log.h"
 
 #ifdef FUZE_PLATFORM_LINUX
 

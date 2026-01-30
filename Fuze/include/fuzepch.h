@@ -6,6 +6,8 @@
 #include <memory>
 #include <utility>
 
+#include "Log.h"
+
 #include <ostream>
 #include <sstream>
 #include <string>

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "Events/ApplicationEvent.h"
 #include "Window.h"
 
 #include "Events/Event.h"
@@ -12,6 +13,9 @@ namespace Fuze {
       public:
         Application();
         virtual ~Application();
+
+        void OnEvent(Event& event);
+        bool OnWindowClose(WindowCloseEvent& event);
 
         void Run();
 
