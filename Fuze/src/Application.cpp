@@ -1,5 +1,5 @@
+#include "fuzepch.h"
 #include "Application.h"
-#include <iostream>
 
 namespace Fuze {
 
@@ -13,7 +13,7 @@ namespace Fuze {
 
     void Application::Run()
     {
-        std::cout << "Hello World!" << std::endl;
+        std::cout << "Running Application..." << std::endl;
         while (true);
     }
 }

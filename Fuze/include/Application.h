@@ -1,6 +1,8 @@
 #pragma once
 #include "Core.h"
 
+#include "Events/Event.h"
+
 namespace Fuze {
 
     class FUZE_API Application {
@@ -13,5 +15,5 @@ namespace Fuze {
     };
 
     // Definido pelo CLIENTE (Sandbox)
-    Application *CreateApplication();
-} // namespace Fuze
+    Application* CreateApplication();
+}

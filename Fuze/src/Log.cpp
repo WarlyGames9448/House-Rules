@@ -1,3 +1,4 @@
+#include "fuzepch.h"
 #include "Log.h"
 #include "spdlog/common.h"
 

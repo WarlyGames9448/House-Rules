@@ -3,8 +3,6 @@
 #include "Core.h"
 #include "Event.h"
 
-#include <sstream>
-
 namespace Fuze {
     class FUZE_API JoystickEvent : public Event {
       public:
@@ -81,7 +79,7 @@ namespace Fuze {
 
     class FUZE_API JoystickAxisMovedEvent : public JoystickEvent {
       public:
-        JoystickAxisMovedEvent(int joystickID, int axis, float value)   
+        JoystickAxisMovedEvent(int joystickID, int axis, float value)
             : JoystickEvent(joystickID), m_Axis(axis), m_Value(value) {}
 
         int GetAxis() const { return m_Axis; }

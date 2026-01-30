@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace Fuze {
     class FUZE_API JoystickMovedEvent : public Event {
       public:

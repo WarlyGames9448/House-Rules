@@ -1,9 +1,8 @@
 #pragma once
 
+#include "fuzepch.h"
 #include "Core.h"
 
-#include <functional>
-#include <string>
 
 namespace Fuze {
 
@@ -72,4 +71,6 @@ namespace Fuze {
       private:
         Event& m_Event;
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const Event& e) { return os << e.ToString(); }
 }

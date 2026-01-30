@@ -5,6 +5,7 @@ class Sandbox : public Fuze::Application
 public:
     Sandbox()
     {
+        FUZE_INFO("Log Created");
     }
 
     ~Sandbox()

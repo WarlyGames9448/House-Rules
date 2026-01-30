@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "Event.h"
-#include <sstream>
 
 namespace Fuze {
     class FUZE_API WindowResizedEvent : public Event {

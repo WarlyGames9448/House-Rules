@@ -1,14 +1,25 @@
 add_library(Fuze SHARED
     src/main.cpp
     src/Application.cpp
-    src/Log.cpp
-    vendor/glad/src/glad.c)
+    src/Log.cpp)
+
+add_library(glad STATIC
+    vendor/glad/src/glad.c
+)
 
 target_include_directories(Fuze
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
+)
+
+set_target_properties(glad PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+target_include_directories(glad
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
 )
 
 target_compile_definitions(Fuze
@@ -17,8 +28,6 @@ target_compile_definitions(Fuze
     PUBLIC
         FUZE_PLATFORM_LINUX
 )
-
-target_link_libraries(Fuze PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Fuze PRIVATE -Wall -Wextra)
@@ -29,6 +38,11 @@ find_package(OpenGL REQUIRED)
 
 target_link_libraries(Fuze
     PRIVATE
+        glad
         glfw
         OpenGL::GL
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
 )
+
+target_precompile_headers(Fuze PRIVATE include/fuzepch.h)
