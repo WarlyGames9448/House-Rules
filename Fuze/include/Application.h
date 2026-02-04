@@ -24,10 +24,16 @@ namespace Fuze {
 
         void Run();
 
+        inline static Application& Get() { return *s_Instance; }
+        inline Window& GetWindow() { return *m_Window; }
+
       private:
         std::unique_ptr<Window> m_Window;
         bool m_Running = true;
         LayerStack m_LayerStack;
+
+      protected:
+        static Application* s_Instance;
     };
 
     // Definido pelo CLIENTE (Sandbox)
