@@ -37,7 +37,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Fuze PRIVATE -Wall -Wextra)
 endif()
 
-find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 target_link_libraries(Fuze
