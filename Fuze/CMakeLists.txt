@@ -3,6 +3,8 @@ add_library(Fuze SHARED
     src/Application.cpp
     src/Log.cpp
     src/Plataform/Linux/LinuxWindow.cpp
+    src/Layer.cpp
+    src/LayerStack.cpp
 )
 
 add_library(glad STATIC

@@ -4,7 +4,9 @@
 #include "Window.h"
 
 #include "Events/Event.h"
-#include <memory>
+
+#include "Layer.h"
+#include "LayerStack.h"
 
 namespace Fuze {
 
@@ -17,11 +19,15 @@ namespace Fuze {
         void OnEvent(Event& event);
         bool OnWindowClose(WindowCloseEvent& event);
 
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* layer);
+
         void Run();
 
       private:
         std::unique_ptr<Window> m_Window;
         bool m_Running = true;
+        LayerStack m_LayerStack;
     };
 
     // Definido pelo CLIENTE (Sandbox)
