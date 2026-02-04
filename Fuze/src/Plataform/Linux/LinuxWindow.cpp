@@ -1,7 +1,8 @@
 #include "fuzepch.h"
 
 #include "Core.h"
-#include <GLFW/glfw3.h>
+
+#include "glad/glad.h"
 #include "Plataform/Linux/LinuxWindow.h"
 
 #include "Events/ApplicationEvent.h"
@@ -32,7 +33,7 @@ namespace Fuze {
 
         if (!s_GLFWInitialized) {
             [[maybe_unused]] int success = glfwInit();
-            FUZE_CORE_ASSERT(success, "Could not initialize GFLW!")
+            FUZE_CORE_ASSERT(success, "Failed to initialize GFLW!")
 
             s_GLFWInitialized = true;
         }
@@ -43,6 +44,8 @@ namespace Fuze {
 
         m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
         glfwMakeContextCurrent(m_Window);
+        [[maybe_unused]] int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        FUZE_CORE_ASSERT(status, "Failed to initialize GLAD!")
         glfwSetErrorCallback(GLFWErrorCallback);
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);

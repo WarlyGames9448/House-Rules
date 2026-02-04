@@ -15,6 +15,7 @@ target_include_directories(Fuze
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
 )
 
 set_target_properties(glad PROPERTIES
