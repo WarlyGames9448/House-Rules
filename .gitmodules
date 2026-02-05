@@ -1,9 +1,12 @@
 [submodule "Fuze/vendor/spdlog"]
 	path = Fuze/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "/home/wesley/Dev/HouseRules/Fuze/vendor/glfw"]
-	path = /home/wesley/Dev/HouseRules/Fuze/vendor/glfw
-	url = https://github.com/glfw/glfw
-[submodule "/home/wesley/Dev/HouseRules/Fuze/vendor/imgui"]
-	path = /home/wesley/Dev/HouseRules/Fuze/vendor/imgui
+	ignore = dirty
+[submodule "Fuze/vendor/glfw"]
+	path = Fuze/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+	ignore = dirty
+[submodule "Fuze/vendor/imgui"]
+	path = Fuze/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
+	ignore = dirty
