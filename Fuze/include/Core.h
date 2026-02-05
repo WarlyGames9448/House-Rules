@@ -46,3 +46,5 @@ static_assert("Fuze only works on Linux.");
 #endif
 
 #define BIT(X) (1 << X)
+
+#define FUZE_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)

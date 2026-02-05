@@ -168,6 +168,7 @@ namespace Fuze {
     void LinuxWindow::OnUpdate() {
         glfwPollEvents();
         glfwSwapBuffers(m_Window);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void LinuxWindow::SetVSync(bool enabled) {
