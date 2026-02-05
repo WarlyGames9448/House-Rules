@@ -13,13 +13,13 @@ namespace Fuze {
         inline unsigned int GetWidth() const override { return m_Data.Width; }
         inline unsigned int GetHeight() const override { return m_Data.Height; }
 
-        virtual void* GetNativeWindow() const override { return m_Window; }
-
         void OnUpdate() override;
 
         void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
         virtual void SetVSync(bool enabled) override;
         virtual bool IsVSync() const override { return m_Data.VSync; }
+
+        virtual void* GetNativeWindow() const override { return m_Window; }
 
       private:
         virtual void Init(const WindowProps& windowProps);

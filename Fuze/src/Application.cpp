@@ -2,6 +2,8 @@
 #include "Window.h"
 #include "Application.h"
 
+#include "Input.h"
+
 namespace Fuze {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
@@ -49,6 +51,9 @@ namespace Fuze {
             for (Layer* layer : m_LayerStack) {
                 layer->OnUpdate();
             }
+
+            auto [x,y] = Input::GetMousePosition();
+            FUZE_INFO("{0},{1}", x, y);
         }
     }
 
