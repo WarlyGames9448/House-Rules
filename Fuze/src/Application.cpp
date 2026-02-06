@@ -52,8 +52,8 @@ namespace Fuze {
                 layer->OnUpdate();
             }
 
-            auto [x,y] = Input::GetMousePosition();
-            FUZE_INFO("{0},{1}", x, y);
+            /* auto [x,y] = Input::GetMousePosition();
+            FUZE_INFO("{0},{1}", x, y); */
         }
     }
 

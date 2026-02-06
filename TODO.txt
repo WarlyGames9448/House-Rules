@@ -1,6 +1,7 @@
 - Wrap Spdlog for the possibility to replace it
 
 - Joystick Implementation
+- Joystick Fuze Codes
 
 - GlfwClearColor Gui
 - FPS profiler
