@@ -10,3 +10,7 @@
 	path = Fuze/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	ignore = dirty
+[submodule "Fuze/vendor/glm"]
+	path = Fuze/vendor/glm
+	url = https://github.com/g-truc/glm.git
+	ignore = dirty
