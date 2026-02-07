@@ -42,6 +42,7 @@ namespace Fuze {
             glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
         }
 
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -49,7 +50,6 @@ namespace Fuze {
         m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 
         FUZE_CORE_ASSERT(m_Window, "Failed to create GLFW window");
-
 
         glfwMakeContextCurrent(m_Window);
         [[maybe_unused]] int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);

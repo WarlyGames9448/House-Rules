@@ -5,20 +5,21 @@
 #include "Events/KeyEvent.h"
 #include "Events/ApplicationEvent.h"
 
-
 namespace Fuze {
     class FUZE_API ImGuiLayer : public Layer {
       public:
         ImGuiLayer();
         ~ImGuiLayer();
 
+        virtual void OnAttach() override;
+        virtual void OnDetach() override;
+        virtual void OnEvent(Event& event) override;
+        virtual void OnImGuiRender() override;
 
-        void OnAttach();
-        void OnDetach();
-        void OnUpdate();
-        void OnEvent(Event& event);
+        void Begin();
+        void End();
 
-    private:
+      private:
         bool OnMouseButtonPressedEvent(MouseButtonEvent& event);
         bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
         bool OnMouseMovedEvent(MouseMovedEvent& event);
