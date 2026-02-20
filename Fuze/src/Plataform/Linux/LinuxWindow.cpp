@@ -4,6 +4,7 @@
 
 #include "glad/glad.h"
 #include "Plataform/Linux/LinuxWindow.h"
+#include "Plataform/OpenGL/OpenGLContext.h"
 
 #include "Events/ApplicationEvent.h"
 #include "Events/JoystickEvent.h"
@@ -48,12 +49,11 @@ namespace Fuze {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-
         FUZE_CORE_ASSERT(m_Window, "Failed to create GLFW window");
 
-        glfwMakeContextCurrent(m_Window);
-        [[maybe_unused]] int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        FUZE_CORE_ASSERT(status, "Failed to initialize GLAD!")
+        m_Context = new OpenGLContext(m_Window);
+        m_Context->Init();
+
         glfwSetErrorCallback(GLFWErrorCallback);
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
@@ -167,8 +167,7 @@ namespace Fuze {
 
     void LinuxWindow::OnUpdate() {
         glfwPollEvents();
-        glfwSwapBuffers(m_Window);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_Context->SwapBuffers();
     }
 
     void LinuxWindow::SetVSync(bool enabled) {

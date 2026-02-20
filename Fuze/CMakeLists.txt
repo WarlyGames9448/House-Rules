@@ -6,6 +6,7 @@ add_library(Fuze SHARED
     src/Layer.cpp
     src/LayerStack.cpp
     src/ImGui/ImGuiLayer.cpp
+    src/Plataform/OpenGL/OpenGLContext.cpp
 )
 
 target_include_directories(Fuze
@@ -74,7 +75,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 target_link_libraries(Fuze
-    PRIVATE
+    PUBLIC
         glad
         glfw
         imgui

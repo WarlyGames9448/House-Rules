@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Window.h"
 #include <GLFW/glfw3.h>
+#include "Renderer/GraphicsContext.h"
 
 namespace Fuze {
     class FUZE_API LinuxWindow : public Window {
@@ -27,6 +28,7 @@ namespace Fuze {
 
       private:
         GLFWwindow* m_Window;
+        GraphicsContext* m_Context;
 
         struct WindowData {
             std::string Title;
