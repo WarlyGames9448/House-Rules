@@ -7,6 +7,7 @@ add_library(Fuze SHARED
     src/LayerStack.cpp
     src/ImGui/ImGuiLayer.cpp
     src/Plataform/OpenGL/OpenGLContext.cpp
+    src/Renderer/Shader.cpp
 )
 
 target_include_directories(Fuze

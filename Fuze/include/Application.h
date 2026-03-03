@@ -9,6 +9,8 @@
 #include "LayerStack.h"
 #include "ImGui/ImGuiLayer.h"
 
+#include "Renderer/Shader.h"
+
 namespace Fuze {
 
     class FUZE_API Application {
@@ -33,6 +35,11 @@ namespace Fuze {
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         LayerStack m_LayerStack;
+
+        unsigned int m_VertexArray;
+        unsigned int m_VertexBuffer;
+        unsigned int m_IndexBuffer;
+        std::unique_ptr<Shader> m_Shader;
 
       protected:
         static Application* s_Instance;

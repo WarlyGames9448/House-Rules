@@ -20,18 +20,6 @@ namespace Fuze {
         void End();
 
       private:
-        bool OnMouseButtonPressedEvent(MouseButtonEvent& event);
-        bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
-        bool OnMouseMovedEvent(MouseMovedEvent& event);
-        bool OnMouseScrolledEvent(MouseScrolledEvent& event);
-
-        bool OnKeyPressedEvent(KeyPressedEvent& event);
-        bool OnKeyReleasedEvent(KeyReleasedEvent& event);
-        bool OnKeyTypedEvent(KeyTypedEvent& event);
-
-        bool OnWindowResizedEvent(WindowResizedEvent& event);
-
-      private:
         float m_Time = 0;
     };
 }

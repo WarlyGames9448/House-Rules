@@ -24,7 +24,9 @@ class ColorPickerLayer : public Fuze::Layer {
 
 class Sandbox : public Fuze::Application {
   public:
-    Sandbox() { PushLayer(new ColorPickerLayer()); }
+    Sandbox() {
+        // PushLayer(new ColorPickerLayer());
+    }
 
     ~Sandbox() {}
 };
