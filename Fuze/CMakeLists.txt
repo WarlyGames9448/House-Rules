@@ -1,12 +1,18 @@
 add_library(Fuze SHARED
     src/Application.cpp
-    src/Log.cpp
-    src/Plataform/Linux/LinuxWindow.cpp
-    src/Plataform/Linux/LinuxInput.cpp
     src/Layer.cpp
     src/LayerStack.cpp
+    src/Log.cpp
+
     src/ImGui/ImGuiLayer.cpp
+
+    src/Plataform/Linux/LinuxInput.cpp
+    src/Plataform/Linux/LinuxWindow.cpp
     src/Plataform/OpenGL/OpenGLContext.cpp
+    src/Plataform/OpenGL/OpenGLBuffer.cpp
+
+    src/Renderer/Buffer.cpp
+    src/Renderer/Renderer.cpp
     src/Renderer/Shader.cpp
 )
 

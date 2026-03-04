@@ -6,7 +6,7 @@
 #include "Renderer/GraphicsContext.h"
 
 namespace Fuze {
-    class FUZE_API LinuxWindow : public Window {
+    class LinuxWindow : public Window {
       public:
         LinuxWindow(const WindowProps& windowProps);
         virtual ~LinuxWindow();

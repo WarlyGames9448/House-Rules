@@ -6,7 +6,7 @@ struct GLFWwindow;
 
 namespace Fuze {
 
-    class FUZE_API OpenGLContext : public GraphicsContext {
+    class OpenGLContext : public GraphicsContext {
       public:
         OpenGLContext(GLFWwindow* windowHandle);
 
