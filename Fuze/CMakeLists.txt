@@ -8,12 +8,15 @@ add_library(Fuze SHARED
 
     src/Plataform/Linux/LinuxInput.cpp
     src/Plataform/Linux/LinuxWindow.cpp
-    src/Plataform/OpenGL/OpenGLContext.cpp
     src/Plataform/OpenGL/OpenGLBuffer.cpp
+    src/Plataform/OpenGL/OpenGLContext.cpp
+    src/Plataform/OpenGL/OpenGLVertexArray.cpp
+
 
     src/Renderer/Buffer.cpp
     src/Renderer/Renderer.cpp
     src/Renderer/Shader.cpp
+    src/Renderer/VertexArray.cpp
 )
 
 target_include_directories(Fuze

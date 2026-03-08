@@ -2,20 +2,22 @@ BasedOnStyle: LLVM
 
 IndentWidth: 4
 ColumnLimit: 120
+UseTab: Never
 
 PointerAlignment: Left
 
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false
+BinPackParameters: "BinPack"
 
 IndentPPDirectives: BeforeHash
 PPIndentWidth: 4
 
 BreakBeforeBraces: Attach
-AllowShortEnumsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
 
 NamespaceIndentation: All
 FixNamespaceComments: false
 
-SortIncludes: false
 IncludeBlocks: Preserve
+SortIncludes: false

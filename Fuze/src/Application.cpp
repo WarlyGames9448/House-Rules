@@ -1,6 +1,6 @@
 #include "fuzepch.h"
-#include "Window.h"
 #include "Application.h"
+#include "Window.h"
 
 #include "Input.h"
 #include "glad/glad.h"
@@ -8,37 +8,6 @@
 namespace Fuze {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
-
-    static GLenum ShaderDataTypeToOpenGLDataType(ShaderDataType type) {
-        switch (type) {
-        case ShaderDataType::Float:
-            return GL_FLOAT;
-        case ShaderDataType::Float2:
-            return GL_FLOAT;
-        case ShaderDataType::Float3:
-            return GL_FLOAT;
-        case ShaderDataType::Float4:
-            return GL_FLOAT;
-        case ShaderDataType::Mat3:
-            return GL_FLOAT;
-        case ShaderDataType::Mat4:
-            return GL_FLOAT;
-        case ShaderDataType::Int:
-            return GL_INT;
-        case ShaderDataType::Int2:
-            return GL_INT;
-        case ShaderDataType::Int3:
-            return GL_INT;
-        case ShaderDataType::Int4:
-            return GL_INT;
-        case ShaderDataType::Bool:
-            return GL_BOOL;
-        case ShaderDataType::None:
-            return GL_NONE;
-        }
-
-        return 0;
-    };
 
     Application* Application::s_Instance = nullptr;
 
@@ -55,32 +24,23 @@ namespace Fuze {
 
         float vertices[3 * 7] = {
             -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-            0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-            0.0f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
+            0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, //
+            0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
         };
 
-        m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-        // Create Vertex Array Object
-        glGenVertexArrays(1, &m_VertexArray);
-        glBindVertexArray(m_VertexArray);
+        std::shared_ptr<VertexBuffer> vertexBuffer;
+        vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+        m_VertexArray.reset(VertexArray::Create());
 
         BufferLayout layout = {{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float4, "a_Color"}};
 
-        m_VertexBuffer->SetLayout(layout);
-
-        uint32_t index = 0;
-        for (const auto& element : m_VertexBuffer->GetLayout()) {
-
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLDataType(element.Type),
-                                  element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(),
-                                  (const void*)(uintptr_t)element.Offset);
-            index++;
-        }
+        vertexBuffer->SetLayout(layout);
+        m_VertexArray->AddVertexBuffer(vertexBuffer);
 
         uint32_t indices[3] = {0, 1, 2};
-        m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
+        std::shared_ptr<IndexBuffer> indexBuffer;
+        indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
+        m_VertexArray->SetIndexBuffer(indexBuffer);
 
         const char* vertexShaderSource = R"(
             #version 330 core
@@ -143,8 +103,8 @@ namespace Fuze {
             glClear(GL_COLOR_BUFFER_BIT);
 
             m_Shader->Bind();
-            glBindVertexArray(m_VertexArray);
-            glDrawArrays(GL_TRIANGLES, 0, 3); // 3= sizeof indices
+            m_VertexArray->Bind();
+            glDrawArrays(GL_TRIANGLES, 0, m_VertexArray->GetIndexBuffer()->GetCount());
 
             m_Window->OnUpdate();
 

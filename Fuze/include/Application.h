@@ -11,6 +11,7 @@
 
 #include "Renderer/Shader.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/VertexArray.h"
 
 namespace Fuze {
 
@@ -28,8 +29,12 @@ namespace Fuze {
 
         void Run();
 
-        inline static Application& Get() { return *s_Instance; }
-        inline Window& GetWindow() { return *m_Window; }
+        inline static Application& Get() {
+            return *s_Instance;
+        }
+        inline Window& GetWindow() {
+            return *m_Window;
+        }
 
       private:
         std::unique_ptr<Window> m_Window;
@@ -37,10 +42,8 @@ namespace Fuze {
         bool m_Running = true;
         LayerStack m_LayerStack;
 
-        unsigned int m_VertexArray;
-        std::unique_ptr<Shader> m_Shader;
-        std::unique_ptr<VertexBuffer> m_VertexBuffer;
-        std::unique_ptr<IndexBuffer> m_IndexBuffer;
+        std::shared_ptr<Shader> m_Shader;
+        std::shared_ptr<VertexArray> m_VertexArray;
 
       protected:
         static Application* s_Instance;
