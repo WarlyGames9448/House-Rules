@@ -3,7 +3,10 @@
 #include "Window.h"
 
 #include "Input.h"
-#include "glad/glad.h"
+#include <glad/glad.h>
+
+#include "Renderer/Renderer.h"
+#include "Renderer/RendererCommand.h"
 
 namespace Fuze {
 
@@ -99,13 +102,15 @@ namespace Fuze {
     void Application::Run() {
         while (m_Running) {
 
-            glClearColor(0.2f, 0.2f, 0.2f, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            RendererCommand::SetClearColor({0.2f, 0.6f, 0.2f, 1});
+            RendererCommand::Clear();
+
+            Renderer::BeginScene();
 
             m_Shader->Bind();
-            m_VertexArray->Bind();
-            glDrawArrays(GL_TRIANGLES, 0, m_VertexArray->GetIndexBuffer()->GetCount());
+            Renderer::Submit(m_VertexArray);
 
+            Renderer::EndScene();
             m_Window->OnUpdate();
 
             for (Layer* layer : m_LayerStack) {

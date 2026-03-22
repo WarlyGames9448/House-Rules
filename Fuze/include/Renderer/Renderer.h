@@ -1,16 +1,19 @@
 #pragma once
 
+#include "Renderer/RendererAPI.h"
+#include "Renderer/VertexArray.h"
+
 namespace Fuze {
-    enum class RendererAPI {
-        none = 0,
-        OpenGL = 1,
-    };
 
     class FUZE_API Renderer {
       public:
-        inline static RendererAPI GetAPI() { return s_RendererAPI; }
+        inline static RendererAPI::API GetAPI() {
+            return RendererAPI::GetAPI();
+        }
 
-      private:
-        static RendererAPI s_RendererAPI;
+        static void BeginScene();
+        static void EndScene();
+
+        static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
     };
 }

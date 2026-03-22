@@ -9,12 +9,12 @@ namespace Fuze {
     VertexArray* VertexArray::Create() {
 
         switch (Renderer::GetAPI()) {
-        case RendererAPI::none: {
+        case RendererAPI::API::none: {
             FUZE_CORE_ASSERT(false, "Renderer::none not defined!")
             return nullptr;
         }
 
-        case RendererAPI::OpenGL: {
+        case RendererAPI::API::OpenGL: {
             return new OpenGLVertexArray();
         }
         }
