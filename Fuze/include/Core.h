@@ -21,21 +21,21 @@ static_assert("Fuze only works on Linux.");
 
 #ifdef FUZE_ENABLE_ASSERTS
 
-    #define FUZE_ASSERT(x, ...)                                                                                        \
-        {                                                                                                              \
-            if (!(x)) {                                                                                                \
-                FUZE_ERROR("Assertion Failed: {0}", __VA_ARGS__);                                                      \
-                FUZE_CORE_ERROR("File: {0}, Line: {1}", __FILE__, __LINE__);                                           \
-                FUZE_DEBUGBREAK();                                                                                     \
-            }                                                                                                          \
+    #define FUZE_ASSERT(x, ...)                                              \
+        {                                                                    \
+            if (!(x)) {                                                      \
+                FUZE_ERROR("Assertion Failed: {0}", __VA_ARGS__);            \
+                FUZE_CORE_ERROR("File: {0}, Line: {1}", __FILE__, __LINE__); \
+                FUZE_DEBUGBREAK();                                           \
+            }                                                                \
         }
-    #define FUZE_CORE_ASSERT(x, ...)                                                                                   \
-        {                                                                                                              \
-            if (!(x)) {                                                                                                \
-                FUZE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__);                                                 \
-                FUZE_CORE_ERROR("File: {0}, Line: {1}", __FILE__, __LINE__);                                           \
-                FUZE_DEBUGBREAK();                                                                                     \
-            }                                                                                                          \
+    #define FUZE_CORE_ASSERT(x, ...)                                         \
+        {                                                                    \
+            if (!(x)) {                                                      \
+                FUZE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__);       \
+                FUZE_CORE_ERROR("File: {0}, Line: {1}", __FILE__, __LINE__); \
+                FUZE_DEBUGBREAK();                                           \
+            }                                                                \
         }
 
 #else

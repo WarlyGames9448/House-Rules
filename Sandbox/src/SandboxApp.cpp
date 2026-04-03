@@ -7,7 +7,7 @@
 
 class ColorPickerLayer : public Fuze::Layer {
   public:
-    ColorPickerLayer() : Layer("ColorPicker") {}
+    ColorPickerLayer(): Layer("ColorPicker") {}
 
     void OnUpdate() override { glClearColor(m_SquareColor.x, m_SquareColor.y, m_SquareColor.z, 1); }
 

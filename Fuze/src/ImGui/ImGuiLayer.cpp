@@ -12,84 +12,84 @@
 
 namespace Fuze {
 
-    ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
+ImGuiLayer::ImGuiLayer(): Layer("ImGuiLayer") {}
 
-    ImGuiLayer::~ImGuiLayer() {}
+ImGuiLayer::~ImGuiLayer() {}
 
-    void ImGuiLayer::OnAttach() {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        (void)io;
+void ImGuiLayer::OnAttach() {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
 
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        io.ConfigViewportsNoAutoMerge = true;
-        io.ConfigViewportsNoTaskBarIcon = true;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigViewportsNoAutoMerge = true;
+    io.ConfigViewportsNoTaskBarIcon = true;
 
-        ImGui::StyleColorsDark();
+    ImGui::StyleColorsDark();
 
-        ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
-
-        Application& app = Application::Get();
-        GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
-
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 410");
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    void ImGuiLayer::OnDetach() {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+    Application& app = Application::Get();
+    GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 410");
+}
+
+void ImGuiLayer::OnDetach() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void ImGuiLayer::Begin() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
+void ImGuiLayer::End() {
+    ImGuiIO& io = ImGui::GetIO();
+    Application& app = Application::Get();
+    GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+
+    ImGui::Render();
+
+    int display_w, display_h;
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
+}
+
+void ImGuiLayer::OnImGuiRender() {
+    static bool show = true;
+    ImGui::ShowDemoWindow(&show);
+}
+
+void ImGuiLayer::OnEvent(Event& event) {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
+        event.handled = true;
+        return;
     }
 
-    void ImGuiLayer::Begin() {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
+        event.handled = true;
+        return;
     }
-
-    void ImGuiLayer::End() {
-        ImGuiIO& io = ImGui::GetIO();
-        Application& app = Application::Get();
-        GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
-
-        ImGui::Render();
-
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
-        }
-    }
-
-    void ImGuiLayer::OnImGuiRender() {
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
-    }
-
-    void ImGuiLayer::OnEvent(Event& event) {
-        ImGuiIO& io = ImGui::GetIO();
-
-        if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
-            event.handled = true;
-            return;
-        }
-
-        if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
-            event.handled = true;
-            return;
-        }
-    }
+}
 }

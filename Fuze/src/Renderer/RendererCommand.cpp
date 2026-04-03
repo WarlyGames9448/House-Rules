@@ -4,5 +4,5 @@
 #include "Plataform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Fuze {
-    RendererAPI* RendererCommand::s_RendererAPI = new OpenGLRendererAPI;
+RendererAPI* RendererCommand::s_RendererAPI = new OpenGLRendererAPI;
 }

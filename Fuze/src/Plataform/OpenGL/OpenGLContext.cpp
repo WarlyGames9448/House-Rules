@@ -6,16 +6,16 @@
 
 namespace Fuze {
 
-    OpenGLContext::OpenGLContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHandle) {}
+OpenGLContext::OpenGLContext(GLFWwindow* windowHandle): m_WindowHandle(windowHandle) {}
 
-    void OpenGLContext::Init() {
-        glfwMakeContextCurrent(m_WindowHandle);
-        [[maybe_unused]] int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        FUZE_CORE_ASSERT(status, "Failed to initialize GLAD!")
-    }
+void OpenGLContext::Init() {
+    glfwMakeContextCurrent(m_WindowHandle);
+    [[maybe_unused]] int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    FUZE_CORE_ASSERT(status, "Failed to initialize GLAD!")
+}
 
-    void OpenGLContext::SwapBuffers() {
-        glfwSwapBuffers(m_WindowHandle);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+void OpenGLContext::SwapBuffers() {
+    glfwSwapBuffers(m_WindowHandle);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
 }

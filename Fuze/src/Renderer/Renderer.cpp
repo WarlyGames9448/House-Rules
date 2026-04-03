@@ -5,10 +5,8 @@
 
 namespace Fuze {
 
-    void Renderer::BeginScene() {}
-    void Renderer::EndScene() {}
+void Renderer::BeginScene() {}
+void Renderer::EndScene() {}
 
-    void Renderer::Submit(const std::shared_ptr<VertexArray>& vertexArray) {
-        RendererCommand::DrawIndexed(vertexArray);
-    }
+void Renderer::Submit(const std::shared_ptr<VertexArray>& vertexArray) { RendererCommand::DrawIndexed(vertexArray); }
 }

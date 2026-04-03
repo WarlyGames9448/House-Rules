@@ -15,40 +15,36 @@
 
 namespace Fuze {
 
-    class FUZE_API Application {
+class FUZE_API Application {
 
-      public:
-        Application();
-        virtual ~Application();
+  public:
+    Application();
+    virtual ~Application();
 
-        void OnEvent(Event& event);
-        bool OnWindowClose(WindowCloseEvent& event);
+    void OnEvent(Event& event);
+    bool OnWindowClose(WindowCloseEvent& event);
 
-        void PushLayer(Layer* layer);
-        void PushOverlay(Layer* layer);
+    void PushLayer(Layer* layer);
+    void PushOverlay(Layer* layer);
 
-        void Run();
+    void Run();
 
-        inline static Application& Get() {
-            return *s_Instance;
-        }
-        inline Window& GetWindow() {
-            return *m_Window;
-        }
+    inline static Application& Get() { return *s_Instance; }
+    inline Window& GetWindow() { return *m_Window; }
 
-      private:
-        std::unique_ptr<Window> m_Window;
-        ImGuiLayer* m_ImGuiLayer;
-        bool m_Running = true;
-        LayerStack m_LayerStack;
+  private:
+    std::unique_ptr<Window> m_Window;
+    ImGuiLayer* m_ImGuiLayer;
+    bool m_Running = true;
+    LayerStack m_LayerStack;
 
-        std::shared_ptr<Shader> m_Shader;
-        std::shared_ptr<VertexArray> m_VertexArray;
+    std::shared_ptr<Shader> m_Shader;
+    std::shared_ptr<VertexArray> m_VertexArray;
 
-      protected:
-        static Application* s_Instance;
-    };
+  protected:
+    static Application* s_Instance;
+};
 
-    // Defined by client (Sandbox)
-    Application* CreateApplication();
+// Defined by client (Sandbox)
+Application* CreateApplication();
 }

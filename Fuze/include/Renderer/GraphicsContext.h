@@ -2,10 +2,10 @@
 
 namespace Fuze {
 
-    class FUZE_API GraphicsContext {
+class FUZE_API GraphicsContext {
 
-      public:
-        virtual void Init() = 0;
-        virtual void SwapBuffers() = 0;
-    };
+  public:
+    virtual void Init() = 0;
+    virtual void SwapBuffers() = 0;
+};
 }

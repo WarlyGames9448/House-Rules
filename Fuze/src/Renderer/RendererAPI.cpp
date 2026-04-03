@@ -2,6 +2,5 @@
 #include "Renderer/RendererAPI.h"
 
 namespace Fuze {
-
-    RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
+RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 }
