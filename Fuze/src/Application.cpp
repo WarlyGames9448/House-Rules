@@ -1,12 +1,20 @@
 #include "fuzepch.h"
+
 #include "Application.h"
 #include "Window.h"
 
 #include "Input.h"
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererCommand.h"
+
+//#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "KeyCodes.h"
 
 namespace Fuze {
 
@@ -53,12 +61,14 @@ Application::Application() {
     layout (location = 0) in vec3 a_Position;
     layout (location = 1) in vec4 a_Color;
 
+    uniform mat4 projection;
+
     out vec3 v_Position;
     out vec4 v_Color;
     void main() {
         v_Position = a_Position;
         v_Color = a_Color;
-        gl_Position = vec4(a_Position, 1.0);
+        gl_Position = projection * vec4(a_Position, 1.0);
     }
     )";
 
@@ -75,7 +85,10 @@ Application::Application() {
     }
     )";
 
+
+
     m_Shader.reset(new Shader(vertexShaderSource, fragmentShaderSource));
+    m_projectionLoc = glGetUniformLocation(m_Shader->GetRendererID(), "projection");
 }
 
 Application::~Application() {}
@@ -104,15 +117,32 @@ void Application::PushOverlay(Layer* layer) {
 
 void Application::Run() {
     while (m_Running) {
-        RendererCommand::SetClearColor({0.2f, 0.6f, 0.2f, 1});
+        RendererCommand::SetClearColor({0.1f, 0.0f, 0.0f, 1});
         RendererCommand::Clear();
 
         Renderer::BeginScene();
-
         m_Shader->Bind();
         Renderer::Submit(m_VertexArray);
+        // Render Logic --------------------------
+        glm::mat4 m_trans;
+        m_trans = glm::mat4(1.0f);
+        float time = (float)glfwGetTime();
+        m_trans = glm::rotate(m_trans, glm::radians(time * 15), glm::vec3(0.0, 0.0, 1.0));
 
+
+        if(Input::IsMouseButtonPressed(1)){
+            m_ortho->MoveX(0.01f);
+        }
+        if(Input::IsMouseButtonPressed(0)){
+            m_ortho->MoveX(-0.01f);
+        }
+        glm::mat4 projection = m_ortho->GetViewProjection();
+
+        glUniformMatrix4fv(m_projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        // ----------------------------------------
         Renderer::EndScene();
+
         m_Window->OnUpdate();
 
         for (Layer* layer : m_LayerStack) {

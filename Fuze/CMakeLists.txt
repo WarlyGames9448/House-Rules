@@ -15,6 +15,7 @@ add_library(Fuze SHARED
 
 
     src/Renderer/Buffer.cpp
+    src/Renderer/OrthographicCamera.cpp
     src/Renderer/Renderer.cpp
     src/Renderer/RendererAPI.cpp
     src/Renderer/RendererCommand.cpp

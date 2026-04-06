@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer/VertexArray.h"
-#include "glm/glm.hpp"
+//#include "glm/glm.hpp"
 
 namespace Fuze {
 class RendererAPI {

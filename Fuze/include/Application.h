@@ -13,6 +13,9 @@
 #include "Renderer/Buffer.h"
 #include "Renderer/VertexArray.h"
 
+#include "Renderer/OrthographicCamera.h"
+
+
 namespace Fuze {
 
 class FUZE_API Application {
@@ -40,6 +43,9 @@ class FUZE_API Application {
 
     std::shared_ptr<Shader> m_Shader;
     std::shared_ptr<VertexArray> m_VertexArray;
+
+    int m_projectionLoc;
+    OrthographicCamera* m_ortho = new OrthographicCamera();
 
   protected:
     static Application* s_Instance;

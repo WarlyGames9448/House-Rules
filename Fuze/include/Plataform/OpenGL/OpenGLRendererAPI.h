@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Renderer/RendererAPI.h"
-#include "glm/glm.hpp"
 
 namespace Fuze {
 class OpenGLRendererAPI : public RendererAPI {
