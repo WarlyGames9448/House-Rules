@@ -1,3 +1,4 @@
+#include "Renderer/OrthographicCamera.h"
 #include "fuzepch.h"
 
 #include "Application.h"
@@ -10,7 +11,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererCommand.h"
 
-//#include <glm/glm.hpp>
+// #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -22,7 +23,7 @@ namespace Fuze {
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application() {
+Application::Application(): m_ortho(new OrthographicCamera(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f)) {
 
     FUZE_CORE_ASSERT(!s_Instance, "Application Already exists!");
     s_Instance = this;
@@ -61,14 +62,14 @@ Application::Application() {
     layout (location = 0) in vec3 a_Position;
     layout (location = 1) in vec4 a_Color;
 
-    uniform mat4 projection;
+    uniform mat4 u_ViewProjection;
 
     out vec3 v_Position;
     out vec4 v_Color;
     void main() {
         v_Position = a_Position;
         v_Color = a_Color;
-        gl_Position = projection * vec4(a_Position, 1.0);
+        gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
     }
     )";
 
@@ -85,10 +86,7 @@ Application::Application() {
     }
     )";
 
-
-
     m_Shader.reset(new Shader(vertexShaderSource, fragmentShaderSource));
-    m_projectionLoc = glGetUniformLocation(m_Shader->GetRendererID(), "projection");
 }
 
 Application::~Application() {}
@@ -120,26 +118,16 @@ void Application::Run() {
         RendererCommand::SetClearColor({0.1f, 0.0f, 0.0f, 1});
         RendererCommand::Clear();
 
-        Renderer::BeginScene();
-        m_Shader->Bind();
+        Renderer::BeginScene(m_Shader, m_ortho);
         Renderer::Submit(m_VertexArray);
-        // Render Logic --------------------------
-        glm::mat4 m_trans;
-        m_trans = glm::mat4(1.0f);
-        float time = (float)glfwGetTime();
-        m_trans = glm::rotate(m_trans, glm::radians(time * 15), glm::vec3(0.0, 0.0, 1.0));
+        // Input Logic --------------------------
 
-
-        if(Input::IsMouseButtonPressed(1)){
-            m_ortho->MoveX(0.01f);
+        if (Input::IsMouseButtonPressed(1)) {
+            m_ortho->SetPosition(glm::vec3(0.01f, 0.0f, 0.0f));
         }
-        if(Input::IsMouseButtonPressed(0)){
-            m_ortho->MoveX(-0.01f);
+        if (Input::IsMouseButtonPressed(0)) {
+            m_ortho->SetPosition(glm::vec3(-0.01f, 0.0f, 0.0f));
         }
-        glm::mat4 projection = m_ortho->GetViewProjection();
-
-        glUniformMatrix4fv(m_projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
         // ----------------------------------------
         Renderer::EndScene();
 
@@ -154,9 +142,6 @@ void Application::Run() {
             layer->OnImGuiRender();
         }
         m_ImGuiLayer->End();
-
-        /* auto [x,y] = Input::GetMousePosition();
-        FUZE_INFO("{0},{1}", x, y); */
     }
 }
 

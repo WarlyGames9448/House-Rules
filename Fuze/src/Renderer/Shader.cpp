@@ -3,6 +3,8 @@
 
 #include <glad/glad.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Fuze {
 Shader::Shader(const std::string& vertexSrc, const std::string& fragmentSrc) {
     // Create an empty vertex shader handle
@@ -109,4 +111,9 @@ Shader::~Shader() { glDeleteProgram(m_RendererID); }
 void Shader::Bind() { glUseProgram(m_RendererID); }
 
 void Shader::Unbind() { glUseProgram(0); }
+
+void Shader::setUniformMat4(glm::mat4 projection) {
+    int projectionLoc = glGetUniformLocation(m_RendererID, "u_ViewProjection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+}
 }
