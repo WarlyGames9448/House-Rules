@@ -41,4 +41,6 @@ IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t count) {
     FUZE_CORE_ASSERT(false, "RendererAPI not defined!")
     return nullptr;
 }
+
+IndexBuffer::~IndexBuffer() {}
 }

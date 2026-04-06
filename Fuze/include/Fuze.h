@@ -10,5 +10,15 @@
 #include "KeyCodes.h"
 #include "MouseButtonCodes.h"
 
+// Renderer ---------------------------------
+
+#include "Renderer/Renderer.h"
+#include "Renderer/RendererCommand.h"
+#include "Renderer/Buffer.h"
+#include "Renderer/GraphicsContext.h"
+#include "Renderer/OrthographicCamera.h"
+#include "Renderer/Shader.h"
+#include "Renderer/VertexArray.h"
+
 // Entry Point ------------------------------
 #include "EntryPoint.h"

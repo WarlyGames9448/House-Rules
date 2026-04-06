@@ -22,4 +22,6 @@ VertexArray* VertexArray::Create() {
     FUZE_CORE_ASSERT(false, "RendererAPI not defined!")
     return nullptr;
 }
+
+VertexArray::~VertexArray() {}
 }

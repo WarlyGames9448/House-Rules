@@ -9,12 +9,6 @@
 #include "LayerStack.h"
 #include "ImGui/ImGuiLayer.h"
 
-#include "Renderer/Shader.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/VertexArray.h"
-
-#include "Renderer/OrthographicCamera.h"
-
 namespace Fuze {
 
 class FUZE_API Application {
@@ -40,10 +34,7 @@ class FUZE_API Application {
     bool m_Running = true;
     LayerStack m_LayerStack;
 
-    std::shared_ptr<Shader> m_Shader;
-    std::shared_ptr<VertexArray> m_VertexArray;
 
-    OrthographicCamera* m_ortho;
 
   protected:
     static Application* s_Instance;
