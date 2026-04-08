@@ -1,5 +1,6 @@
 #pragma once
 #include "fuzepch.h"
+#include "Core/Timestep.h"
 
 #include "Core.h"
 #include "Events/Event.h"
@@ -33,5 +34,7 @@ class FUZE_API Window {
     virtual void* GetNativeWindow() const = 0;
 
     static Window* Create(const WindowProps& windowProps = WindowProps());
+
+    virtual Timestep GetTime() const = 0;
 };
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Timestep.h"
 #include "Events/Event.h"
 
 namespace Fuze {
@@ -10,7 +11,8 @@ class FUZE_API Layer {
     virtual ~Layer();
     virtual void OnAttach() {}
     virtual void OnDetach() {}
-    virtual void OnUpdate() {}
+    virtual void OnUpdate([[maybe_unused]] Timestep ts) {}
+    virtual void OnFixedUpdate() {} // For logic and physics
     virtual void OnImGuiRender() {}
     virtual void OnEvent(Event& /*event*/) {}
 

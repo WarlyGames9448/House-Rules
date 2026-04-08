@@ -22,6 +22,8 @@ class LinuxWindow : public Window {
 
     virtual void* GetNativeWindow() const override { return m_Window; }
 
+    virtual Timestep GetTime() const override;
+
   private:
     virtual void Init(const WindowProps& windowProps);
     virtual void Shutdown();

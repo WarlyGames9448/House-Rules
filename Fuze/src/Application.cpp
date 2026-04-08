@@ -9,7 +9,7 @@ namespace Fuze {
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application(){
+Application::Application() {
 
     FUZE_CORE_ASSERT(!s_Instance, "Application Already exists!");
     s_Instance = this;
@@ -49,8 +49,12 @@ void Application::Run() {
     while (m_Running) {
         m_Window->OnUpdate();
 
+        m_DeltaTime = m_Window->GetTime() - m_LastFrameTime;
+        if (m_DeltaTime > 0.25) m_DeltaTime = 0.25; // Clipping
+        m_LastFrameTime = m_Window->GetTime();
+
         for (Layer* layer : m_LayerStack) {
-            layer->OnUpdate();
+            layer->OnUpdate(m_DeltaTime);
         }
 
         m_ImGuiLayer->Begin();

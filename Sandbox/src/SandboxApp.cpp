@@ -1,5 +1,6 @@
 #include "Fuze.h"
 
+#include "Log.h"
 #include "imgui.h"
 #include <glm/glm.hpp>
 
@@ -7,7 +8,7 @@ class ColorPickerLayer : public Fuze::Layer {
   public:
     ColorPickerLayer(): Layer("ColorPicker") {}
 
-    void OnUpdate() override {
+    void OnUpdate(Fuze::Timestep ts) override {
         Fuze::RendererCommand::SetClearColor(m_SquareColor);
         Fuze::RendererCommand::Clear();
     }
@@ -83,28 +84,30 @@ class TestLayer : public Fuze::Layer {
         m_Shader.reset(new Fuze::Shader(vertexShaderSource, fragmentShaderSource));
     }
 
-    void OnUpdate() override {
+    void OnUpdate(Fuze::Timestep ts) override {
         /* Fuze::RendererCommand::SetClearColor({0.1f, 0.0f, 0.0f, 1});
         Fuze::RendererCommand::Clear(); */
+
+        // FUZE_TRACE("Seconds: {0}, Miliseconds: {1}", ts.GetSeconds(), ts.GetMiliseconds());
 
         Fuze::Renderer::BeginScene(m_Shader, m_ortho);
         Fuze::Renderer::Submit(m_VertexArray);
         // Input Logic --------------------------
         if (Fuze::Input::IsKeyPressed(FUZE_KEY_A)) {
-            m_ortho->SetPosition(glm::vec3(0.01f, 0.0f, 0.0f));
+            m_ortho->SetPosition(glm::vec3(1.0f * ts, 0.0f, 0.0f));
         } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_D)) {
-            m_ortho->SetPosition(glm::vec3(-0.01f, 0.0f, 0.0f));
+            m_ortho->SetPosition(glm::vec3(-1.0f * ts, 0.0f, 0.0f));
         }
         if (Fuze::Input::IsKeyPressed(FUZE_KEY_W)) {
-            m_ortho->SetPosition(glm::vec3(0.0f, -0.01f, 0.0f));
+            m_ortho->SetPosition(glm::vec3(0.0f, -1.0f * ts, 0.0f));
         } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_S)) {
-            m_ortho->SetPosition(glm::vec3(0.0f, 0.01f, 0.0f));
+            m_ortho->SetPosition(glm::vec3(0.0f, 1.0f * ts, 0.0f));
         }
 
         if (Fuze::Input::IsKeyPressed(FUZE_KEY_LEFT)) {
-            m_ortho->SetRotation(2.0f);
+            m_ortho->SetRotation(180.0f * ts);
         } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_RIGHT)) {
-            m_ortho->SetRotation(-2.0f);
+            m_ortho->SetRotation(-180.0f * ts);
         }
 
         // ----------------------------------------

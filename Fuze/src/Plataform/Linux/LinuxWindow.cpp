@@ -180,4 +180,8 @@ void LinuxWindow::SetVSync(bool enabled) {
 
     m_Data.VSync = enabled;
 }
+
+Timestep LinuxWindow::GetTime() const {
+    return glfwGetTime();
+}
 }
