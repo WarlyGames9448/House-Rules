@@ -11,7 +11,7 @@ class OrthographicCamera {
     void SetPosition(glm::vec3 position);
     void SetRotation(float rotation);
 
-    inline const glm::mat4 GetViewProjection() { return m_ViewProjection; }
+    inline const glm::mat4 GetViewProjection() const { return m_ViewProjection; }
 
   private:
     void RecalculateViewProjection();

@@ -1,6 +1,5 @@
 #include "Fuze.h"
 
-#include "Log.h"
 #include "imgui.h"
 #include <glm/glm.hpp>
 

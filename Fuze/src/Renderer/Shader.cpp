@@ -112,8 +112,8 @@ void Shader::Bind() { glUseProgram(m_RendererID); }
 
 void Shader::Unbind() { glUseProgram(0); }
 
-void Shader::setUniformMat4(glm::mat4 projection) {
-    int projectionLoc = glGetUniformLocation(m_RendererID, "u_ViewProjection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+void Shader::setUniformMat4(const std::string& name, glm::mat4 value) {
+    int location = glGetUniformLocation(m_RendererID, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 }

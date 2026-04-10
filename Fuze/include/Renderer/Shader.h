@@ -12,7 +12,7 @@ class FUZE_API Shader {
 
     inline uint32_t GetRendererID() { return m_RendererID; }
 
-    void setUniformMat4(glm::mat4 projection);
+    void setUniformMat4(const std::string& name, glm::mat4 value);
 
   private:
     uint32_t m_RendererID;

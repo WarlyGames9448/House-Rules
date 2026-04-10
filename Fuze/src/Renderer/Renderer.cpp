@@ -7,7 +7,7 @@ namespace Fuze {
 
 void Renderer::BeginScene(std::shared_ptr<Shader>& shader, OrthographicCamera* camera) {
     shader->Bind();
-    shader->setUniformMat4(camera->GetViewProjection());
+    shader->setUniformMat4("u_ViewProjection", camera->GetViewProjection());
 }
 void Renderer::EndScene() {}
 
