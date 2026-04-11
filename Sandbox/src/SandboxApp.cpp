@@ -25,13 +25,14 @@ class ColorPickerLayer : public Fuze::Layer {
 
 class TestLayer : public Fuze::Layer {
   public:
-    TestLayer(): Layer("Testing"), m_ortho(new Fuze::OrthographicCamera(-1.6f, 1.6f, -1.2f, 1.2f, -1.0f, 1.0f)) {}
+    TestLayer(): Layer("Testing"), m_ortho(new Fuze::OrthographicCamera(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f)) {}
 
     void OnAttach() override {
-        float vertices[3 * 7] = {
-            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-            0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, //
-            0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
+        float vertices[4 * 7] = {
+            0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, //
+            0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
+            -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
+            -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, //
         };
 
         std::shared_ptr<Fuze::VertexBuffer> vertexBuffer;
@@ -46,9 +47,12 @@ class TestLayer : public Fuze::Layer {
         vertexBuffer->SetLayout(layout);
         m_VertexArray->AddVertexBuffer(vertexBuffer);
 
-        uint32_t indices[3] = {0, 1, 2};
+        uint32_t indices[6] = {
+            0, 1, 2,
+            2, 3, 0,
+        };
         std::shared_ptr<Fuze::IndexBuffer> indexBuffer;
-        indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices)));
+        indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint32_t)));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
         const char* vertexShaderSource = R"(
