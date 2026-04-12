@@ -15,6 +15,6 @@ class FUZE_API Renderer {
     static void BeginScene(std::shared_ptr<Shader>& shader, OrthographicCamera* camera);
     static void EndScene();
 
-    static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+    static void Submit(std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& modelMatrix = 1.0f);
 };
 }

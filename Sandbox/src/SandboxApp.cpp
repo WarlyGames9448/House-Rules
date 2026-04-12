@@ -1,11 +1,13 @@
 #include "Fuze.h"
 
 #include "imgui.h"
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
 class ColorPickerLayer : public Fuze::Layer {
   public:
-    ColorPickerLayer(): Layer("ColorPicker") {}
+    ColorPickerLayer(): Layer("ColorPicker") {
+    }
 
     void OnUpdate(Fuze::Timestep ts) override {
         Fuze::RendererCommand::SetClearColor(m_SquareColor);
@@ -17,7 +19,8 @@ class ColorPickerLayer : public Fuze::Layer {
         ImGui::ColorEdit4("Background", &m_SquareColor.x);
         ImGui::End();
     }
-    void OnEvent(Fuze::Event& event) override {}
+    void OnEvent(Fuze::Event& event) override {
+    }
 
   private:
     glm::vec4 m_SquareColor = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -25,13 +28,14 @@ class ColorPickerLayer : public Fuze::Layer {
 
 class TestLayer : public Fuze::Layer {
   public:
-    TestLayer(): Layer("Testing"), m_ortho(new Fuze::OrthographicCamera(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f)) {}
+    TestLayer(): Layer("Testing"), m_ortho(new Fuze::OrthographicCamera(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f)) {
+    }
 
     void OnAttach() override {
         float vertices[4 * 7] = {
             0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, //
             0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-            -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
             -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, //
         };
 
@@ -48,11 +52,15 @@ class TestLayer : public Fuze::Layer {
         m_VertexArray->AddVertexBuffer(vertexBuffer);
 
         uint32_t indices[6] = {
-            0, 1, 2,
-            2, 3, 0,
+            0,
+            1,
+            2,
+            2,
+            3,
+            0,
         };
         std::shared_ptr<Fuze::IndexBuffer> indexBuffer;
-        indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint32_t)));
+        indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
         const char* vertexShaderSource = R"(
@@ -61,13 +69,14 @@ class TestLayer : public Fuze::Layer {
     layout (location = 1) in vec4 a_Color;
 
     uniform mat4 u_ViewProjection;
+    uniform mat4 u_ModelMatrix;
 
     out vec3 v_Position;
     out vec4 v_Color;
     void main() {
         v_Position = a_Position;
         v_Color = a_Color;
-        gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+        gl_Position = u_ViewProjection * u_ModelMatrix * vec4(a_Position, 1.0);
     }
     )";
 
@@ -93,8 +102,6 @@ class TestLayer : public Fuze::Layer {
 
         // FUZE_TRACE("Seconds: {0}, Miliseconds: {1}", ts.GetSeconds(), ts.GetMiliseconds());
 
-        Fuze::Renderer::BeginScene(m_Shader, m_ortho);
-        Fuze::Renderer::Submit(m_VertexArray);
         // Input Logic --------------------------
         if (Fuze::Input::IsKeyPressed(FUZE_KEY_A)) {
             m_ortho->SetPosition(glm::vec3(1.0f * ts, 0.0f, 0.0f));
@@ -114,10 +121,23 @@ class TestLayer : public Fuze::Layer {
         }
 
         // ----------------------------------------
+
+        // Submits --------------------------------
+        Fuze::Renderer::BeginScene(m_Shader, m_ortho);
+
+        for (int i = 0; i < 20; i++) {
+            glm::mat4 transform = 1.0f;
+            transform = glm::translate(transform, glm::vec3(0.3f * i, 0.2f * i, 0.0f));
+            transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f * i));
+            transform = glm::rotate(transform, glm::radians(30.0f), glm::vec3(0, 0, 1));
+            Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
+        }
+
         Fuze::Renderer::EndScene();
     }
 
-    void OnEvent(Fuze::Event& event) override {}
+    void OnEvent(Fuze::Event& event) override {
+    }
 
   private:
     std::shared_ptr<Fuze::Shader> m_Shader;
@@ -133,7 +153,10 @@ class Sandbox : public Fuze::Application {
         PushLayer(new TestLayer());
     }
 
-    ~Sandbox() {}
+    ~Sandbox() {
+    }
 };
 
-Fuze::Application* Fuze::CreateApplication() { return new Sandbox(); }
+Fuze::Application* Fuze::CreateApplication() {
+    return new Sandbox();
+}

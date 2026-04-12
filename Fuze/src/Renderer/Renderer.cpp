@@ -11,5 +11,10 @@ void Renderer::BeginScene(std::shared_ptr<Shader>& shader, OrthographicCamera* c
 }
 void Renderer::EndScene() {}
 
-void Renderer::Submit(const std::shared_ptr<VertexArray>& vertexArray) { RendererCommand::DrawIndexed(vertexArray); }
+void Renderer::Submit(std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray,
+                      const glm::mat4& modelMatrix) {
+    shader->Bind();
+    shader->setUniformMat4("u_ModelMatrix", modelMatrix);
+    RendererCommand::DrawIndexed(vertexArray);
+}
 }
