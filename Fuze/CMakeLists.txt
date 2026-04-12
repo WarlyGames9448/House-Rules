@@ -11,6 +11,7 @@ add_library(Fuze SHARED
     src/Plataform/OpenGL/OpenGLBuffer.cpp
     src/Plataform/OpenGL/OpenGLContext.cpp
     src/Plataform/OpenGL/OpenGLRendererAPI.cpp
+    src/Plataform/OpenGL/OpenGLShader.cpp
     src/Plataform/OpenGL/OpenGLVertexArray.cpp
 
 

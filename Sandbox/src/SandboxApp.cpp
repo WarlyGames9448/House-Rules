@@ -93,7 +93,7 @@ class TestLayer : public Fuze::Layer {
     }
     )";
 
-        m_Shader.reset(new Fuze::Shader(vertexShaderSource, fragmentShaderSource));
+        m_Shader.reset(Fuze::Shader::Create(vertexShaderSource, fragmentShaderSource));
     }
 
     void OnUpdate(Fuze::Timestep ts) override {

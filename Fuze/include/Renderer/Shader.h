@@ -4,15 +4,15 @@ namespace Fuze {
 
 class FUZE_API Shader {
   public:
-    Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
-    ~Shader();
+    static Shader* Create(const std::string& vertexSrc, const std::string& fragmentSrc);
+    virtual ~Shader() = default;
 
-    void Bind();
-    void Unbind();
+    virtual void Bind() const = 0;
+    virtual void Unbind() const = 0;
 
-    inline uint32_t GetRendererID() { return m_RendererID; }
-
-    void setUniformMat4(const std::string& name, glm::mat4 value);
+    inline uint32_t GetRendererID() {
+        return m_RendererID;
+    }
 
   private:
     uint32_t m_RendererID;
