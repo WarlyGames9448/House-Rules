@@ -32,11 +32,11 @@ class TestLayer : public Fuze::Layer {
     }
 
     void OnAttach() override {
-        float vertices[4 * 7] = {
-            0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, //
-            0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, //
-            -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, //
+        float vertices[4 * 9] = {
+            0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, //
+            0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, //
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+            -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
         };
 
         Ref<Fuze::VertexBuffer> vertexBuffer;
@@ -45,7 +45,8 @@ class TestLayer : public Fuze::Layer {
 
         Fuze::BufferLayout layout = {
             {Fuze::ShaderDataType::Float3, "a_Position"},
-            {Fuze::ShaderDataType::Float4,    "a_Color"}
+            {Fuze::ShaderDataType::Float4,    "a_Color"},
+            {Fuze::ShaderDataType::Float2, "a_TexCoord"},
         };
 
         vertexBuffer->SetLayout(layout);
@@ -64,34 +65,40 @@ class TestLayer : public Fuze::Layer {
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
         const char* vertexShaderSource = R"(
-    #version 330 core
-    layout (location = 0) in vec3 a_Position;
-    layout (location = 1) in vec4 a_Color;
+        #version 330 core
+        layout (location = 0) in vec3 a_Position;
+        layout (location = 1) in vec4 a_Color;
+        layout (location = 2) in vec2 a_TexCoord; // Fixed: vex2 -> vec2
 
-    uniform mat4 u_ViewProjection;
-    uniform mat4 u_ModelMatrix;
+        uniform mat4 u_ViewProjection;
+        uniform mat4 u_ModelMatrix;
 
-    out vec3 v_Position;
-    out vec4 v_Color;
-    void main() {
-        v_Position = a_Position;
-        v_Color = a_Color;
-        gl_Position = u_ViewProjection * u_ModelMatrix * vec4(a_Position, 1.0);
-    }
-    )";
+        out vec3 v_Position;
+        out vec4 v_Color;
+        out vec2 v_TexCoord;
+
+        void main() {
+            v_Position = a_Position;
+            v_Color = a_Color;
+            v_TexCoord = a_TexCoord;
+            gl_Position = u_ViewProjection * u_ModelMatrix * vec4(a_Position, 1.0);
+        }
+        )";
 
         const char* fragmentShaderSource = R"(
-    #version 330 core
-    layout (location = 0) out vec4 color;
+        #version 330 core
+        layout (location = 0) out vec4 color;
 
-    in vec3 v_Position;
-    in vec4 v_Color;
+        in vec3 v_Position;
+        in vec4 v_Color;
+        in vec2 v_TexCoord;
 
-    void main() {
-        color = vec4(v_Position * 0.5 + 0.5, 1.0f);
-        color = v_Color;
-    }
-    )";
+        uniform sampler2D u_Texture;
+
+        void main() {
+            color = texture(u_Texture, v_TexCoord);
+        }
+)";
 
         m_Shader.reset(Fuze::Shader::Create(vertexShaderSource, fragmentShaderSource));
     }
