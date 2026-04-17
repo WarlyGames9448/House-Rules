@@ -4,6 +4,8 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
+#include <filesystem>
+
 class ColorPickerLayer : public Fuze::Layer {
   public:
     ColorPickerLayer(): Layer("ColorPicker") {
@@ -98,9 +100,12 @@ class TestLayer : public Fuze::Layer {
         void main() {
             color = texture(u_Texture, v_TexCoord);
         }
-)";
+        )";
 
         m_Shader.reset(Fuze::Shader::Create(vertexShaderSource, fragmentShaderSource));
+
+        m_Texture.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
+                                                "/Sandbox/assets/textures/madruga.jpeg"));
     }
 
     void OnUpdate(Fuze::Timestep ts) override {
@@ -129,14 +134,13 @@ class TestLayer : public Fuze::Layer {
 
         // ----------------------------------------
 
+        m_Texture->Bind(0);
         // Submits --------------------------------
         Fuze::Renderer::BeginScene(m_Shader, m_ortho);
 
         for (int i = 0; i < 20; i++) {
             glm::mat4 transform = 1.0f;
-            transform = glm::translate(transform, glm::vec3(0.3f * i, 0.2f * i, 0.0f));
-            transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f * i));
-            transform = glm::rotate(transform, glm::radians(30.0f), glm::vec3(0, 0, 1));
+            transform = glm::translate(transform, glm::vec3(0.3f + i, 0.0f, 0.0f));
             Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
         }
 
@@ -149,6 +153,8 @@ class TestLayer : public Fuze::Layer {
   private:
     Ref<Fuze::Shader> m_Shader;
     Ref<Fuze::VertexArray> m_VertexArray;
+
+    Ref<Fuze::Texture2D> m_Texture;
 
     Fuze::OrthographicCamera* m_ortho;
 };

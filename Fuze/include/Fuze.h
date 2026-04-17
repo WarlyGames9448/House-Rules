@@ -19,6 +19,7 @@
 #include "Renderer/OrthographicCamera.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
+#include "Renderer/Texture.h"
 
 // Entry Point ------------------------------
 #include "EntryPoint.h"

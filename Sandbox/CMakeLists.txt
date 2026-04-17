@@ -12,3 +12,5 @@ set_target_properties(Sandbox PROPERTIES
     BUILD_RPATH "\$ORIGIN"
     INSTALL_RPATH "\$ORIGIN"
 )
+
+add_definitions(-DRESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")

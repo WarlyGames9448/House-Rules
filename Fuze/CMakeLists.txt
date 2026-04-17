@@ -12,6 +12,7 @@ add_library(Fuze SHARED
     src/Plataform/OpenGL/OpenGLContext.cpp
     src/Plataform/OpenGL/OpenGLRendererAPI.cpp
     src/Plataform/OpenGL/OpenGLShader.cpp
+    src/Plataform/OpenGL/OpenGLTexture.cpp
     src/Plataform/OpenGL/OpenGLVertexArray.cpp
 
 
@@ -21,6 +22,7 @@ add_library(Fuze SHARED
     src/Renderer/RendererAPI.cpp
     src/Renderer/RendererCommand.cpp
     src/Renderer/Shader.cpp
+    src/Renderer/Texture.cpp
     src/Renderer/VertexArray.cpp
 )
 
@@ -30,6 +32,19 @@ target_include_directories(Fuze
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
+)
+
+# ═══════════════════════════════════════════════════════════
+# STB
+# ═══════════════════════════════════════════════════════════
+
+add_library(stb STATIC
+    vendor/stb/stb_image.cpp
+)
+
+target_include_directories(stb
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
 )
 
 # ═══════════════════════════════════════════════════════════
@@ -58,6 +73,7 @@ add_library(imgui STATIC
     vendor/imgui/backends/imgui_impl_opengl3.cpp
     vendor/imgui/imgui_demo.cpp
 )
+
 target_include_directories(imgui PUBLIC
     vendor/imgui
     vendor/imgui/backends
@@ -95,6 +111,7 @@ target_link_libraries(Fuze
         glfw
         imgui
         OpenGL::GL
+        stb
         Threads::Threads
         ${CMAKE_DL_LIBS}
 )

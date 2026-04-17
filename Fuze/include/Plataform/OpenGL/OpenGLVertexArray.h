@@ -4,7 +4,7 @@
 
 namespace Fuze {
 
-class FUZE_API OpenGLVertexArray : public VertexArray {
+class OpenGLVertexArray : public VertexArray {
   public:
     OpenGLVertexArray();
     virtual ~OpenGLVertexArray();
