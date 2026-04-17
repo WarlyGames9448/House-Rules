@@ -25,16 +25,22 @@ class FUZE_API Application {
 
     void Run();
 
-    inline static Application& Get() { return *s_Instance; }
-    inline Window& GetWindow() { return *m_Window; }
+    inline static Application& Get() {
+        return *s_Instance;
+    }
+    inline Window& GetWindow() {
+        return *m_Window;
+    }
 
-    Timestep GetDeltaTime() const {return m_DeltaTime;}
+    Timestep GetDeltaTime() const {
+        return m_DeltaTime;
+    }
 
   private:
     bool OnWindowClose(WindowCloseEvent& event);
 
   private:
-    std::unique_ptr<Window> m_Window;
+    Scope<Window> m_Window;
     ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
     LayerStack m_LayerStack;

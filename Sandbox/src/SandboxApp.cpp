@@ -39,7 +39,7 @@ class TestLayer : public Fuze::Layer {
             -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, //
         };
 
-        std::shared_ptr<Fuze::VertexBuffer> vertexBuffer;
+        Ref<Fuze::VertexBuffer> vertexBuffer;
         vertexBuffer.reset(Fuze::VertexBuffer::Create(vertices, sizeof(vertices)));
         m_VertexArray.reset(Fuze::VertexArray::Create());
 
@@ -59,7 +59,7 @@ class TestLayer : public Fuze::Layer {
             3,
             0,
         };
-        std::shared_ptr<Fuze::IndexBuffer> indexBuffer;
+        Ref<Fuze::IndexBuffer> indexBuffer;
         indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
@@ -140,8 +140,8 @@ class TestLayer : public Fuze::Layer {
     }
 
   private:
-    std::shared_ptr<Fuze::Shader> m_Shader;
-    std::shared_ptr<Fuze::VertexArray> m_VertexArray;
+    Ref<Fuze::Shader> m_Shader;
+    Ref<Fuze::VertexArray> m_VertexArray;
 
     Fuze::OrthographicCamera* m_ortho;
 };

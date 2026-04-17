@@ -48,3 +48,11 @@ static_assert("Fuze only works on Linux.");
 #define BIT(X) (1 << X)
 
 #define FUZE_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+#include <memory>
+
+template<typename T>
+using Ref = std::shared_ptr<T>;
+
+template<typename T>
+using Scope = std::unique_ptr<T>;

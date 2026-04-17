@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core.h"
+
 namespace Fuze {
 
 class FUZE_API Shader {

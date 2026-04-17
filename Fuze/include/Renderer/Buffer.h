@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core.h"
+
 namespace Fuze {
 
 enum class ShaderDataType { None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool };
@@ -38,10 +40,12 @@ static uint32_t ShaderDataTypeToSizeType(ShaderDataType type) {
 
 struct BufferElement {
   public:
-    BufferElement() {}
+    BufferElement() {
+    }
 
     BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-        : Type(type), Name(name), Size(ShaderDataTypeToSizeType(type)), Offset(0), Normalized(normalized) {}
+        : Type(type), Name(name), Size(ShaderDataTypeToSizeType(type)), Offset(0), Normalized(normalized) {
+    }
 
     uint32_t GetComponentCount() const {
         switch (Type) {
@@ -84,16 +88,31 @@ struct BufferElement {
 
 class FUZE_API BufferLayout {
   public:
-    BufferLayout() {}
-    BufferLayout(const std::initializer_list<BufferElement>& elements): m_Elements(elements) { SetOffesetAndStride(); }
+    BufferLayout() {
+    }
+    BufferLayout(const std::initializer_list<BufferElement>& elements): m_Elements(elements) {
+        SetOffesetAndStride();
+    }
 
-    inline uint32_t GetStride() const { return m_Stride; }
-    inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+    inline uint32_t GetStride() const {
+        return m_Stride;
+    }
+    inline const std::vector<BufferElement>& GetElements() const {
+        return m_Elements;
+    }
 
-    std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-    std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-    std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-    std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+    std::vector<BufferElement>::iterator begin() {
+        return m_Elements.begin();
+    }
+    std::vector<BufferElement>::iterator end() {
+        return m_Elements.end();
+    }
+    std::vector<BufferElement>::const_iterator begin() const {
+        return m_Elements.begin();
+    }
+    std::vector<BufferElement>::const_iterator end() const {
+        return m_Elements.end();
+    }
 
   private:
     std::vector<BufferElement> m_Elements;

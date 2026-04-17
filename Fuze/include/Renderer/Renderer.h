@@ -10,11 +10,13 @@ namespace Fuze {
 
 class FUZE_API Renderer {
   public:
-    inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+    inline static RendererAPI::API GetAPI() {
+        return RendererAPI::GetAPI();
+    }
 
-    static void BeginScene(std::shared_ptr<Shader>& shader, OrthographicCamera* camera);
+    static void BeginScene(Ref<Shader>& shader, OrthographicCamera* camera);
     static void EndScene();
 
-    static void Submit(std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& modelMatrix = 1.0f);
+    static void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix = 1.0f);
 };
 }
