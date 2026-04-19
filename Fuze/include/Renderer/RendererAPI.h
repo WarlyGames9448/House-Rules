@@ -3,6 +3,12 @@
 #include "Renderer/VertexArray.h"
 
 namespace Fuze {
+
+enum BlendMode {
+    FUZE_BLEND_DEFAULT = 0,
+    FUZE_BLEND_ALPHA,
+};
+
 class RendererAPI {
   public:
     enum class API {
@@ -14,6 +20,8 @@ class RendererAPI {
     inline static API GetAPI() {
         return s_API;
     }
+
+    virtual void SetBlendMode(BlendMode mode) = 0;
 
     virtual void SetClearColor(const glm::vec4& color) = 0;
     virtual void Clear() = 0;

@@ -1,5 +1,7 @@
 #include "Fuze.h"
 
+#include "Renderer/RendererAPI.h"
+#include "Renderer/RendererCommand.h"
 #include "imgui.h"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -34,6 +36,8 @@ class TestLayer : public Fuze::Layer {
     }
 
     void OnAttach() override {
+        Fuze::RendererCommand::SetBlendMode(Fuze::FUZE_BLEND_ALPHA);
+
         float vertices[4 * 9] = {
             0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, //
             0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, //
@@ -95,17 +99,19 @@ class TestLayer : public Fuze::Layer {
         in vec4 v_Color;
         in vec2 v_TexCoord;
 
-        uniform sampler2D u_Texture;
+        uniform sampler2D u_Texture1;
 
         void main() {
-            color = texture(u_Texture, v_TexCoord);
+            color = texture(u_Texture1, v_TexCoord);
         }
         )";
 
         m_Shader.reset(Fuze::Shader::Create(vertexShaderSource, fragmentShaderSource));
 
-        m_Texture.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
-                                                "/Sandbox/assets/textures/madruga.jpeg"));
+        m_Texture1.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
+                                                 "/Sandbox/assets/textures/madruga.jpeg"));
+        m_Texture2.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
+                                                 "/Sandbox/assets/textures/line.png"));
     }
 
     void OnUpdate(Fuze::Timestep ts) override {
@@ -134,15 +140,17 @@ class TestLayer : public Fuze::Layer {
 
         // ----------------------------------------
 
-        m_Texture->Bind(0);
         // Submits --------------------------------
         Fuze::Renderer::BeginScene(m_Shader, m_ortho);
 
-        for (int i = 0; i < 20; i++) {
-            glm::mat4 transform = 1.0f;
-            transform = glm::translate(transform, glm::vec3(0.3f + i, 0.0f, 0.0f));
-            Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
-        }
+        glm::mat4 transform = 1.0f;
+        transform = glm::translate(transform, glm::vec3(0.3f , 0.0f, 0.0f));
+
+        m_Texture1->Bind();
+        Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
+
+        m_Texture2->Bind();
+        Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
 
         Fuze::Renderer::EndScene();
     }
@@ -154,7 +162,8 @@ class TestLayer : public Fuze::Layer {
     Ref<Fuze::Shader> m_Shader;
     Ref<Fuze::VertexArray> m_VertexArray;
 
-    Ref<Fuze::Texture2D> m_Texture;
+    Ref<Fuze::Texture2D> m_Texture1;
+    Ref<Fuze::Texture2D> m_Texture2;
 
     Fuze::OrthographicCamera* m_ortho;
 };

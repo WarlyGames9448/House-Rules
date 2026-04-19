@@ -8,8 +8,8 @@ class OpenGLTexture2D : public Texture2D {
     OpenGLTexture2D(const std::string& path);
     ~OpenGLTexture2D();
 
-    virtual void Bind(uint32_t slot) const override;
-    virtual void Unbind() const override;
+    virtual void Bind(uint32_t slot = 0) const override;
+    virtual void Unbind(uint32_t slot = 0) const override;
 
     virtual int GetHight() const override {
         return m_Height;

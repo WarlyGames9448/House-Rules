@@ -4,6 +4,17 @@
 #include <glad/glad.h>
 
 namespace Fuze {
+
+void OpenGLRendererAPI::SetBlendMode(BlendMode mode) {
+    if(mode == FUZE_BLEND_DEFAULT){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ZERO);
+    } else if(mode == FUZE_BLEND_ALPHA){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+}
+
 void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
     glClearColor(color.r, color.g, color.b, color.a);
 }

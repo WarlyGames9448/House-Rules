@@ -1,3 +1,4 @@
+#include "Core.h"
 #include "fuzepch.h"
 
 #include "Plataform/OpenGL/OpenGLTexture.h"
@@ -20,6 +21,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
         internalFormat = GL_RGB8;
         dataFormat = GL_RGB;
     }
+    FUZE_CORE_ASSERT(internalFormat | dataFormat, "Format not suported!")
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 
@@ -45,9 +47,11 @@ OpenGLTexture2D::~OpenGLTexture2D() {
 
 void OpenGLTexture2D::Bind(uint32_t slot) const {
     glBindTextureUnit(slot, m_RendererID);
+/*     glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, m_RendererID); */
 }
 
-void OpenGLTexture2D::Unbind() const {
-    glBindTextureUnit(1, 0);
+void OpenGLTexture2D::Unbind(uint32_t slot) const {
+    glBindTextureUnit(slot, 0);
 }
 }
