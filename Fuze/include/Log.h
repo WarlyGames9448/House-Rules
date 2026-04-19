@@ -8,8 +8,12 @@ namespace Fuze {
 class FUZE_API Log {
   public:
     static void init();
-    inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_Core_Logger; }
-    inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_Client_Logger; }
+    inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() {
+        return s_Core_Logger;
+    }
+    inline static std::shared_ptr<spdlog::logger>& GetClientLogger() {
+        return s_Client_Logger;
+    }
 
   private:
     static std::shared_ptr<spdlog::logger> s_Core_Logger;
@@ -19,12 +23,15 @@ class FUZE_API Log {
 
 // Core Logger
 #define FUZE_CORE_TRACE(...) ::Fuze::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define FUZE_CORE_DEBUG(...) ::Fuze::Log::GetCoreLogger()->debug(__VA_ARGS__)
 #define FUZE_CORE_INFO(...) ::Fuze::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define FUZE_CORE_WARN(...) ::Fuze::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define FUZE_CORE_ERROR(...) ::Fuze::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define FUZE_CORE_CRITICAL(...) ::Fuze::Log::GetCoreLogger()->critical(__VA_ARGS__) F
+#define FUZE_CORE_CRITICAL(...) ::Fuze::Log::GetCoreLogger()->critical(__VA_ARGS__)
+
 // App Logger
 #define FUZE_TRACE(...) ::Fuze::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define FUZE_DEBUG(...) ::Fuze::Log::GetClientLogger()->debug(__VA_ARGS__)
 #define FUZE_INFO(...) ::Fuze::Log::GetClientLogger()->info(__VA_ARGS__)
 #define FUZE_WARN(...) ::Fuze::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define FUZE_ERROR(...) ::Fuze::Log::GetClientLogger()->error(__VA_ARGS__)
