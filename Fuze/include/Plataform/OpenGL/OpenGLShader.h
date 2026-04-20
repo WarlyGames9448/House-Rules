@@ -4,10 +4,13 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
 
+#include <glad/glad.h>
+
 namespace Fuze {
 
 class FUZE_API OpenGLShader : public Shader {
   public:
+    OpenGLShader(const std::string& filepath);
     OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
     virtual ~OpenGLShader();
 
@@ -27,6 +30,12 @@ class FUZE_API OpenGLShader : public Shader {
 
     void UploadUniformMat3(const std::string& name, const glm::mat3& value);
     void UploadUniformMat4(const std::string& name, const glm::mat4& value);
+
+  private:
+    const std::unordered_map<GLenum, std::string> ParseShader(const std::string& source);
+    const std::string ReadFile(const std::string& filepath);
+
+    void Compile(const std::string& vertexSrc, const std::string& fragmentSrc);
 
   private:
     uint32_t m_RendererID;

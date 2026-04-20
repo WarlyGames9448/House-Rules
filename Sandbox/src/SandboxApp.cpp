@@ -70,48 +70,12 @@ class TestLayer : public Fuze::Layer {
         indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
-        const char* vertexShaderSource = R"(
-        #version 330 core
-        layout (location = 0) in vec3 a_Position;
-        layout (location = 1) in vec4 a_Color;
-        layout (location = 2) in vec2 a_TexCoord; // Fixed: vex2 -> vec2
+        std::string current_path = std::string(std::filesystem::current_path());
 
-        uniform mat4 u_ViewProjection;
-        uniform mat4 u_ModelMatrix;
+        m_Shader.reset(Fuze::Shader::Create(current_path+ "/Sandbox/assets/shaders/basic.glsl"));
 
-        out vec3 v_Position;
-        out vec4 v_Color;
-        out vec2 v_TexCoord;
-
-        void main() {
-            v_Position = a_Position;
-            v_Color = a_Color;
-            v_TexCoord = a_TexCoord;
-            gl_Position = u_ViewProjection * u_ModelMatrix * vec4(a_Position, 1.0);
-        }
-        )";
-
-        const char* fragmentShaderSource = R"(
-        #version 330 core
-        layout (location = 0) out vec4 color;
-
-        in vec3 v_Position;
-        in vec4 v_Color;
-        in vec2 v_TexCoord;
-
-        uniform sampler2D u_Texture1;
-
-        void main() {
-            color = texture(u_Texture1, v_TexCoord);
-        }
-        )";
-
-        m_Shader.reset(Fuze::Shader::Create(vertexShaderSource, fragmentShaderSource));
-
-        m_Texture1.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
-                                                 "/Sandbox/assets/textures/madruga.jpeg"));
-        m_Texture2.reset(Fuze::Texture2D::Create(std::string(std::filesystem::current_path()) +
-                                                 "/Sandbox/assets/textures/line.png"));
+        m_Texture1.reset(Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/madruga.jpeg"));
+        m_Texture2.reset(Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/line.png"));
     }
 
     void OnUpdate(Fuze::Timestep ts) override {
@@ -144,7 +108,7 @@ class TestLayer : public Fuze::Layer {
         Fuze::Renderer::BeginScene(m_Shader, m_ortho);
 
         glm::mat4 transform = 1.0f;
-        transform = glm::translate(transform, glm::vec3(0.3f , 0.0f, 0.0f));
+        transform = glm::translate(transform, glm::vec3(0.3f, 0.0f, 0.0f));
 
         m_Texture1->Bind();
         Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);

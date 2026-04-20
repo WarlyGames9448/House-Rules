@@ -6,6 +6,7 @@ namespace Fuze {
 
 class FUZE_API Shader {
   public:
+    static Shader* Create(const std::string& filepath);
     static Shader* Create(const std::string& vertexSrc, const std::string& fragmentSrc);
     virtual ~Shader() = default;
 
