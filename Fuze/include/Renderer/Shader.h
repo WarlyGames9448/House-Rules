@@ -1,23 +1,33 @@
 #pragma once
 
 #include "Core.h"
+#include <unordered_map>
 
 namespace Fuze {
 
 class FUZE_API Shader {
   public:
-    static Shader* Create(const std::string& filepath);
-    static Shader* Create(const std::string& vertexSrc, const std::string& fragmentSrc);
+    static Ref<Shader> Create(const std::string& name, const std::string& filepath);
+    static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
     virtual ~Shader() = default;
 
     virtual void Bind() const = 0;
     virtual void Unbind() const = 0;
 
-    inline uint32_t GetRendererID() {
-        return m_RendererID;
-    }
+    virtual uint32_t GetRendererID() const = 0;
+
+    virtual const std::string GetName() const = 0;
+};
+
+class FUZE_API ShaderLibrary {
+  public:
+    void AddShader(const std::string& name, const std::string& filepath);
+    void AddShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+    Ref<Shader> GetShader(const std::string& name) const;
+
+    bool NameExists(const std::string& name) const;
 
   private:
-    uint32_t m_RendererID;
+    std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 };
 }

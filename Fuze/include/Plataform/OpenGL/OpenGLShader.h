@@ -10,16 +10,18 @@ namespace Fuze {
 
 class FUZE_API OpenGLShader : public Shader {
   public:
-    OpenGLShader(const std::string& filepath);
-    OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+    OpenGLShader(const std::string& name, const std::string& filepath);
+    OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
     virtual ~OpenGLShader();
 
     virtual void Bind() const override;
     virtual void Unbind() const override;
 
-    inline uint32_t GetRendererID() {
+    inline uint32_t GetRendererID() const override {
         return m_RendererID;
     }
+
+    inline const std::string GetName() const override { return m_Name;}
 
     void UploadUniformInt(const std::string& name, int value);
 
@@ -32,12 +34,13 @@ class FUZE_API OpenGLShader : public Shader {
     void UploadUniformMat4(const std::string& name, const glm::mat4& value);
 
   private:
-    const std::unordered_map<GLenum, std::string> ParseShader(const std::string& source);
+    const std::pair<std::string, std::string> ParseShader(const std::string& source);
     const std::string ReadFile(const std::string& filepath);
 
     void Compile(const std::string& vertexSrc, const std::string& fragmentSrc);
 
   private:
     uint32_t m_RendererID;
+    std::string m_Name;
 };
 }

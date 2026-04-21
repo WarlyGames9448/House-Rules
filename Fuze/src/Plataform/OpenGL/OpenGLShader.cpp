@@ -9,12 +9,13 @@
 
 namespace Fuze {
 
-OpenGLShader::OpenGLShader(const std::string& filepath) {
-    const std::unordered_map<GLenum, std::string> shaderSrc = ParseShader(ReadFile(filepath));
-    Compile(shaderSrc.at(GL_VERTEX_SHADER), shaderSrc.at(GL_FRAGMENT_SHADER));
+OpenGLShader::OpenGLShader(const std::string& name, const std::string& filepath): m_Name(name) {
+    const std::pair<std::string, std::string> shaderSrc = ParseShader(ReadFile(filepath));
+    Compile(shaderSrc.first, shaderSrc.second);
 }
 
-OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc) {
+OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+    : m_Name(name) {
     Compile(vertexSrc, fragmentSrc);
 }
 
@@ -90,11 +91,13 @@ void OpenGLShader::Unbind() const {
     glUseProgram(0);
 }
 
-const std::unordered_map<GLenum, std::string> OpenGLShader::ParseShader(const std::string& source) {
+const std::pair<std::string, std::string> OpenGLShader::ParseShader(const std::string& source) {
+
+    std::string shaderSrc[2];
+    enum Type { VERTEX = 0, FRAGMENT = 1 };
+    Type type;
 
     size_t pos = source.find("#define");
-    std::unordered_map<GLenum, std::string> shaderSrc;
-    GLenum type = GL_NONE;
 
     while (pos != std::string::npos) {
         pos++;
@@ -102,15 +105,18 @@ const std::unordered_map<GLenum, std::string> OpenGLShader::ParseShader(const st
         pos += 7;
         size_t next_pos = source.find_first_of("\n", pos);
         const std::string defineValue = source.substr(pos, next_pos - pos).c_str();
-        if (defineValue == "_TYPE_VERTEX_SHADER") type = GL_VERTEX_SHADER;
-        else if (defineValue == "_TYPE_FRAGMENT_SHADER") type = GL_FRAGMENT_SHADER;
+        if (defineValue == "_TYPE_VERTEX_SHADER") type = VERTEX;
+        else if (defineValue == "_TYPE_FRAGMENT_SHADER") type = FRAGMENT;
         else FUZE_CORE_ASSERT(0, "Wrong #define syntax: {0}", defineValue);
 
         pos = source.find("#define", next_pos);
 
         shaderSrc[type] = std::string(source.substr(next_pos, pos - next_pos - 1));
     }
-    return shaderSrc;
+
+    std::pair<std::string, std::string> finalSource(shaderSrc[0], shaderSrc[1]);
+
+    return finalSource;
 }
 
 // TODO: Move this to file handler system

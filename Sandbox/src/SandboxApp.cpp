@@ -45,8 +45,8 @@ class TestLayer : public Fuze::Layer {
             -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
         };
 
-        Ref<Fuze::VertexBuffer> vertexBuffer;
-        vertexBuffer.reset(Fuze::VertexBuffer::Create(vertices, sizeof(vertices)));
+        Ref<Fuze::VertexBuffer> vertexBuffer = Fuze::VertexBuffer::Create(vertices, sizeof(vertices));
+
         m_VertexArray.reset(Fuze::VertexArray::Create());
 
         Fuze::BufferLayout layout = {
@@ -66,16 +66,15 @@ class TestLayer : public Fuze::Layer {
             3,
             0,
         };
-        Ref<Fuze::IndexBuffer> indexBuffer;
-        indexBuffer.reset(Fuze::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+        Ref<Fuze::IndexBuffer> indexBuffer = Fuze::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
         std::string current_path = std::string(std::filesystem::current_path());
 
-        m_Shader.reset(Fuze::Shader::Create(current_path+ "/Sandbox/assets/shaders/basic.glsl"));
+        m_ShaderLibrary.AddShader("square", current_path+ "/Sandbox/assets/shaders/basic.glsl");
 
-        m_Texture1.reset(Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/madruga.jpeg"));
-        m_Texture2.reset(Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/line.png"));
+        m_Texture1 = Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/madruga.jpeg");
+        m_Texture2 = Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/line.png");
     }
 
     void OnUpdate(Fuze::Timestep ts) override {
@@ -105,16 +104,17 @@ class TestLayer : public Fuze::Layer {
         // ----------------------------------------
 
         // Submits --------------------------------
-        Fuze::Renderer::BeginScene(m_Shader, m_ortho);
+        Ref<Fuze::Shader> shader = m_ShaderLibrary.GetShader("square");
+        Fuze::Renderer::BeginScene(shader, m_ortho);
 
         glm::mat4 transform = 1.0f;
         transform = glm::translate(transform, glm::vec3(0.3f, 0.0f, 0.0f));
 
         m_Texture1->Bind();
-        Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
+        Fuze::Renderer::Submit(shader, m_VertexArray, transform);
 
         m_Texture2->Bind();
-        Fuze::Renderer::Submit(m_Shader, m_VertexArray, transform);
+        Fuze::Renderer::Submit(shader, m_VertexArray, transform);
 
         Fuze::Renderer::EndScene();
     }
@@ -123,7 +123,7 @@ class TestLayer : public Fuze::Layer {
     }
 
   private:
-    Ref<Fuze::Shader> m_Shader;
+    Fuze::ShaderLibrary m_ShaderLibrary;
     Ref<Fuze::VertexArray> m_VertexArray;
 
     Ref<Fuze::Texture2D> m_Texture1;

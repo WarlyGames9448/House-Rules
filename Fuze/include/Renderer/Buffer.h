@@ -132,7 +132,7 @@ class FUZE_API BufferLayout {
 
 class FUZE_API VertexBuffer {
   public:
-    static VertexBuffer* Create(float* vertices, uint32_t size);
+    static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 
     virtual ~VertexBuffer();
 
@@ -145,7 +145,7 @@ class FUZE_API VertexBuffer {
 
 class FUZE_API IndexBuffer {
   public:
-    static IndexBuffer* Create(uint32_t* indices, uint32_t count);
+    static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 
     virtual ~IndexBuffer();
 

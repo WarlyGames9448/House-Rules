@@ -5,10 +5,11 @@
 #include "Renderer/Renderer.h"
 
 #include "Plataform/OpenGL/OpenGLTexture.h"
+#include <memory>
 
 namespace Fuze {
 
-Texture2D* Texture2D::Create(const std::string& path) {
+Ref<Texture2D> Texture2D::Create(const std::string& path) {
 
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::none: {
@@ -17,7 +18,7 @@ Texture2D* Texture2D::Create(const std::string& path) {
     }
 
     case RendererAPI::API::OpenGL: {
-        return new OpenGLTexture2D(path);
+        return  std::make_shared<OpenGLTexture2D>(path);
     }
     }
 
