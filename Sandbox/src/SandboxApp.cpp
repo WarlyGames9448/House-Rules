@@ -30,9 +30,13 @@ class ColorPickerLayer : public Fuze::Layer {
     glm::vec4 m_SquareColor = {0.0f, 0.0f, 0.0f, 0.0f};
 };
 
+// Principal Layer ========================================
+
 class TestLayer : public Fuze::Layer {
   public:
-    TestLayer(): Layer("Testing"), m_ortho(new Fuze::OrthographicCamera(-1.6f, 1.6f, -0.9f, 0.9f, -1.0f, 1.0f)) {
+    TestLayer(): Layer("Testing"), m_CameraController(new Fuze::OrthographicCameraController(1280.0f/720.0f, true)){
+        m_CameraController->SetSpeed(5.0f, 180.0f, 0.05f);
+        m_CameraController->InvertScroll(true);
     }
 
     void OnAttach() override {
@@ -81,31 +85,12 @@ class TestLayer : public Fuze::Layer {
         /* Fuze::RendererCommand::SetClearColor({0.1f, 0.0f, 0.0f, 1});
         Fuze::RendererCommand::Clear(); */
 
-        // FUZE_TRACE("Seconds: {0}, Miliseconds: {1}", ts.GetSeconds(), ts.GetMiliseconds());
-
         // Input Logic --------------------------
-        if (Fuze::Input::IsKeyPressed(FUZE_KEY_A)) {
-            m_ortho->SetPosition(glm::vec3(1.0f * ts, 0.0f, 0.0f));
-        } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_D)) {
-            m_ortho->SetPosition(glm::vec3(-1.0f * ts, 0.0f, 0.0f));
-        }
-        if (Fuze::Input::IsKeyPressed(FUZE_KEY_W)) {
-            m_ortho->SetPosition(glm::vec3(0.0f, -1.0f * ts, 0.0f));
-        } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_S)) {
-            m_ortho->SetPosition(glm::vec3(0.0f, 1.0f * ts, 0.0f));
-        }
-
-        if (Fuze::Input::IsKeyPressed(FUZE_KEY_LEFT)) {
-            m_ortho->SetRotation(180.0f * ts);
-        } else if (Fuze::Input::IsKeyPressed(FUZE_KEY_RIGHT)) {
-            m_ortho->SetRotation(-180.0f * ts);
-        }
-
-        // ----------------------------------------
+        m_CameraController->OnUpdate(ts);
 
         // Submits --------------------------------
         Ref<Fuze::Shader> shader = m_ShaderLibrary.GetShader("square");
-        Fuze::Renderer::BeginScene(shader, m_ortho);
+        Fuze::Renderer::BeginScene(shader, m_CameraController->GetCamera());
 
         glm::mat4 transform = 1.0f;
         transform = glm::translate(transform, glm::vec3(0.3f, 0.0f, 0.0f));
@@ -119,7 +104,8 @@ class TestLayer : public Fuze::Layer {
         Fuze::Renderer::EndScene();
     }
 
-    void OnEvent(Fuze::Event& event) override {
+    void OnEvent(Fuze::Event& e) override {
+        m_CameraController->OnEvent(e);
     }
 
   private:
@@ -129,7 +115,7 @@ class TestLayer : public Fuze::Layer {
     Ref<Fuze::Texture2D> m_Texture1;
     Ref<Fuze::Texture2D> m_Texture2;
 
-    Fuze::OrthographicCamera* m_ortho;
+    Ref<Fuze::OrthographicCameraController> m_CameraController;
 };
 
 class Sandbox : public Fuze::Application {

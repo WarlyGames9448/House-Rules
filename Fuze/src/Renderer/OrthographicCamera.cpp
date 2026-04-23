@@ -6,9 +6,11 @@
 namespace Fuze {
 OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top, float zNear, float zFar)
     : m_Projection(glm::ortho(left, right, bottom, top, zNear, zFar)), m_View(1.0f),
-      m_ViewProjection(m_Projection * m_View) {}
+      m_ViewProjection(m_Projection * m_View) {
+}
 
-OrthographicCamera::~OrthographicCamera() {}
+OrthographicCamera::~OrthographicCamera() {
+}
 
 void OrthographicCamera::RecalculateViewProjection() {
     m_View = glm::translate(glm::mat4(1.0f), m_Position) *
@@ -19,12 +21,22 @@ void OrthographicCamera::RecalculateViewProjection() {
     m_ViewProjection = m_Projection * m_View;
 }
 
-void OrthographicCamera::SetPosition(glm::vec3 position) {
-    m_Position += position;
+void OrthographicCamera::XTranslate(float xPos) {
+    m_Position += glm::vec3(xPos, 0.0f, 0.0f);
     RecalculateViewProjection();
 }
-void OrthographicCamera::SetRotation(float rotation) {
-    m_rotation += rotation;
+void OrthographicCamera::YTranslate(float yPos) {
+    m_Position += glm::vec3(0.0f, yPos, 0.0f);
+    RecalculateViewProjection();
+}
+
+void OrthographicCamera::Rotate(float degrees) {
+    m_rotation += degrees;
+    RecalculateViewProjection();
+}
+
+void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float zNear, float zFar){
+    m_Projection = glm::ortho(left, right, bottom, top, zNear, zFar);
     RecalculateViewProjection();
 }
 

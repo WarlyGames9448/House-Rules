@@ -5,11 +5,14 @@
 namespace Fuze {
 class OrthographicCamera {
   public:
-    OrthographicCamera(float left, float right, float bottom, float top, float zNear, float zFar);
+    OrthographicCamera(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
     ~OrthographicCamera();
 
-    void SetPosition(glm::vec3 position);
-    void SetRotation(float rotation);
+    void XTranslate(float xPos);
+    void YTranslate(float yPos);
+
+    void Rotate(float degrees);
+    void SetProjection(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
 
     inline const glm::mat4 GetViewProjection() const { return m_ViewProjection; }
 

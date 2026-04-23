@@ -7,7 +7,7 @@
 
 namespace Fuze {
 
-void Renderer::BeginScene(Ref<Shader>& shader, OrthographicCamera* camera) {
+void Renderer::BeginScene(Ref<Shader>& shader, Ref<OrthographicCamera> camera) {
     std::dynamic_pointer_cast<OpenGLShader>(shader)->Bind();
     std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", camera->GetViewProjection());
 }

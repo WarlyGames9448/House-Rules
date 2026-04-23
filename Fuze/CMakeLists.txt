@@ -3,6 +3,7 @@ add_library(Fuze SHARED
     src/Layer.cpp
     src/LayerStack.cpp
     src/Log.cpp
+    src/OrthographicCameraController.cpp
 
     src/ImGui/ImGuiLayer.cpp
 

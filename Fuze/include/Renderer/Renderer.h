@@ -14,7 +14,7 @@ class FUZE_API Renderer {
         return RendererAPI::GetAPI();
     }
 
-    static void BeginScene(Ref<Shader>& shader, OrthographicCamera* camera);
+    static void BeginScene(Ref<Shader>& shader, Ref<OrthographicCamera> camera);
     static void EndScene();
 
     static void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix = 1.0f);
