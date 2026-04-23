@@ -36,5 +36,9 @@ class FUZE_API Window {
     static Window* Create(const WindowProps& windowProps = WindowProps());
 
     virtual Timestep GetTime() const = 0;
+
+    virtual void SetTitle(const std::string& title) = 0;
+    virtual void SetIcon(const std::string& filepath) = 0;
+
 };
 }

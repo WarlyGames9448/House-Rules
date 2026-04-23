@@ -24,6 +24,26 @@ class FUZE_API WindowResizedEvent : public Event {
     float m_Width, m_Height;
 };
 
+class FUZE_API FrameBufferResizedEvent : public Event {
+  public:
+    FrameBufferResizedEvent(float width, float height): m_Width(width), m_Height(height) {}
+
+    float GetWidth() const { return m_Width; }
+    float GetHeight() const { return m_Height; }
+
+    inline std::string ToString() const override {
+        std::stringstream ss;
+        ss << "FrameBufferResized: " << m_Width << " " << m_Height;
+        return ss.str();
+    }
+
+    EVENT_CLASS_TYPE(FrameBufferResized)
+    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+  private:
+    float m_Width, m_Height;
+};
+
 class FUZE_API WindowCloseEvent : public Event {
   public:
     EVENT_CLASS_TYPE(WindowClose)
@@ -39,6 +59,24 @@ class FUZE_API WindowLostFocusEvent : public Event {
 class FUZE_API WindowFocusEvent : public Event {
   public:
     EVENT_CLASS_TYPE(WindowFocus)
+    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+};
+
+class FUZE_API WindowMinimizedEvent : public Event {
+  public:
+    EVENT_CLASS_TYPE(WindowMinimized)
+    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+};
+
+class FUZE_API WindowMaximizedEvent : public Event {
+  public:
+    EVENT_CLASS_TYPE(WindowMaximized)
+    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+};
+
+class FUZE_API WindowRestoredEvent : public Event {
+  public:
+    EVENT_CLASS_TYPE(WindowRestored)
     EVENT_CLASS_CATEGORY(EventCategoryApplication)
 };
 

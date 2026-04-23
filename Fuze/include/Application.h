@@ -38,15 +38,21 @@ class FUZE_API Application {
 
   private:
     bool OnWindowClose(WindowCloseEvent& event);
+    bool OnWindowMinimized(WindowMinimizedEvent& event);
+    bool OnWindowRestored(WindowRestoredEvent& event);
+
 
   private:
     Scope<Window> m_Window;
     ImGuiLayer* m_ImGuiLayer;
-    bool m_Running = true;
+
     LayerStack m_LayerStack;
 
     Timestep m_LastFrameTime = 0.0f;
     Timestep m_DeltaTime = 0.0f;
+
+    bool m_Running = true;
+    bool m_Minimized = false;
 
   protected:
     static Application* s_Instance;

@@ -1,3 +1,5 @@
+#include "Application.h"
+#include "Events/Event.h"
 #include "Fuze.h"
 
 #include "Renderer/RendererAPI.h"
@@ -23,6 +25,7 @@ class ColorPickerLayer : public Fuze::Layer {
         ImGui::ColorEdit4("Background", &m_SquareColor.x);
         ImGui::End();
     }
+
     void OnEvent(Fuze::Event& event) override {
     }
 
@@ -34,7 +37,7 @@ class ColorPickerLayer : public Fuze::Layer {
 
 class TestLayer : public Fuze::Layer {
   public:
-    TestLayer(): Layer("Testing"), m_CameraController(new Fuze::OrthographicCameraController(1280.0f/720.0f, true)){
+    TestLayer(): Layer("Testing"), m_CameraController(new Fuze::OrthographicCameraController(1280.0f / 720.0f, true)) {
         m_CameraController->SetSpeed(5.0f, 180.0f, 0.05f);
         m_CameraController->InvertScroll(true);
     }
@@ -75,7 +78,7 @@ class TestLayer : public Fuze::Layer {
 
         std::string current_path = std::string(std::filesystem::current_path());
 
-        m_ShaderLibrary.AddShader("square", current_path+ "/Sandbox/assets/shaders/basic.glsl");
+        m_ShaderLibrary.AddShader("square", current_path + "/Sandbox/assets/shaders/basic.glsl");
 
         m_Texture1 = Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/madruga.jpeg");
         m_Texture2 = Fuze::Texture2D::Create(current_path + "/Sandbox/assets/textures/line.png");
@@ -123,6 +126,8 @@ class Sandbox : public Fuze::Application {
     Sandbox() {
         PushLayer(new ColorPickerLayer());
         PushLayer(new TestLayer());
+
+        this->Get().GetWindow().SetTitle("Fuze");
     }
 
     ~Sandbox() {

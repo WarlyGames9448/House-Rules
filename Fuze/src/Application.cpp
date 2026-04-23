@@ -16,6 +16,7 @@ Application::Application() {
 
     m_Window = Scope<Window>(Window::Create());
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+    m_Window->SetIcon(std::string(std::filesystem::current_path()) + "/Fuze/assets/FuzeLogo.png");
 
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);
@@ -27,6 +28,8 @@ Application::~Application() {
 void Application::OnEvent(Event& event) {
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+    dispatcher.Dispatch<WindowMinimizedEvent>(BIND_EVENT_FN(OnWindowMinimized));
+    dispatcher.Dispatch<WindowRestoredEvent>(BIND_EVENT_FN(OnWindowRestored));
 
     for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
         (*--it)->OnEvent(event);
@@ -54,8 +57,10 @@ void Application::Run() {
         if (m_DeltaTime > 0.25) m_DeltaTime = 0.25; // Clipping
         m_LastFrameTime = m_Window->GetTime();
 
-        for (Layer* layer : m_LayerStack) {
-            layer->OnUpdate(m_DeltaTime);
+        if (!m_Minimized) {
+            for (Layer* layer : m_LayerStack) {
+                layer->OnUpdate(m_DeltaTime);
+            }
         }
 
         m_ImGuiLayer->Begin();
@@ -72,4 +77,15 @@ bool Application::OnWindowClose(WindowCloseEvent& event) {
     return true;
 }
 
+bool Application::OnWindowMinimized(WindowMinimizedEvent& event) {
+    (void)event;
+    m_Minimized = true;
+    return false;
+}
+
+bool Application::OnWindowRestored(WindowRestoredEvent& event) {
+    (void)event;
+    m_Minimized = false;
+    return false;
+}
 }

@@ -24,6 +24,9 @@ class LinuxWindow : public Window {
 
     virtual Timestep GetTime() const override;
 
+    virtual void SetTitle(const std::string& title) override;
+    virtual void SetIcon(const std::string& filepath) override;
+
   private:
     virtual void Init(const WindowProps& windowProps);
     virtual void Shutdown();

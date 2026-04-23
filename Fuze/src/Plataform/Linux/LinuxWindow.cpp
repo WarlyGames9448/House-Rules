@@ -11,6 +11,8 @@
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
 
+#include <stb_image.h>
+
 namespace Fuze {
 
 static bool s_GLFWInitialized = false;
@@ -19,11 +21,17 @@ static void GLFWErrorCallback(int error_code, const char* description) {
     FUZE_ERROR("[GLFW] Error: {0}, Description: {1}", error_code, description);
 }
 
-Window* Window::Create(const WindowProps& windowProps) { return new LinuxWindow(windowProps); }
+Window* Window::Create(const WindowProps& windowProps) {
+    return new LinuxWindow(windowProps);
+}
 
-LinuxWindow::LinuxWindow(const WindowProps& windowProps) { Init(windowProps); }
+LinuxWindow::LinuxWindow(const WindowProps& windowProps) {
+    Init(windowProps);
+}
 
-LinuxWindow::~LinuxWindow() { Shutdown(); }
+LinuxWindow::~LinuxWindow() {
+    Shutdown();
+}
 
 void LinuxWindow::Init(const WindowProps& windowProps) {
     m_Data.Title = windowProps.Title;
@@ -62,11 +70,19 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
+        WindowResizedEvent event(width, height);
+        data.EventCallback(event);
+    });
+
+    glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
         data.Width = width;
         data.Height = height;
 
-        WindowResizedEvent event(width, height);
+        FrameBufferResizedEvent event(width, height);
         data.EventCallback(event);
+        glViewport(0, 0, width, height);
     });
 
     glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
@@ -84,6 +100,29 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
             data.EventCallback(event);
         } else {
             WindowLostFocusEvent event;
+            data.EventCallback(event);
+        }
+    });
+
+    glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow* window, int iconified) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+        if (iconified) {
+            WindowMinimizedEvent event;
+            data.EventCallback(event);
+        } else {
+            WindowRestoredEvent event;
+            data.EventCallback(event);
+        }
+    });
+
+    glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow* window, int maximized) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+        if (maximized) {
+            WindowMaximizedEvent event;
+            data.EventCallback(event);
+        } else {
+            WindowRestoredEvent event;
             data.EventCallback(event);
         }
     });
@@ -164,7 +203,9 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     });
 }
 
-void LinuxWindow::Shutdown() { glfwDestroyWindow(m_Window); }
+void LinuxWindow::Shutdown() {
+    glfwDestroyWindow(m_Window);
+}
 
 void LinuxWindow::OnUpdate() {
     glfwPollEvents();
@@ -184,4 +225,27 @@ void LinuxWindow::SetVSync(bool enabled) {
 Timestep LinuxWindow::GetTime() const {
     return glfwGetTime();
 }
+
+void LinuxWindow::SetTitle(const std::string& title) {
+    glfwSetWindowTitle(m_Window, title.c_str());
+}
+
+void LinuxWindow::SetIcon(const std::string& filepath) {
+    int width, height;
+    unsigned char* data = stbi_load(filepath.c_str(), &width, &height, 0, 4);
+
+    if (data) {
+        GLFWimage images[1];
+        images[0].width = width;
+        images[0].height = height;
+        images[0].pixels = data;
+
+        glfwSetWindowIcon(m_Window, 1, images);
+
+        stbi_image_free(data);
+    } else {
+        FUZE_CORE_ASSERT(false, "Can't Load Icon: {0}", filepath);
+    }
+}
+
 }
