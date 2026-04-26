@@ -7,6 +7,23 @@
 #include <glad/glad.h>
 
 namespace Fuze {
+OpenGLTexture2D::OpenGLTexture2D(): m_Width(1), m_Height(1) {
+    unsigned char whitePixel[] = { 255, 255, 255, 255 };
+
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
+
+    glTextureStorage2D(m_RendererID, 1, GL_RGBA8, 1, 1);
+
+    glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glTextureSubImage2D(m_RendererID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, whitePixel);
+}
+
 OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
     stbi_set_flip_vertically_on_load(true);
 
@@ -36,7 +53,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
 
     glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
-    //glGenerateTextureMipmap(m_RendererID);
+    // glGenerateTextureMipmap(m_RendererID);
 
     stbi_image_free(data);
 }
@@ -47,8 +64,6 @@ OpenGLTexture2D::~OpenGLTexture2D() {
 
 void OpenGLTexture2D::Bind(uint32_t slot) const {
     glBindTextureUnit(slot, m_RendererID);
-/*     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, m_RendererID); */
 }
 
 void OpenGLTexture2D::Unbind(uint32_t slot) const {

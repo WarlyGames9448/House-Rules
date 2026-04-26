@@ -1,6 +1,7 @@
 add_executable(Sandbox
     src/SandboxApp.cpp
-)
+    src/Sandbox2D.cpp
+    )
 
 target_link_libraries(Sandbox
     PRIVATE Fuze

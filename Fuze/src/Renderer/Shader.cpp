@@ -6,7 +6,7 @@
 
 namespace Fuze {
 
-Ref<Shader> Shader::Create(const std::string& name, const std::string& filepath) {
+Ref<Shader> Shader::Create(const std::string& filepath) {
 
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::none: {
@@ -15,7 +15,7 @@ Ref<Shader> Shader::Create(const std::string& name, const std::string& filepath)
     }
 
     case RendererAPI::API::OpenGL: {
-        return std::make_shared<OpenGLShader>(name, filepath);
+        return CreateRef<OpenGLShader>(filepath);
     }
     }
 
@@ -23,7 +23,7 @@ Ref<Shader> Shader::Create(const std::string& name, const std::string& filepath)
     return nullptr;
 }
 
-Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) {
+Ref<Shader> Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc) {
 
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::none: {
@@ -32,20 +32,22 @@ Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc
     }
 
     case RendererAPI::API::OpenGL: {
-        return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+        return CreateRef<OpenGLShader>(vertexSrc, fragmentSrc);
     }
     }
 
     FUZE_CORE_ASSERT(false, "RendererAPI not defined!")
     return nullptr;
 }
+
+// ShaderLibrary //////////////////////////
 
 void ShaderLibrary::AddShader(const std::string& name, const std::string& filepath) {
     if (NameExists(name)) {
         FUZE_CORE_ASSERT(false, "Shader name already exists: {0}", name);
         return;
     }
-    m_Shaders[name] = Shader::Create(name, filepath);
+    m_Shaders[name] = Shader::Create(filepath);
 }
 
 void ShaderLibrary::AddShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) {
@@ -53,11 +55,11 @@ void ShaderLibrary::AddShader(const std::string& name, const std::string& vertex
         FUZE_CORE_ASSERT(false, "Shader name already exists: {0}", name);
         return;
     }
-    m_Shaders[name] = Shader::Create(name, vertexSrc, fragmentSrc);
+    m_Shaders[name] = Shader::Create(vertexSrc, fragmentSrc);
 }
 
 Ref<Shader> ShaderLibrary::GetShader(const std::string& name) const {
-     if (!NameExists(name)) {
+    if (!NameExists(name)) {
         FUZE_CORE_ASSERT(false, "Shader name doesn't exists: {0}", name);
         return nullptr;
     }

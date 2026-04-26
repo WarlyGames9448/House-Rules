@@ -11,6 +11,8 @@ class FUZE_API Texture {
 
 class FUZE_API Texture2D : public Texture {
   public:
+    static Ref<Texture2D> Create();
+
     static Ref<Texture2D> Create(const std::string& path);
 
     virtual void Bind(uint32_t slot = 0) const = 0;

@@ -9,13 +9,12 @@
 
 namespace Fuze {
 
-OpenGLShader::OpenGLShader(const std::string& name, const std::string& filepath): m_Name(name) {
+OpenGLShader::OpenGLShader(const std::string& filepath) {
     const std::pair<std::string, std::string> shaderSrc = ParseShader(ReadFile(filepath));
     Compile(shaderSrc.first, shaderSrc.second);
 }
 
-OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-    : m_Name(name) {
+OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc) {
     Compile(vertexSrc, fragmentSrc);
 }
 
@@ -47,7 +46,7 @@ void OpenGLShader::Compile(const std::string& vertexSrc, const std::string& frag
             glDeleteShader(fragmentShader);
 
             FUZE_CORE_ERROR("{0}", infoLog.data());
-            FUZE_CORE_ASSERT(false, "Shader failure!");
+            FUZE_CORE_ASSERT(false, "Shader Compilation failure!");
             return;
         }
     }
@@ -147,6 +146,17 @@ const std::string OpenGLShader::ReadFile(const std::string& filepath) {
     return buffer;
 }
 
+void OpenGLShader::SetInt(const std::string& name, int value){
+    UploadUniformInt(name, value);
+}
+
+void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value) {
+    UploadUniformFloat4(name, value);
+}
+void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value) {
+    UploadUniformMat4(name, value);
+}
+
 void OpenGLShader::UploadUniformInt(const std::string& name, int value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform1d(location, value);
@@ -154,27 +164,27 @@ void OpenGLShader::UploadUniformInt(const std::string& name, int value) {
 
 void OpenGLShader::UploadUniformFloat(const std::string& name, float value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
-    glUniform1d(location, value);
+    glUniform1f(location, value);
 }
 
 void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    glUniform2fv(location, 1, glm::value_ptr(value));
 }
 
 void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    glUniform3fv(location, 1, glm::value_ptr(value));
 }
 
 void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    glUniform4fv(location, 1, glm::value_ptr(value));
 }
 
 void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& value) {

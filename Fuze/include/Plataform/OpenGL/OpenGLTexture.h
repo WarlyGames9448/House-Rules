@@ -5,6 +5,7 @@
 namespace Fuze {
 class OpenGLTexture2D : public Texture2D {
   public:
+    OpenGLTexture2D();
     OpenGLTexture2D(const std::string& path);
     ~OpenGLTexture2D();
 

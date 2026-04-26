@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Renderer/Shader.h"
-#include <glm/ext/vector_float3.hpp>
-#include <glm/ext/vector_float4.hpp>
 
 #include <glad/glad.h>
 
@@ -10,8 +8,8 @@ namespace Fuze {
 
 class FUZE_API OpenGLShader : public Shader {
   public:
-    OpenGLShader(const std::string& name, const std::string& filepath);
-    OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+    OpenGLShader(const std::string& filepath);
+    OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
     virtual ~OpenGLShader();
 
     virtual void Bind() const override;
@@ -21,7 +19,9 @@ class FUZE_API OpenGLShader : public Shader {
         return m_RendererID;
     }
 
-    inline const std::string GetName() const override { return m_Name;}
+    virtual void SetInt(const std::string& name, int value) override;
+    virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
+    virtual void SetMat4(const std::string& name, const glm::mat4& value) override;
 
     void UploadUniformInt(const std::string& name, int value);
 
@@ -41,6 +41,5 @@ class FUZE_API OpenGLShader : public Shader {
 
   private:
     uint32_t m_RendererID;
-    std::string m_Name;
 };
 }
