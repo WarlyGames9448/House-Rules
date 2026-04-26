@@ -40,8 +40,7 @@ static uint32_t ShaderDataTypeToSizeType(ShaderDataType type) {
 
 struct BufferElement {
   public:
-    BufferElement() {
-    }
+    BufferElement() = default;
 
     BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
         : Type(type), Name(name), Size(ShaderDataTypeToSizeType(type)), Offset(0), Normalized(normalized) {
@@ -82,7 +81,7 @@ struct BufferElement {
     ShaderDataType Type;
     std::string Name;
     uint32_t Size;
-    uint32_t Offset;
+    size_t Offset;
     bool Normalized;
 };
 
@@ -120,7 +119,7 @@ class FUZE_API BufferLayout {
 
   private:
     void SetOffesetAndStride() {
-        uint32_t offset = 0;
+        size_t offset = 0;
         m_Stride = 0;
         for (auto& element : m_Elements) {
             element.Offset = offset;

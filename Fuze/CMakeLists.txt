@@ -1,8 +1,8 @@
 add_library(Fuze SHARED
-    src/Application.cpp
-    src/Layer.cpp
-    src/LayerStack.cpp
-    src/Log.cpp
+    src/Core/Application.cpp
+    src/Core/Layer.cpp
+    src/Core/LayerStack.cpp
+    src/Core/Log.cpp
 
     src/ImGui/ImGuiLayer.cpp
 
@@ -30,6 +30,7 @@ add_library(Fuze SHARED
 target_include_directories(Fuze
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Core
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
@@ -117,4 +118,4 @@ target_link_libraries(Fuze
         ${CMAKE_DL_LIBS}
 )
 
-target_precompile_headers(Fuze PRIVATE include/fuzepch.h)
+target_precompile_headers(Fuze PRIVATE include/Core/fuzepch.h)

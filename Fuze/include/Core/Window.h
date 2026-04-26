@@ -1,6 +1,6 @@
 #pragma once
 #include "fuzepch.h"
-#include "Core/Timestep.h"
+#include "Timestep.h"
 
 #include "Core.h"
 #include "Events/Event.h"
