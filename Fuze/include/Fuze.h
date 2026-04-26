@@ -9,7 +9,6 @@
 #include "Input.h"
 #include "KeyCodes.h"
 #include "MouseButtonCodes.h"
-#include "OrthographicCameraController.h"
 
 // Renderer ---------------------------------
 
@@ -17,6 +16,7 @@
 #include "Renderer/RendererCommand.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/GraphicsContext.h"
+#include "Renderer/OrthographicCameraController.h"
 #include "Renderer/OrthographicCamera.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"

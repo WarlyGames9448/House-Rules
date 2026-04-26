@@ -37,6 +37,9 @@ class FUZE_API OrthographicCameraController {
     float m_TranslationSpeed = 1.0f, m_RotationSpeed = 180.0f, m_ScrollSpeed = 0.5f;
 
     Ref<OrthographicCamera> m_Camera;
+    glm::vec2 m_CameraPosition = {0.0f, 0.0f};
+    float m_CameraRotation = 0.0f;
+
 
     bool m_RotationActiveted;
     bool m_InvertScroll = false;

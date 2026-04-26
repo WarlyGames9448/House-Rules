@@ -7,7 +7,7 @@
 
 namespace Fuze {
 
-Input* Input::s_Instance = new LinuxInput();
+Scope<Input> Input::s_Instance = CreateScope<LinuxInput>();
 
 bool LinuxInput::IsKeyPressedImpl(int keycode) {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

@@ -1,6 +1,6 @@
 #include "fuzepch.h"
 
-#include "OrthographicCameraController.h"
+#include "Renderer/OrthographicCameraController.h"
 
 #include "Events/Event.h"
 #include "Input.h"
@@ -15,24 +15,35 @@ OrthographicCameraController::OrthographicCameraController(float aspectRatio, bo
 
 void OrthographicCameraController::OnUpdate(float ts) {
     if (Input::IsKeyPressed(FUZE_KEY_A)) {
-        m_Camera->XTranslate(-m_TranslationSpeed * ts * m_ZoomLevel);
+        m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
+        m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
     } else if (Input::IsKeyPressed(FUZE_KEY_D)) {
-        m_Camera->XTranslate(+m_TranslationSpeed * ts * m_ZoomLevel);
+        m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
+        m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
     }
 
     if (Input::IsKeyPressed(FUZE_KEY_W)) {
-        m_Camera->YTranslate(+m_TranslationSpeed * ts * m_ZoomLevel);
+        m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
+        m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
     } else if (Input::IsKeyPressed(FUZE_KEY_S)) {
-        m_Camera->YTranslate(-m_TranslationSpeed * ts * m_ZoomLevel);
+        m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
+        m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * ts;
     }
 
     if (m_RotationActiveted) {
-        if (Input::IsKeyPressed(FUZE_KEY_LEFT)) {
-            m_Camera->Rotate(m_RotationSpeed * ts);
-        } else if (Input::IsKeyPressed(FUZE_KEY_RIGHT)) {
-            m_Camera->Rotate(-m_RotationSpeed * ts);
+        if (Input::IsKeyPressed(FUZE_KEY_Q)) {
+            m_CameraRotation += m_RotationSpeed * ts;
+        } else if (Input::IsKeyPressed(FUZE_KEY_E)) {
+            m_CameraRotation -= m_RotationSpeed * ts;
         }
+
+        if (m_CameraRotation > 180.0f) m_CameraRotation -= 360.0f;
+        else if (m_CameraRotation <= -180.0f) m_CameraRotation += 360.0f;
+
+        m_Camera->SetRotation(m_CameraRotation);
     }
+
+    m_Camera->SetPosition(m_CameraPosition.x, m_CameraPosition.y);
 }
 
 void OrthographicCameraController::OnEvent(Event& e) {

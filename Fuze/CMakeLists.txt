@@ -3,7 +3,6 @@ add_library(Fuze SHARED
     src/Layer.cpp
     src/LayerStack.cpp
     src/Log.cpp
-    src/OrthographicCameraController.cpp
 
     src/ImGui/ImGuiLayer.cpp
 
@@ -19,6 +18,7 @@ add_library(Fuze SHARED
 
     src/Renderer/Buffer.cpp
     src/Renderer/OrthographicCamera.cpp
+    src/Renderer/OrthographicCameraController.cpp
     src/Renderer/Renderer.cpp
     src/Renderer/RendererAPI.cpp
     src/Renderer/RendererCommand.cpp

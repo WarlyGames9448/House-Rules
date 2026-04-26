@@ -21,21 +21,17 @@ void OrthographicCamera::RecalculateViewProjection() {
     m_ViewProjection = m_Projection * m_View;
 }
 
-void OrthographicCamera::XTranslate(float xPos) {
-    m_Position += glm::vec3(xPos, 0.0f, 0.0f);
-    RecalculateViewProjection();
-}
-void OrthographicCamera::YTranslate(float yPos) {
-    m_Position += glm::vec3(0.0f, yPos, 0.0f);
+void OrthographicCamera::SetPosition(float x, float y) {
+    m_Position = {x, y, 0.0f};
     RecalculateViewProjection();
 }
 
-void OrthographicCamera::Rotate(float degrees) {
-    m_rotation += degrees;
+void OrthographicCamera::SetRotation(float degrees) {
+    m_rotation = degrees;
     RecalculateViewProjection();
 }
 
-void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float zNear, float zFar){
+void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
     m_Projection = glm::ortho(left, right, bottom, top, zNear, zFar);
     RecalculateViewProjection();
 }

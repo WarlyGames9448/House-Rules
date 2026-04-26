@@ -59,7 +59,7 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
     FUZE_CORE_ASSERT(m_Window, "Failed to create GLFW window");
 
-    m_Context = new OpenGLContext(m_Window);
+    m_Context = CreateScope<OpenGLContext>(m_Window);
     m_Context->Init();
 
     glfwSetErrorCallback(GLFWErrorCallback);

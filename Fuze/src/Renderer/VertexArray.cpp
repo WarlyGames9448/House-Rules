@@ -6,7 +6,7 @@
 #include "Plataform/OpenGL/OpenGLVertexArray.h"
 
 namespace Fuze {
-VertexArray* VertexArray::Create() {
+Ref<VertexArray> VertexArray::Create() {
 
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::none: {
@@ -15,7 +15,7 @@ VertexArray* VertexArray::Create() {
     }
 
     case RendererAPI::API::OpenGL: {
-        return new OpenGLVertexArray();
+        return CreateRef<OpenGLVertexArray>();
     }
     }
 

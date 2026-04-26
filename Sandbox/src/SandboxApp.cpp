@@ -54,7 +54,7 @@ class TestLayer : public Fuze::Layer {
 
         Ref<Fuze::VertexBuffer> vertexBuffer = Fuze::VertexBuffer::Create(vertices, sizeof(vertices));
 
-        m_VertexArray.reset(Fuze::VertexArray::Create());
+        m_VertexArray = Fuze::VertexArray::Create();
 
         Fuze::BufferLayout layout = {
             {Fuze::ShaderDataType::Float3, "a_Position"},
@@ -85,8 +85,8 @@ class TestLayer : public Fuze::Layer {
     }
 
     void OnUpdate(Fuze::Timestep ts) override {
-        /* Fuze::RendererCommand::SetClearColor({0.1f, 0.0f, 0.0f, 1});
-        Fuze::RendererCommand::Clear(); */
+       Fuze::RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
+        Fuze::RendererCommand::Clear();
 
         // Input Logic --------------------------
         m_CameraController->OnUpdate(ts);
@@ -124,7 +124,7 @@ class TestLayer : public Fuze::Layer {
 class Sandbox : public Fuze::Application {
   public:
     Sandbox() {
-        PushLayer(new ColorPickerLayer());
+        //PushLayer(new ColorPickerLayer());
         PushLayer(new TestLayer());
 
         this->Get().GetWindow().SetTitle("Fuze");

@@ -8,13 +8,14 @@ class OrthographicCamera {
     OrthographicCamera(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
     ~OrthographicCamera();
 
-    void XTranslate(float xPos);
-    void YTranslate(float yPos);
+    void SetPosition(float x, float y);
 
-    void Rotate(float degrees);
+    void SetRotation(float degrees);
     void SetProjection(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
 
-    inline const glm::mat4 GetViewProjection() const { return m_ViewProjection; }
+    inline const glm::mat4 GetViewProjection() const {
+        return m_ViewProjection;
+    }
 
   private:
     void RecalculateViewProjection();

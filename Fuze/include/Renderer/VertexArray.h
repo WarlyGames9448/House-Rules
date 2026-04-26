@@ -6,7 +6,7 @@ namespace Fuze {
 
 class FUZE_API VertexArray {
   public:
-    static VertexArray* Create();
+    static Ref<VertexArray> Create();
 
     virtual ~VertexArray();
 
