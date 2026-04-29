@@ -14,3 +14,7 @@
 	path = Fuze/vendor/glm
 	url = https://github.com/g-truc/glm.git
 	ignore = dirty
+[submodule "Fuze/vendor/tracy"]
+	path = Fuze/vendor/tracy
+	url = https://github.com/wolfpld/tracy.git
+	ignore = dirty
