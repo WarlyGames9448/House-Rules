@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Window.h"
 
+#include "Utils/FileUtils.h"
+
 namespace Fuze {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
@@ -16,7 +18,7 @@ Application::Application() {
 
     m_Window = Scope<Window>(Window::Create());
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
-    m_Window->SetIcon(std::string(std::filesystem::current_path()) + "/Fuze/assets/FuzeLogo.png");
+    m_Window->SetIcon(std::string(FileUtils::GetAppAsset("FuzeLogo.png")));
 
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);

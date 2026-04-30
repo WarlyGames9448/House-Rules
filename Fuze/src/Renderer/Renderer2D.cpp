@@ -5,6 +5,8 @@
 #include "Renderer/RendererCommand.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Utils/FileUtils.h"
+
 namespace Fuze {
 
 struct Renderer2DStorage {
@@ -50,9 +52,7 @@ void Renderer2D::Init() {
     Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
     m_Data->vertexArray->SetIndexBuffer(indexBuffer);
 
-    std::string current_path = std::string(std::filesystem::current_path());
-
-    m_Data->shader = Shader::Create(current_path + "/Fuze/assets/shaders/shader.glsl");
+    m_Data->shader = Shader::Create(FileUtils::GetAppAsset("shaders/shader.glsl"));
     m_Data->whiteTexture = Texture2D::Create();
     m_Data->shader->SetInt("u_Texture", 0);
 }

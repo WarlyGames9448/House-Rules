@@ -30,7 +30,7 @@ class ColorPickerLayer : public Fuze::Layer {
 class Sandbox : public Fuze::Application {
   public:
     Sandbox() {
-        //PushLayer(new ColorPickerLayer());
+        // PushLayer(new ColorPickerLayer());
         PushLayer(new Fuze::Sandbox2D());
 
         this->Get().GetWindow().SetTitle("Fuze");

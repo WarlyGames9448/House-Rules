@@ -16,7 +16,12 @@ static_assert("Fuze only works on Linux.");
     #include <Windows.h>
 #elif defined(FUZE_PLATFORM_LINUX)
     #include <signal.h>
+    #include <unistd.h>
+    #include <limits.h>
     #define FUZE_DEBUGBREAK() raise(SIGTRAP)
+#elif defined(FUZE_PLATFORM_MACOS)
+    #include <mach-o/dyld.h>
+    #include <limits.h>
 #else
     #define FUZE_DEBUGBREAK()
 #endif

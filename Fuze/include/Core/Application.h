@@ -25,6 +25,7 @@ class FUZE_API Application {
 
     void Run();
 
+
     inline static Application& Get() {
         return *s_Instance;
     }
@@ -32,7 +33,7 @@ class FUZE_API Application {
         return *m_Window;
     }
 
-    Timestep GetDeltaTime() const {
+    inline Timestep GetDeltaTime() const {
         return m_DeltaTime;
     }
 
@@ -40,7 +41,6 @@ class FUZE_API Application {
     bool OnWindowClose(WindowCloseEvent& event);
     bool OnWindowMinimized(WindowMinimizedEvent& event);
     bool OnWindowRestored(WindowRestoredEvent& event);
-
 
   private:
     Scope<Window> m_Window;

@@ -11,6 +11,8 @@ class Sandbox2D : public Layer {
     void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
 
+    std::filesystem::path GetSandboxAsset(const std::string& file);
+
   private:
     Ref<Texture2D> m_Texture1;
     Ref<Texture2D> m_Texture2;

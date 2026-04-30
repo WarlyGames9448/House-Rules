@@ -1,7 +1,7 @@
 #include "Sandbox2D.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 #include "Renderer/Renderer2D.h"
+#include "Utils/FileUtils.h"
 
 namespace Fuze {
 Sandbox2D::Sandbox2D()
@@ -11,13 +11,11 @@ Sandbox2D::Sandbox2D()
 void Sandbox2D::OnAttach() {
     Renderer2D::Init();
 
-    m_CameraController->SetSpeed(5.0f, 180.0f, 0.05f);
+    m_CameraController->SetSpeed(5.0f, 180.0f, 0.2f);
     m_CameraController->InvertScroll(true);
 
-    std::string current_path = std::string(std::filesystem::current_path());
-
-    m_Texture1 = Texture2D::Create(current_path + "/Sandbox/assets/textures/madruga.jpeg");
-    m_Texture2 = Texture2D::Create(current_path + "/Sandbox/assets/textures/line.png");
+    m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
+    m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
 }
 
 void Sandbox2D::OnDetach() {

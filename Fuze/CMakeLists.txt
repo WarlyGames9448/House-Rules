@@ -26,6 +26,8 @@ add_library(Fuze SHARED
     src/Renderer/Shader.cpp
     src/Renderer/Texture.cpp
     src/Renderer/VertexArray.cpp
+
+    src/Utils/FileUtils.cpp
 )
 
 target_include_directories(Fuze
@@ -91,6 +93,24 @@ target_compile_definitions(imgui PRIVATE
 )
 
 # ═══════════════════════════════════════════════════════════
+# TRACY
+# ═══════════════════════════════════════════════════════════
+
+option(FUZE_ENABLE_PROFILING "Enable Tracy Profiling" ON)
+
+if(FUZE_ENABLE_PROFILING)
+    add_library(tracy STATIC vendor/tracy/public/TracyClient.cpp)
+
+    target_include_directories(tracy PUBLIC vendor/tracy/public)
+
+    target_compile_definitions(tracy PUBLIC TRACY_ENABLE)
+
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(tracy PUBLIC dl)
+    endif()
+endif()
+
+# ═══════════════════════════════════════════════════════════
 # OTHERS
 # ═══════════════════════════════════════════════════════════
 
@@ -107,6 +127,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
 
 target_link_libraries(Fuze
     PUBLIC
@@ -118,5 +139,10 @@ target_link_libraries(Fuze
         Threads::Threads
         ${CMAKE_DL_LIBS}
 )
+
+if(FUZE_ENABLE_PROFILING)
+    target_link_libraries(Fuze PUBLIC tracy)
+    target_compile_definitions(Fuze PUBLIC FUZE_PROFILE_ON)
+endif()
 
 target_precompile_headers(Fuze PRIVATE include/Core/fuzepch.h)
