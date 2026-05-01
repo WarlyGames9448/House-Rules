@@ -8,6 +8,8 @@
 
 namespace Fuze {
 OpenGLTexture2D::OpenGLTexture2D(): m_Width(1), m_Height(1) {
+    FUZE_PROFILE_FUNCTION();
+
     unsigned char whitePixel[] = { 255, 255, 255, 255 };
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
@@ -25,6 +27,8 @@ OpenGLTexture2D::OpenGLTexture2D(): m_Width(1), m_Height(1) {
 }
 
 OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
+    FUZE_PROFILE_FUNCTION();
+
     stbi_set_flip_vertically_on_load(true);
 
     stbi_uc* data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Channels, 0);
@@ -59,14 +63,20 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
 }
 
 OpenGLTexture2D::~OpenGLTexture2D() {
+    FUZE_PROFILE_FUNCTION();
+
     glDeleteTextures(1, &m_RendererID);
 }
 
 void OpenGLTexture2D::Bind(uint32_t slot) const {
+    FUZE_PROFILE_FUNCTION();
+
     glBindTextureUnit(slot, m_RendererID);
 }
 
 void OpenGLTexture2D::Unbind(uint32_t slot) const {
+    FUZE_PROFILE_FUNCTION();
+
     glBindTextureUnit(slot, 0);
 }
 }

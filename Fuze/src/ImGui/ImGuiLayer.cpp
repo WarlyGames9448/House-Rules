@@ -12,11 +12,15 @@
 
 namespace Fuze {
 
-ImGuiLayer::ImGuiLayer(): Layer("ImGuiLayer") {}
+ImGuiLayer::ImGuiLayer(): Layer("ImGuiLayer") {
+}
 
-ImGuiLayer::~ImGuiLayer() {}
+ImGuiLayer::~ImGuiLayer() {
+}
 
 void ImGuiLayer::OnAttach() {
+    FUZE_PROFILE_FUNCTION();
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -44,18 +48,24 @@ void ImGuiLayer::OnAttach() {
 }
 
 void ImGuiLayer::OnDetach() {
+    FUZE_PROFILE_FUNCTION();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
 void ImGuiLayer::Begin() {
+    FUZE_PROFILE_FUNCTION();
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
 void ImGuiLayer::End() {
+    FUZE_PROFILE_FUNCTION();
+
     ImGuiIO& io = ImGui::GetIO();
     Application& app = Application::Get();
     GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
@@ -75,8 +85,6 @@ void ImGuiLayer::End() {
 }
 
 void ImGuiLayer::OnImGuiRender() {
-    static bool show = true;
-    ImGui::ShowDemoWindow(&show);
 }
 
 void ImGuiLayer::OnEvent(Event& event) {

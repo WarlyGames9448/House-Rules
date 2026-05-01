@@ -3,6 +3,7 @@ add_library(Fuze SHARED
     src/Core/Layer.cpp
     src/Core/LayerStack.cpp
     src/Core/Log.cpp
+    src/Core/Profiler.cpp
 
     src/ImGui/ImGuiLayer.cpp
 

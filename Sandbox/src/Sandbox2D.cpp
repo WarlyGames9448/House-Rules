@@ -9,6 +9,8 @@ Sandbox2D::Sandbox2D()
 }
 
 void Sandbox2D::OnAttach() {
+    FUZE_PROFILE_FUNCTION();
+
     Renderer2D::Init();
 
     m_CameraController->SetSpeed(5.0f, 180.0f, 0.2f);

@@ -12,6 +12,7 @@ namespace Fuze {
 Application* Application::s_Instance = nullptr;
 
 Application::Application() {
+    FUZE_PROFILE_FUNCTION();
 
     FUZE_CORE_ASSERT(!s_Instance, "Application Already exists!");
     s_Instance = this;
@@ -25,9 +26,11 @@ Application::Application() {
 }
 
 Application::~Application() {
+    FUZE_PROFILE_FUNCTION();
 }
 
 void Application::OnEvent(Event& event) {
+    FUZE_PROFILE_FUNCTION();
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
     dispatcher.Dispatch<WindowMinimizedEvent>(BIND_EVENT_FN(OnWindowMinimized));
@@ -53,7 +56,11 @@ void Application::PushOverlay(Layer* layer) {
 
 void Application::Run() {
     while (m_Running) {
-        m_Window->OnUpdate();
+        {
+            FUZE_PROFILE_SCOPE("Window Update");
+
+            m_Window->OnUpdate();
+        }
 
         m_DeltaTime = m_Window->GetTime() - m_LastFrameTime;
         if (m_DeltaTime > 0.25) m_DeltaTime = 0.25; // Clipping
@@ -65,11 +72,16 @@ void Application::Run() {
             }
         }
 
-        m_ImGuiLayer->Begin();
-        for (Layer* layer : m_LayerStack) {
-            layer->OnImGuiRender();
+        {
+            FUZE_PROFILE_SCOPE("ImGUI Render")
+            m_ImGuiLayer->Begin();
+            for (Layer* layer : m_LayerStack) {
+                layer->OnImGuiRender();
+            }
+            m_ImGuiLayer->End();
         }
-        m_ImGuiLayer->End();
+
+        FUZE_PROFILE_FRAME();
     }
 }
 

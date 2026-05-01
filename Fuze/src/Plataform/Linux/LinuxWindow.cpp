@@ -34,6 +34,8 @@ LinuxWindow::~LinuxWindow() {
 }
 
 void LinuxWindow::Init(const WindowProps& windowProps) {
+    FUZE_PROFILE_FUNCTION();
+
     m_Data.Title = windowProps.Title;
     m_Data.Width = windowProps.Width;
     m_Data.Height = windowProps.Height;
@@ -41,6 +43,7 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     FUZE_CORE_INFO("Creating Window: {0}, ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
 
     if (!s_GLFWInitialized) {
+        FUZE_PROFILE_SCOPE("glfwInit")
         [[maybe_unused]] int success = glfwInit();
         FUZE_CORE_ASSERT(success, "Failed to initialize GFLW!")
 
@@ -56,8 +59,12 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-    FUZE_CORE_ASSERT(m_Window, "Failed to create GLFW window");
+    {
+        FUZE_PROFILE_SCOPE("glfwCreateWindow");
+
+        m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+        FUZE_CORE_ASSERT(m_Window, "Failed to create GLFW window");
+    }
 
     m_Context = CreateScope<OpenGLContext>(m_Window);
     m_Context->Init();
@@ -204,11 +211,15 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
 }
 
 void LinuxWindow::Shutdown() {
+    FUZE_PROFILE_FUNCTION();
+
     glfwDestroyWindow(m_Window);
 }
 
 void LinuxWindow::OnUpdate() {
-    glfwPollEvents();
+    FUZE_PROFILE_SCOPE("PollEvents"){
+        glfwPollEvents();
+    }
     m_Context->SwapBuffers();
 }
 
@@ -227,10 +238,14 @@ Timestep LinuxWindow::GetTime() const {
 }
 
 void LinuxWindow::SetTitle(const std::string& title) {
+    FUZE_PROFILE_FUNCTION();
+
     glfwSetWindowTitle(m_Window, title.c_str());
 }
 
 void LinuxWindow::SetIcon(const std::string& filepath) {
+    FUZE_PROFILE_FUNCTION();
+
     int width, height;
     unsigned char* data = stbi_load(filepath.c_str(), &width, &height, 0, 4);
 

@@ -25,7 +25,6 @@ class FUZE_API Application {
 
     void Run();
 
-
     inline static Application& Get() {
         return *s_Instance;
     }

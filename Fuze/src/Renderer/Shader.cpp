@@ -43,6 +43,8 @@ Ref<Shader> Shader::Create(const std::string& vertexSrc, const std::string& frag
 // ShaderLibrary //////////////////////////
 
 void ShaderLibrary::AddShader(const std::string& name, const std::string& filepath) {
+    FUZE_PROFILE_FUNCTION();
+
     if (NameExists(name)) {
         FUZE_CORE_ASSERT(false, "Shader name already exists: {0}", name);
         return;
@@ -51,6 +53,8 @@ void ShaderLibrary::AddShader(const std::string& name, const std::string& filepa
 }
 
 void ShaderLibrary::AddShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) {
+    FUZE_PROFILE_FUNCTION();
+
     if (NameExists(name)) {
         FUZE_CORE_ASSERT(false, "Shader name already exists: {0}", name);
         return;
@@ -59,6 +63,8 @@ void ShaderLibrary::AddShader(const std::string& name, const std::string& vertex
 }
 
 Ref<Shader> ShaderLibrary::GetShader(const std::string& name) const {
+    FUZE_PROFILE_FUNCTION();
+
     if (!NameExists(name)) {
         FUZE_CORE_ASSERT(false, "Shader name doesn't exists: {0}", name);
         return nullptr;

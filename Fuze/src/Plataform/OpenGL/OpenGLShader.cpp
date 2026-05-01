@@ -19,10 +19,14 @@ OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& frag
 }
 
 OpenGLShader::~OpenGLShader() {
+    FUZE_PROFILE_FUNCTION();
+
     glDeleteProgram(m_RendererID);
 }
 
 void OpenGLShader::Compile(const std::string& vertexSrc, const std::string& fragmentSrc) {
+    FUZE_PROFILE_FUNCTION();
+
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -83,14 +87,19 @@ void OpenGLShader::Compile(const std::string& vertexSrc, const std::string& frag
 }
 
 void OpenGLShader::Bind() const {
+    FUZE_PROFILE_FUNCTION();
+
     glUseProgram(m_RendererID);
 }
 
 void OpenGLShader::Unbind() const {
+    FUZE_PROFILE_FUNCTION();
+
     glUseProgram(0);
 }
 
 const std::pair<std::string, std::string> OpenGLShader::ParseShader(const std::string& source) {
+    FUZE_PROFILE_FUNCTION();
 
     std::string shaderSrc[2];
     enum Type { VERTEX = 0, FRAGMENT = 1 };
@@ -120,6 +129,8 @@ const std::pair<std::string, std::string> OpenGLShader::ParseShader(const std::s
 
 // TODO: Move this to file handler system
 const std::string OpenGLShader::ReadFile(const std::string& filepath) {
+    FUZE_PROFILE_FUNCTION();
+
     std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 
     FUZE_CORE_ASSERT(file.is_open(), "Could not open file: {0}", filepath);
@@ -147,13 +158,19 @@ const std::string OpenGLShader::ReadFile(const std::string& filepath) {
 }
 
 void OpenGLShader::SetInt(const std::string& name, int value){
+    FUZE_PROFILE_FUNCTION();
+
     UploadUniformInt(name, value);
 }
 
 void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value) {
+    FUZE_PROFILE_FUNCTION();
+
     UploadUniformFloat4(name, value);
 }
 void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value) {
+    FUZE_PROFILE_FUNCTION();
+
     UploadUniformMat4(name, value);
 }
 

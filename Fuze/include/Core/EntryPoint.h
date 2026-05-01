@@ -7,11 +7,23 @@
 extern Fuze::Application* Fuze::CreateApplication();
 
 int main(int argc, char** argv) {
-    Fuze::Log::init();
+    Fuze::Application* app;
+    {
+        FUZE_PROFILE_SCOPE("Init");
+        Fuze::Log::init();
+        app = Fuze::CreateApplication();
+    }
+    {
+        FUZE_PROFILE_SCOPE("Running");
 
-    auto app = Fuze::CreateApplication();
-    app->Run();
-    delete app;
+        app->Run();
+    }
+    {
+        FUZE_PROFILE_SCOPE("Delete");
+        delete app;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     return 0;
 }
 

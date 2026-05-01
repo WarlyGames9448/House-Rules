@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_PURE
 #include <glm/glm.hpp>
 
 #include <algorithm>
@@ -9,6 +11,7 @@
 #include <utility>
 
 #include "Log.h"
+#include "Profiler.h"
 
 #include <ostream>
 #include <sstream>

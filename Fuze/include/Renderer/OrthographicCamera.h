@@ -13,7 +13,7 @@ class OrthographicCamera {
     void SetRotation(float degrees);
     void SetProjection(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
 
-    inline const glm::mat4 GetViewProjection() const {
+    inline const glm::mat4& GetViewProjection() const {
         return m_ViewProjection;
     }
 
