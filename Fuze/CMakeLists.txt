@@ -143,7 +143,6 @@ target_link_libraries(Fuze
 
 if(FUZE_ENABLE_PROFILING)
     target_link_libraries(Fuze PUBLIC tracy)
-    target_compile_definitions(Fuze PUBLIC FUZE_PROFILE_ON)
 endif()
 
 target_precompile_headers(Fuze PRIVATE include/Core/fuzepch.h)

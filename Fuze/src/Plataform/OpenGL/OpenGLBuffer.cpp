@@ -7,6 +7,13 @@
 namespace Fuze {
 
 // Vertex Buffer ////////////////////////////////////////////////////////////////////////
+OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size) {
+    FUZE_PROFILE_FUNCTION();
+
+    glGenBuffers(1, &m_RendererID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+    glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
+}
 
 OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) {
     FUZE_PROFILE_FUNCTION();
@@ -32,6 +39,13 @@ void OpenGLVertexBuffer::Unbind() const {
     FUZE_PROFILE_FUNCTION();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void OpenGLVertexBuffer::SetData(const void* data, uint32_t size) const {
+    FUZE_PROFILE_FUNCTION();
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }
 
 // Index Buffer ////////////////////////////////////////////////////////////////////////

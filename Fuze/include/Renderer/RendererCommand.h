@@ -8,8 +8,12 @@ class RendererCommand {
     inline static void SetBlendMode(BlendMode mode){
         s_RendererAPI->SetBlendMode(mode);
     }
+
     inline static void DrawIndexed(const Ref<VertexArray>& vertexArray) {
         s_RendererAPI->DrawIndexed(vertexArray);
+    }
+      inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
+        s_RendererAPI->DrawIndexed(vertexArray, indexCount);
     }
 
     inline static void SetClearColor(const glm::vec4& color) {

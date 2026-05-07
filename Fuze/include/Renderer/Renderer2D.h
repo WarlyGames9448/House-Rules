@@ -25,5 +25,8 @@ class FUZE_API Renderer2D : public Renderer {
                          const glm::vec4& color, float rotation = 0.0f);
     static void DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture,
                          const glm::vec4& color, float rotation = 0.0f);
+
+  private:
+    static void Flush();
 };
 }

@@ -1,6 +1,7 @@
 #pragma once
 
-#ifdef FUZE_PROFILE_ON
+#define FUZE_PROFILE_ON 0
+#if FUZE_PROFILE_ON
     #include <tracy/Tracy.hpp>
     #define FUZE_STACK_DEEP 15
     #define FUZE_PROFILE_FRAME() FrameMark

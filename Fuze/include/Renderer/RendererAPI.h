@@ -27,6 +27,7 @@ class RendererAPI {
     virtual void Clear() = 0;
 
     virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) = 0;
+    virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) = 0;
 
   private:
     static API s_API;

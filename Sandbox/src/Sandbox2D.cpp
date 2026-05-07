@@ -33,9 +33,10 @@ void Sandbox2D::OnUpdate(Timestep ts) {
 
     Renderer2D::BeginScene(m_CameraController->GetCamera());
 
-    Renderer2D::DrawQuad({0.0f,0.0f}, {3.0f, 0.5f}, m_Texture1, 30.0f);
-    Renderer2D::DrawQuad({-1.0f, 0.0f, 0.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-    Renderer2D::DrawQuad({0.0f,0.0f}, {10.0f, 10.0f}, m_Texture2, {1.0f, 1.0f, 0.0f, 0.8f}, 45.0f);
+    // Renderer2D::DrawQuad({0.0f,0.0f}, {3.0f, 0.5f}, m_Texture1, 30.0f);
+    Renderer2D::DrawQuad({-1.0f, 0.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+    Renderer2D::DrawQuad({1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 1.0f});
+    // Renderer2D::DrawQuad({0.0f,0.0f}, {10.0f, 10.0f}, m_Texture2, {1.0f, 1.0f, 0.0f, 0.8f}, 45.0f);
 
     Renderer2D::EndScene();
 }

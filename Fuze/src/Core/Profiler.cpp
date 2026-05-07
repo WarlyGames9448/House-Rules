@@ -2,7 +2,7 @@
 
 #include "Profiler.h"
 
-#ifdef FUZE_PROFILE_ON
+#if FUZE_PROFILE_ON
 void* operator new(std::size_t count) {
     auto ptr = malloc(count);
     FUZE_PROFILE_ALLOC(ptr, count);

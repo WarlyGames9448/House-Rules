@@ -32,4 +32,12 @@ void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray) {
 
     glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
+
+void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
+    FUZE_PROFILE_FUNCTION();
+
+    uint32_t count = (indexCount == 0) ? vertexArray->GetIndexBuffer()->GetCount() : indexCount;
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+}
+
 }
