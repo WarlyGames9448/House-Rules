@@ -28,5 +28,6 @@ class FUZE_API Renderer2D : public Renderer {
 
   private:
     static void Flush();
+    static void FlushAndReset();
 };
 }

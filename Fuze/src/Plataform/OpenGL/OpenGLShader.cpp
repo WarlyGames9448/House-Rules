@@ -157,7 +157,7 @@ const std::string OpenGLShader::ReadFile(const std::string& filepath) {
     return buffer;
 }
 
-void OpenGLShader::SetInt(const std::string& name, int value){
+void OpenGLShader::SetInt(const std::string& name, int value) {
     FUZE_PROFILE_FUNCTION();
 
     UploadUniformInt(name, value);
@@ -174,38 +174,53 @@ void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value) {
     UploadUniformMat4(name, value);
 }
 
+void OpenGLShader::SetIntArray(const std::string& name, uint32_t size, int* value) {
+    FUZE_PROFILE_FUNCTION();
+
+    int location = glGetUniformLocation(m_RendererID, name.c_str());
+    glUniform1iv(location, size, value);
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
+}
+
 void OpenGLShader::UploadUniformInt(const std::string& name, int value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform1d(location, value);
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat(const std::string& name, float value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform1f(location, value);
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform2fv(location, 1, glm::value_ptr(value));
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform3fv(location, 1, glm::value_ptr(value));
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform4fv(location, 1, glm::value_ptr(value));
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 
 void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& value) {
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    if(location == -1) FUZE_CORE_WARN("Uniform {0} not found!", name);
 }
 }

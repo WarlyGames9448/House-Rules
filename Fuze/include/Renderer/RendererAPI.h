@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/VertexArray.h"
+#include "Renderer/Texture.h"
 
 namespace Fuze {
 

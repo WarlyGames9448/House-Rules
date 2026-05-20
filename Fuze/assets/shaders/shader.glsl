@@ -1,33 +1,72 @@
 #define _TYPE_VERTEX_SHADER
-#version 330 core
+#version 460 core
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec4 a_Color;
 layout (location = 2) in vec2 a_TexCoord;
+layout (location = 3) in float a_TexIndex;
 
 uniform mat4 u_ViewProjection;
 uniform mat4 u_ModelMatrix;
 
-out vec2 v_TexCoord;
 out vec4 v_Color;
-
+out vec2 v_TexCoord;
+flat out float v_TexIndex;
 
 void main() {
-    v_TexCoord = a_TexCoord;
     v_Color = a_Color;
+    v_TexCoord = a_TexCoord;
+    v_TexIndex = a_TexIndex;
     gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
 
 #define _TYPE_FRAGMENT_SHADER
-#version 330 core
+#version 460 core
 layout (location = 0) out vec4 color;
 
-in vec2 v_TexCoord;
 in vec4 v_Color;
+in vec2 v_TexCoord;
+flat in float v_TexIndex;
 
-uniform vec4 u_Color;
-uniform sampler2D u_Texture1;
+uniform sampler2D u_Textures[32];
+
+vec4 GetTextureColor(int index, vec2 uv) {
+    switch (index) {
+        case 0:  return texture(u_Textures[0], uv);
+        case 1:  return texture(u_Textures[1], uv);
+        case 2:  return texture(u_Textures[2], uv);
+        case 3:  return texture(u_Textures[3], uv);
+        case 4:  return texture(u_Textures[4], uv);
+        case 5:  return texture(u_Textures[5], uv);
+        case 6:  return texture(u_Textures[6], uv);
+        case 7:  return texture(u_Textures[7], uv);
+        case 8:  return texture(u_Textures[8], uv);
+        case 9:  return texture(u_Textures[9], uv);
+        case 10: return texture(u_Textures[10], uv);
+        case 11: return texture(u_Textures[11], uv);
+        case 12: return texture(u_Textures[12], uv);
+        case 13: return texture(u_Textures[13], uv);
+        case 14: return texture(u_Textures[14], uv);
+        case 15: return texture(u_Textures[15], uv);
+        case 16: return texture(u_Textures[16], uv);
+        case 17: return texture(u_Textures[17], uv);
+        case 18: return texture(u_Textures[18], uv);
+        case 19: return texture(u_Textures[19], uv);
+        case 20: return texture(u_Textures[20], uv);
+        case 21: return texture(u_Textures[21], uv);
+        case 22: return texture(u_Textures[22], uv);
+        case 23: return texture(u_Textures[23], uv);
+        case 24: return texture(u_Textures[24], uv);
+        case 25: return texture(u_Textures[25], uv);
+        case 26: return texture(u_Textures[26], uv);
+        case 27: return texture(u_Textures[27], uv);
+        case 28: return texture(u_Textures[28], uv);
+        case 29: return texture(u_Textures[29], uv);
+        case 30: return texture(u_Textures[30], uv);
+        case 31: return texture(u_Textures[31], uv);
+    }
+    return vec4(1.0, 0.0, 1.0, 1.0); // Pink for error
+}
 
 void main() {
-    //color = texture(u_Texture1, v_TexCoord) * u_Color;
-    color = v_Color;
+    color = GetTextureColor(int(v_TexIndex), v_TexCoord) * v_Color;
 }
