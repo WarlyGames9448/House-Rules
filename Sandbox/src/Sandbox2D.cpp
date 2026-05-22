@@ -10,6 +10,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach() {
     FUZE_PROFILE_FUNCTION();
+    RendererCommand::InitializeRenderCaps();
 
     Renderer2D::Init();
 
@@ -18,6 +19,11 @@ void Sandbox2D::OnAttach() {
 
     m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
     m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
+
+    FUZE_INFO("{0} {1} {2}",
+              RendererCommand::GetRenderCaps().GraphicsAPI,
+              RendererCommand::GetRenderCaps().Vendor,
+              RendererCommand::GetRenderCaps().Renderer);
 }
 
 void Sandbox2D::OnDetach() {
@@ -34,9 +40,9 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     Renderer2D::BeginScene(m_CameraController->GetCamera());
 
     Renderer2D::DrawQuad({0.0f, 0.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-    Renderer2D::DrawQuad({0.0f,0.0f}, {10.0f, 10.0f}, m_Texture2, {1.0f, 1.0f, 0.0f, 0.8f}, 45.0f);
+    Renderer2D::DrawQuad({0.0f, 0.0f}, {10.0f, 10.0f}, m_Texture2, 1.0f, {1.0f, 1.0f, 0.0f, 0.8f});
     Renderer2D::DrawQuad({1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
-    Renderer2D::DrawQuad({3.0f,0.0f}, {3.0f, 0.5f}, m_Texture1, 30.0f);
+    Renderer2D::DrawQuad({3.0f, 0.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
 
     Renderer2D::EndScene();
 }

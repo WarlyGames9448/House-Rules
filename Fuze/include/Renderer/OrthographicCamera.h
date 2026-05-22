@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 
 namespace Fuze {
-class OrthographicCamera {
+class FUZE_API OrthographicCamera {
   public:
     OrthographicCamera(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
     ~OrthographicCamera();

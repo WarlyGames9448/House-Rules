@@ -19,6 +19,7 @@ class FUZE_API Shader {
     virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
     virtual void SetIntArray(const std::string& name, uint32_t size, int* value) = 0;
 
+    [[deprecated]] // Should not be used
     virtual uint32_t GetRendererID() const = 0;
 };
 

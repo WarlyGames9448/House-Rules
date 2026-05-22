@@ -31,8 +31,9 @@ struct Renderer2DData {
     QuadVertex* quadVertexBufferBase = nullptr;
     QuadVertex* quadVertexBufferPtr = nullptr;
 
-    static const uint32_t maxTextureSlots = 32;
-    Ref<Texture2D> TextureSlots[maxTextureSlots];
+    uint32_t maxTextureSlots = 32;
+
+    Ref<Texture2D> TextureSlots[32];
     int TextureSlotIndex = 1;
 };
 
@@ -45,10 +46,10 @@ void Renderer2D::Init() {
 
     s_Data.vertexBuffer = VertexBuffer::Create(s_Data.maxVertices * sizeof(QuadVertex));
     s_Data.vertexBuffer->SetLayout({
-        {ShaderDataType::Float3, "a_Position"},
-        {ShaderDataType::Float4,    "a_Color"},
-        {ShaderDataType::Float2, "a_TexCoord"},
-        { ShaderDataType::Float, "a_TexIndex"}
+        {ShaderDataType::Float3,     "a_Position"},
+        {ShaderDataType::Float4,        "a_Color"},
+        {ShaderDataType::Float2,     "a_TexCoord"},
+        { ShaderDataType::Float,     "a_TexIndex"}
     });
 
     s_Data.vertexArray = VertexArray::Create();
@@ -78,7 +79,11 @@ void Renderer2D::Init() {
     s_Data.shader = Shader::Create(FileUtils::GetAppAsset("shaders/shader.glsl"));
     s_Data.whiteTexture = Texture2D::Create();
 
-    // TODO: change GL_MAX_TEXTURE_IMAGE_UNITS based on hardware
+    // Max supported is 32 textures
+    s_Data.maxTextureSlots = RendererCommand::GetRenderCaps().MaxTextureImageUnits <= 32
+                                 ? RendererCommand::GetRenderCaps().MaxTextureImageUnits
+                                 : 32;
+
     s_Data.shader->Bind();
     int samplers[32];
     for (int i = 0; i < 32; i++)
@@ -92,7 +97,6 @@ void Renderer2D::Init() {
 
 void Renderer2D::Shutdown() {
     FUZE_PROFILE_FUNCTION();
-
 }
 
 void Renderer2D::BeginScene(Ref<OrthographicCamera> camera) {
@@ -132,10 +136,11 @@ void Renderer2D::FlushAndReset() {
     s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const glm::vec4& color, float rotation) {
-    DrawQuad({position.x, position.y, 0.0f}, scale, color, rotation);
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const glm::vec4& color) {
+    DrawQuad({position.x, position.y, 0.0f}, scale, color);
 }
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const glm::vec4& color, float rotation) {
+
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
 
     s_Data.quadVertexBufferPtr->Position = position;
@@ -165,20 +170,13 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, con
     s_Data.quadIndexCount += 6;
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<Texture2D> texture, float rotation) {
-    DrawQuad({position.x, position.y, 0.0f}, scale, texture, rotation);
-}
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float rotation) {
-    DrawQuad(position, scale, texture, {1.0f, 1.0f, 1.0f, 1.0f}, rotation);
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor,
+                          const glm::vec4& color) {
+    DrawQuad({position.x, position.y, 0.0f}, scale, texture, tilingFactor, color);
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<Texture2D> texture,
-                          const glm::vec4& color, float rotation) {
-    DrawQuad({position.x, position.y, 0.0f}, scale, texture, color, rotation);
-}
-
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture,
-                          const glm::vec4& color, float rotation) {
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor,
+                          const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
 
     s_Data.quadVertexBufferPtr->Position = position;
@@ -189,19 +187,19 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref
 
     s_Data.quadVertexBufferPtr->Position = {position.x + scale.x, position.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
-    s_Data.quadVertexBufferPtr->TexCoords = {1.0f, 0.0f};
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 0.0f};
     s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadVertexBufferPtr->Position = {position.x + scale.x, position.y + scale.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
-    s_Data.quadVertexBufferPtr->TexCoords = {1.0f, 1.0f};
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 1.0f * tilingFactor};
     s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadVertexBufferPtr->Position = {position.x, position.y + scale.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
-    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 1.0f};
+    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 1.0f * tilingFactor};
     s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
     s_Data.quadVertexBufferPtr++;
     s_Data.quadIndexCount += 6;

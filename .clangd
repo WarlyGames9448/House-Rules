@@ -1,0 +1,10 @@
+CompileFlags:
+  Remove:
+    - "-include-pch"
+    - "*.pch"
+    - "*.gch"
+
+Diagnostics:
+  Suppress:
+    - "missing-includes"
+    - "unused-includes"

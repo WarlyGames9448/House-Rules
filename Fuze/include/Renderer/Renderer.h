@@ -17,6 +17,7 @@ class FUZE_API Renderer {
     static void BeginScene(Ref<Shader>& shader, Ref<OrthographicCamera> camera);
     static void EndScene();
 
+    [[deprecated]] // Using now dinamic vertexArray
     static void Submit(Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix = 1.0f);
 };
 }

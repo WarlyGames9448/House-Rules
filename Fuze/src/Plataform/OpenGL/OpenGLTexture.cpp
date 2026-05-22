@@ -48,7 +48,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
 
     glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
 
-    glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -78,6 +78,7 @@ void OpenGLTexture2D::Bind(uint32_t slot) const {
 void OpenGLTexture2D::Unbind(uint32_t slot) const {
     FUZE_PROFILE_FUNCTION();
 
-    glBindTextureUnit(slot, 0);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 }

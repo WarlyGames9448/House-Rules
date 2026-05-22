@@ -3,16 +3,17 @@
 #include "RendererAPI.h"
 
 namespace Fuze {
-class RendererCommand {
+class FUZE_API RendererCommand {
   public:
-    inline static void SetBlendMode(BlendMode mode){
+    inline static void SetBlendMode(BlendMode mode) {
         s_RendererAPI->SetBlendMode(mode);
     }
 
     inline static void DrawIndexed(const Ref<VertexArray>& vertexArray) {
         s_RendererAPI->DrawIndexed(vertexArray);
     }
-      inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
+
+    inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
         s_RendererAPI->DrawIndexed(vertexArray, indexCount);
     }
 
@@ -21,6 +22,14 @@ class RendererCommand {
     }
     inline static void Clear() {
         s_RendererAPI->Clear();
+    }
+
+    inline static const RenderCaps GetRenderCaps() {
+        return s_RendererAPI->GetRenderCaps();
+    }
+
+    inline static void InitializeRenderCaps() {
+        s_RendererAPI->InitializeRenderCaps();
     }
 
   private:
