@@ -1,7 +1,6 @@
 #include "Fuze.h"
 #include "EntryPoint.h"
 
-#include "imgui.h"
 #include "Sandbox2D.h"
 
 class ColorPickerLayer : public Fuze::Layer {

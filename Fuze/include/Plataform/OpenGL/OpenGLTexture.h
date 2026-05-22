@@ -19,7 +19,13 @@ class OpenGLTexture2D : public Texture2D {
         return m_Width;
     }
 
-    virtual int GetChannels() const { return m_Channels;}
+    virtual unsigned int GetRendererID() const override {
+        return m_RendererID;
+    }
+
+    virtual int GetChannels() const {
+        return m_Channels;
+    }
 
   private:
     int m_Width, m_Height, m_Channels;

@@ -10,10 +10,13 @@ class Sandbox2D : public Layer {
     void OnDetach() override;
     void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
+    void OnImGuiRender() override;
   private:
     Ref<Texture2D> m_Texture1;
     Ref<Texture2D> m_Texture2;
 
     Ref<OrthographicCameraController> m_CameraController;
+
+    float m_Time = 0.0f;
 };
 }

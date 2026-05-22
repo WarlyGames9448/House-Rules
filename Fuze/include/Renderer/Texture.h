@@ -7,6 +7,8 @@ class FUZE_API Texture {
 
     virtual int GetHight() const = 0;
     virtual int GetWidth() const = 0;
+
+    virtual unsigned int GetRendererID() const = 0;
 };
 
 class FUZE_API Texture2D : public Texture {

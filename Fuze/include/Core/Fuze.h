@@ -5,6 +5,7 @@
 #include "Layer.h"
 #include "Log.h"
 #include "ImGui/ImGuiLayer.h"
+#include "imgui.h"
 
 #include "Input.h"
 #include "KeyCodes.h"

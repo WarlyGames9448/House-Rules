@@ -31,13 +31,22 @@ struct Renderer2DData {
     QuadVertex* quadVertexBufferBase = nullptr;
     QuadVertex* quadVertexBufferPtr = nullptr;
 
-    uint32_t maxTextureSlots = 32;
+    int maxTextureSlots = 32;
 
     Ref<Texture2D> TextureSlots[32];
     int TextureSlotIndex = 1;
+
+    const glm::vec4 VertexPositions[4] = {
+        { 0.5f,  0.5f, 0.0f, 1.0f},
+        { 0.5f, -0.5f, 0.0f, 1.0f},
+        {-0.5f, -0.5f, 0.0f, 1.0f},
+        {-0.5f,  0.5f, 0.0f, 1.0f}
+    };
 };
 
 static Renderer2DData s_Data;
+
+static Renderer2D::Statistics stats;
 
 void Renderer2D::Init() {
     FUZE_PROFILE_FUNCTION();
@@ -46,10 +55,10 @@ void Renderer2D::Init() {
 
     s_Data.vertexBuffer = VertexBuffer::Create(s_Data.maxVertices * sizeof(QuadVertex));
     s_Data.vertexBuffer->SetLayout({
-        {ShaderDataType::Float3,     "a_Position"},
-        {ShaderDataType::Float4,        "a_Color"},
-        {ShaderDataType::Float2,     "a_TexCoord"},
-        { ShaderDataType::Float,     "a_TexIndex"}
+        {ShaderDataType::Float3, "a_Position"},
+        {ShaderDataType::Float4,    "a_Color"},
+        {ShaderDataType::Float2, "a_TexCoord"},
+        { ShaderDataType::Float, "a_TexIndex"}
     });
 
     s_Data.vertexArray = VertexArray::Create();
@@ -80,9 +89,7 @@ void Renderer2D::Init() {
     s_Data.whiteTexture = Texture2D::Create();
 
     // Max supported is 32 textures
-    s_Data.maxTextureSlots = RendererCommand::GetRenderCaps().MaxTextureImageUnits <= 32
-                                 ? RendererCommand::GetRenderCaps().MaxTextureImageUnits
-                                 : 32;
+    s_Data.maxTextureSlots = RendererCommand::GetRenderCaps().MaxTextureImageUnits <= 32 ? RendererCommand::GetRenderCaps().MaxTextureImageUnits : 32;
 
     s_Data.shader->Bind();
     int samplers[32];
@@ -125,6 +132,7 @@ void Renderer2D::Flush() {
     }
 
     RendererCommand::DrawIndexed(s_Data.vertexArray, s_Data.quadIndexCount);
+    stats.DrawCalls++;
 }
 
 void Renderer2D::FlushAndReset() {
@@ -168,47 +176,170 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, con
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadIndexCount += 6;
+
+    stats.QuadCount++;
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor,
-                          const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor, const glm::vec4& color) {
     DrawQuad({position.x, position.y, 0.0f}, scale, texture, tilingFactor, color);
 }
 
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor,
-                          const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
+
+    // Finding index of the texture
+    float textureIndex = 0.0f;
+    for (int index = 0; index < s_Data.TextureSlotIndex; index++) {
+        if (s_Data.TextureSlots[index]->GetRendererID() == texture->GetRendererID()) {
+            textureIndex = (float)index;
+            break;
+        }
+    }
+
+    if (!textureIndex) {
+        if (s_Data.TextureSlotIndex >= s_Data.maxTextureSlots) {
+            FlushAndReset();
+        }
+
+        textureIndex = s_Data.TextureSlotIndex;
+    }
 
     s_Data.quadVertexBufferPtr->Position = position;
     s_Data.quadVertexBufferPtr->Color = color;
     s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 0.0f};
-    s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadVertexBufferPtr->Position = {position.x + scale.x, position.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
     s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 0.0f};
-    s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadVertexBufferPtr->Position = {position.x + scale.x, position.y + scale.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
     s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 1.0f * tilingFactor};
-    s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
 
     s_Data.quadVertexBufferPtr->Position = {position.x, position.y + scale.y, 1.0f};
     s_Data.quadVertexBufferPtr->Color = color;
     s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 1.0f * tilingFactor};
-    s_Data.quadVertexBufferPtr->TexIndex = float(s_Data.TextureSlotIndex);
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
     s_Data.quadIndexCount += 6;
 
     s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
     s_Data.TextureSlotIndex++;
 
-    if (s_Data.quadIndexCount >= s_Data.maxTextureSlots) {
-        FlushAndReset();
+    stats.QuadCount++;
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+    FUZE_PROFILE_FUNCTION();
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
+                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[0];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 0.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[1];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f, 0.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[2];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f, 1.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[3];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 1.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadIndexCount += 6;
+
+    stats.QuadCount++;
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
+                                 const glm::vec4& color) {
+    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, texture, tilingFactor, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
+                                 const glm::vec4& color) {
+    FUZE_PROFILE_FUNCTION();
+
+    // Finding index of the texture
+    float textureIndex = 0.0f;
+    for (int index = 0; index < s_Data.TextureSlotIndex; index++) {
+        if (s_Data.TextureSlots[index]->GetRendererID() == texture->GetRendererID()) {
+            textureIndex = (float)index;
+            break;
+        }
     }
+
+    if (!textureIndex) {
+        if (s_Data.TextureSlotIndex >= s_Data.maxTextureSlots) {
+            FlushAndReset();
+        }
+
+        textureIndex = s_Data.TextureSlotIndex;
+    }
+
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
+                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[0];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 0.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[1];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 0.0f};
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[2];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {1.0f * tilingFactor, 1.0f * tilingFactor};
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
+    s_Data.quadVertexBufferPtr++;
+
+    s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[3];
+    s_Data.quadVertexBufferPtr->Color = color;
+    s_Data.quadVertexBufferPtr->TexCoords = {0.0f, 1.0f * tilingFactor};
+    s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
+    s_Data.quadVertexBufferPtr++;
+    s_Data.quadIndexCount += 6;
+
+    s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+    s_Data.TextureSlotIndex++;
+
+    stats.QuadCount++;
+}
+
+Renderer2D::Statistics Renderer2D::GetStats() {
+    return stats;
+}
+
+void Renderer2D::ResetStats() {
+    stats.DrawCalls = 0;
+    stats.QuadCount = 0;
 }
 }

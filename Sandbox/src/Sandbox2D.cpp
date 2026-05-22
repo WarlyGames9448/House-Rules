@@ -4,8 +4,7 @@
 #include "Utils/FileUtils.h"
 
 namespace Fuze {
-Sandbox2D::Sandbox2D()
-    : Layer("2DGameEngine"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)) {
+Sandbox2D::Sandbox2D(): Layer("2DGameEngine"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)) {
 }
 
 void Sandbox2D::OnAttach() {
@@ -34,8 +33,14 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
     RendererCommand::Clear();
 
-    // Input Logic --------------------------
+    // Test variables ------------------------
+    m_Time += ts;
+    int color = ((int)m_Time) % 255;
+    // ---------------------------------------
+
     m_CameraController->OnUpdate(ts);
+
+    Renderer2D::ResetStats();
 
     Renderer2D::BeginScene(m_CameraController->GetCamera());
 
@@ -44,11 +49,22 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     Renderer2D::DrawQuad({1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
     Renderer2D::DrawQuad({3.0f, 0.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
 
+    Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
+    Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
     Renderer2D::EndScene();
 }
 
 void Sandbox2D::OnEvent(Event& e) {
     m_CameraController->OnEvent(e);
+}
+
+void Sandbox2D::OnImGuiRender() {
+    if (0) { // for desactivate Imgui
+        ImGui::Begin("Stats");
+        ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
+        ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
+        ImGui::End();
+    }
 }
 
 }
