@@ -49,6 +49,10 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     Renderer2D::DrawQuad({1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
     Renderer2D::DrawQuad({3.0f, 0.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
 
+    for (int i = 0; i < 100; i++) {
+        Renderer2D::DrawQuad({3.0f, 0.0f + i}, {3.0f, 3.0f}, m_Texture1, 20.0f);
+    }
+
     Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
     Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
     Renderer2D::EndScene();

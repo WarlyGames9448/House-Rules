@@ -37,7 +37,7 @@ target_include_directories(Fuze
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Core
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm
 )
 
 # ═══════════════════════════════════════════════════════════

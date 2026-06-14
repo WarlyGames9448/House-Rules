@@ -136,6 +136,9 @@ void Renderer2D::Flush() {
 }
 
 void Renderer2D::FlushAndReset() {
+    uint32_t dataSize = (uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase;
+    s_Data.vertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
+
     Flush();
 
     s_Data.TextureSlotIndex = 1;
@@ -197,11 +200,13 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref
     }
 
     if (!textureIndex) {
-        if (s_Data.TextureSlotIndex >= s_Data.maxTextureSlots) {
+        if (s_Data.TextureSlotIndex > s_Data.maxTextureSlots) {
             FlushAndReset();
         }
 
         textureIndex = s_Data.TextureSlotIndex;
+        s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+        s_Data.TextureSlotIndex++;
     }
 
     s_Data.quadVertexBufferPtr->Position = position;
@@ -228,9 +233,6 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref
     s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
     s_Data.quadIndexCount += 6;
-
-    s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-    s_Data.TextureSlotIndex++;
 
     stats.QuadCount++;
 }
@@ -293,11 +295,13 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
     }
 
     if (!textureIndex) {
-        if (s_Data.TextureSlotIndex >= s_Data.maxTextureSlots) {
+        if (s_Data.TextureSlotIndex > s_Data.maxTextureSlots) {
             FlushAndReset();
         }
 
         textureIndex = s_Data.TextureSlotIndex;
+        s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+        s_Data.TextureSlotIndex++;
     }
 
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
@@ -327,9 +331,6 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
     s_Data.quadVertexBufferPtr->TexIndex = textureIndex;
     s_Data.quadVertexBufferPtr++;
     s_Data.quadIndexCount += 6;
-
-    s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-    s_Data.TextureSlotIndex++;
 
     stats.QuadCount++;
 }
