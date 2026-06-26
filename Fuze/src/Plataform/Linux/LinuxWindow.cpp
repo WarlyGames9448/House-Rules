@@ -18,7 +18,7 @@ namespace Fuze {
 static bool s_GLFWInitialized = false;
 
 static void GLFWErrorCallback(int error_code, const char* description) {
-    FUZE_ERROR("[GLFW] Error: {0}, Description: {1}", error_code, description);
+    FUZE_CORE_ERROR("[GLFW] Error: {0}, Description: {1}", error_code, description);
 }
 
 Window* Window::Create(const WindowProps& windowProps) {
@@ -50,9 +50,10 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
         s_GLFWInitialized = true;
     }
 
-    if (!glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
+    // setting Wayland support
+    /* if (!glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
         glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
-    }
+    } */
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

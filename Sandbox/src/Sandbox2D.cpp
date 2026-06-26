@@ -2,9 +2,11 @@
 
 #include "Renderer/Renderer2D.h"
 #include "Utils/FileUtils.h"
+#include "Random.h"
 
 namespace Fuze {
-Sandbox2D::Sandbox2D(): Layer("2DGameEngine"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)) {
+Sandbox2D::Sandbox2D()
+    : Layer("2DGameEngine"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)), m_ParticleSystem(new ParticleSystem()) {
 }
 
 void Sandbox2D::OnAttach() {
@@ -44,10 +46,10 @@ void Sandbox2D::OnUpdate(Timestep ts) {
 
     Renderer2D::BeginScene(m_CameraController->GetCamera());
 
-    Renderer2D::DrawQuad({0.0f, 0.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
-    Renderer2D::DrawQuad({0.0f, 0.0f}, {10.0f, 10.0f}, m_Texture2, 1.0f, {1.0f, 1.0f, 0.0f, 0.8f});
-    Renderer2D::DrawQuad({1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
-    Renderer2D::DrawQuad({3.0f, 0.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
+    Renderer2D::DrawQuad({0.0f, 2.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+    Renderer2D::DrawQuad({-1.0f, 2.0f}, {10.0f, 10.0f}, m_Texture2, 1.0f, {1.0f, 1.0f, 0.0f, 0.8f});
+    Renderer2D::DrawQuad({-1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
+    Renderer2D::DrawQuad({3.0f, 1.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
 
     for (int i = 0; i < 100; i++) {
         Renderer2D::DrawQuad({3.0f, 0.0f + i}, {3.0f, 3.0f}, m_Texture1, 20.0f);
@@ -56,6 +58,13 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
     Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
     Renderer2D::EndScene();
+
+    if (Input::IsKeyPressed(FUZE_KEY_SPACE)) {
+        m_ParticleSystem->AddParticle({0.0f, 0.0f}, {0.0f, 0.0f}, {Random::GetFloat(-1.0f,1.0f), Random::GetFloat(-1.0f,1.0f)}, {1.0f, 1.0f, 0.0f, 1.0f}, Random::GetFloat(2.0f, 5.0f));
+    }
+
+     m_ParticleSystem->OnUpdate(ts);
+     m_ParticleSystem->OnRender(m_CameraController->GetCamera());
 }
 
 void Sandbox2D::OnEvent(Event& e) {

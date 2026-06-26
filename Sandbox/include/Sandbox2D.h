@@ -1,5 +1,6 @@
 #pragma once
 #include "Fuze.h"
+#include "ParticleSystem.h"
 
 namespace Fuze {
 class Sandbox2D : public Layer {
@@ -16,6 +17,8 @@ class Sandbox2D : public Layer {
     Ref<Texture2D> m_Texture2;
 
     Ref<OrthographicCameraController> m_CameraController;
+
+    Ref<ParticleSystem> m_ParticleSystem;
 
     float m_Time = 0.0f;
 };

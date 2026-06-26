@@ -17,6 +17,10 @@ class FUZE_API RendererCommand {
         s_RendererAPI->DrawIndexed(vertexArray, indexCount);
     }
 
+    inline static void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, int instanceCount){
+        s_RendererAPI->DrawIndexedInstanced(vertexArray, instanceCount);
+    }
+
     inline static void SetClearColor(const glm::vec4& color) {
         s_RendererAPI->SetClearColor(color);
     }

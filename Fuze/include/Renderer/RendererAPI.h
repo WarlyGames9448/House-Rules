@@ -53,6 +53,8 @@ class FUZE_API RendererAPI {
     // When indexCount has the possibility to be zero
     virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) = 0;
 
+    virtual void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, int instancedCount) = 0;
+
   private:
     static API s_API;
 };

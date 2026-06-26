@@ -42,8 +42,8 @@ struct BufferElement {
   public:
     BufferElement() = default;
 
-    BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-        : Type(type), Name(name), Size(ShaderDataTypeToSizeType(type)), Offset(0), Normalized(normalized) {
+    BufferElement(ShaderDataType type, const std::string& name, uint32_t divisor = 0, size_t offset = 0, bool normalized = false)
+        : Type(type), Name(name), Size(ShaderDataTypeToSizeType(type)), Offset(offset), Divisor(divisor), Normalized(normalized) {
     }
 
     uint32_t GetComponentCount() const {
@@ -82,6 +82,7 @@ struct BufferElement {
     std::string Name;
     uint32_t Size;
     size_t Offset;
+    uint32_t Divisor;
     bool Normalized;
 };
 
@@ -140,11 +141,11 @@ class FUZE_API VertexBuffer {
     virtual void Unbind() const = 0;
 
     /**
-    * @brief set a new array of data to vertexBuffer, usefull for dynamic batching
-    *
-    * @param data the data pointer.
-    * @param size the size of all data in bytes
-    */
+     * @brief set a new array of data to vertexBuffer, usefull for dynamic batching
+     *
+     * @param data the data pointer.
+     * @param size the size of all data in bytes
+     */
     virtual void SetData(const void* data, uint32_t size) const = 0;
 
     virtual const BufferLayout& GetLayout() const = 0;

@@ -19,7 +19,7 @@ Application::Application() {
 
     m_Window = Scope<Window>(Window::Create());
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
-    m_Window->SetIcon(std::string(FileUtils::GetAppAsset("FuzeLogo.png")));
+    //m_Window->SetIcon(std::string(FileUtils::GetAppAsset("FuzeLogo.png")));
 
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);

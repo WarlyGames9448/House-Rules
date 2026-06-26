@@ -1,6 +1,7 @@
 add_executable(Sandbox
     src/SandboxApp.cpp
     src/Sandbox2D.cpp
+    src/ParticleSystem.cpp
     )
 
 target_link_libraries(Sandbox
