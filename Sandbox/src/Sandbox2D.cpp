@@ -20,6 +20,9 @@ void Sandbox2D::OnAttach() {
 
     m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
     m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
+    m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
+
+    m_floor = SubTexture2D::Create(m_Spritesheet, {24, 15}, {16, 16}, {1, 1});
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
@@ -57,14 +60,21 @@ void Sandbox2D::OnUpdate(Timestep ts) {
 
     Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
     Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
+
+    Renderer2D::DrawQuad({-5.0f, -5.0f},  {2.0f, 2.0f}, m_floor);
+
     Renderer2D::EndScene();
 
     if (Input::IsKeyPressed(FUZE_KEY_SPACE)) {
-        m_ParticleSystem->AddParticle({0.0f, 0.0f}, {0.0f, 0.0f}, {Random::GetFloat(-1.0f,1.0f), Random::GetFloat(-1.0f,1.0f)}, {1.0f, 1.0f, 0.0f, 1.0f}, Random::GetFloat(2.0f, 5.0f));
+        m_ParticleSystem->AddParticle({0.0f, 0.0f},
+                                      {0.0f, 0.0f},
+                                      {Random::GetFloat(-1.0f, 1.0f), Random::GetFloat(-1.0f, 1.0f)},
+                                      {1.0f, 1.0f, 0.0f, 1.0f},
+                                      Random::GetFloat(2.0f, 5.0f));
     }
 
-     m_ParticleSystem->OnUpdate(ts);
-     m_ParticleSystem->OnRender(m_CameraController->GetCamera());
+    m_ParticleSystem->OnUpdate(ts);
+    m_ParticleSystem->OnRender(m_CameraController->GetCamera());
 }
 
 void Sandbox2D::OnEvent(Event& e) {

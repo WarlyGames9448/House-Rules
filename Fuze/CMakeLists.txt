@@ -25,6 +25,7 @@ add_library(Fuze SHARED
     src/Renderer/RendererAPI.cpp
     src/Renderer/RendererCommand.cpp
     src/Renderer/Shader.cpp
+    src/Renderer/SubTexture2D.cpp
     src/Renderer/Texture.cpp
     src/Renderer/VertexArray.cpp
 

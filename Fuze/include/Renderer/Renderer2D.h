@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer/Renderer.h"
 #include "Renderer/Texture.h"
+#include "Renderer/SubTexture2D.h"
 
 namespace Fuze {
 class FUZE_API Renderer2D : public Renderer {
@@ -23,6 +24,10 @@ class FUZE_API Renderer2D : public Renderer {
                          const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
     static void DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor = 1.0f,
                          const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+    static void DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture,
+                         const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+    static void DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture,
+                         const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     // Rotation in radians
     // Rotation is slower because use Matrix multiplication
@@ -31,6 +36,10 @@ class FUZE_API Renderer2D : public Renderer {
     static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor = 1.0f,
                                 const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
     static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor = 1.0f,
+                                const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+    static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
+                                const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+    static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
                                 const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     static Statistics GetStats();

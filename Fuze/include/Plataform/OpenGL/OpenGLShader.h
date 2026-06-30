@@ -22,7 +22,7 @@ class FUZE_API OpenGLShader : public Shader {
     virtual void SetInt(const std::string& name, int value) override;
     virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
     virtual void SetMat4(const std::string& name, const glm::mat4& value) override;
-    virtual void SetIntArray(const std::string& name, uint32_t size, int* value);
+    virtual void SetIntArray(const std::string& name, uint32_t size, int* value) override;
 
     void UploadUniformInt(const std::string& name, int value);
 

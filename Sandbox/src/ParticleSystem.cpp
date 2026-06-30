@@ -89,7 +89,7 @@ void ParticleSystem::CopyParticle(int from, int to) {
     m_Particles.LifeRemaining[to] = m_Particles.LifeRemaining[from];
 }
 
-bool ParticleSystem::AddParticle(glm::vec2 position, glm::vec2 velocity, glm::vec2 acceleration, glm::vec4 color, float lifeRemaining) {
+bool ParticleSystem::AddParticle(const glm::vec2 position, const glm::vec2 velocity, const glm::vec2 acceleration, const glm::vec4 color, float lifeRemaining) {
     FUZE_PROFILE_FUNCTION();
 
     if (m_AliveCount < MAXPARTICLES) {

@@ -5,7 +5,7 @@ class FUZE_API Texture {
   public:
     virtual ~Texture() = default;
 
-    virtual int GetHight() const = 0;
+    virtual int GetHeight() const = 0;
     virtual int GetWidth() const = 0;
 
     virtual unsigned int GetRendererID() const = 0;

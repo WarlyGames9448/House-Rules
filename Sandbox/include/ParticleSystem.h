@@ -33,7 +33,7 @@ class ParticleSystem {
     void OnUpdate(Timestep ts);
     void OnRender(Ref<OrthographicCamera> camera);
 
-    bool AddParticle(glm::vec2 position, glm::vec2 velocity, glm::vec2 acceleration, glm::vec4 color, float lifeRemaining);
+    bool AddParticle(const glm::vec2 position, const glm::vec2 velocity, const glm::vec2 acceleration, const glm::vec4 color, float lifeRemaining);
 
   private:
     void CopyParticle(int from, int to);

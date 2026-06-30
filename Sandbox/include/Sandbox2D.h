@@ -15,6 +15,9 @@ class Sandbox2D : public Layer {
   private:
     Ref<Texture2D> m_Texture1;
     Ref<Texture2D> m_Texture2;
+    Ref<Texture2D> m_Spritesheet;
+
+    Ref<SubTexture2D> m_floor;
 
     Ref<OrthographicCameraController> m_CameraController;
 
