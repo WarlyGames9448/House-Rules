@@ -37,10 +37,10 @@ void Application::OnEvent(Event& event) {
     dispatcher.Dispatch<WindowRestoredEvent>(BIND_EVENT_FN(OnWindowRestored));
 
     for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it) {
-        (*it)->OnEvent(event);
         if (event.handled) {
             break;
         }
+        (*it)->OnEvent(event);
     }
 }
 
