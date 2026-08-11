@@ -18,6 +18,22 @@ ImGuiLayer::ImGuiLayer(): Layer("ImGuiLayer") {
 ImGuiLayer::~ImGuiLayer() {
 }
 
+bool isWayland() {
+    // Primary check
+    const char* waylandDisplay = std::getenv("WAYLAND_DISPLAY");
+    if (waylandDisplay != nullptr && std::string(waylandDisplay) != "") {
+        return true;
+    }
+
+    // Fallback check
+    const char* xdgSessionType = std::getenv("XDG_SESSION_TYPE");
+    if (xdgSessionType != nullptr && std::string(xdgSessionType) == "wayland") {
+        return true;
+    }
+
+    return false;
+}
+
 void ImGuiLayer::OnAttach() {
     FUZE_PROFILE_FUNCTION();
 
@@ -28,9 +44,17 @@ void ImGuiLayer::OnAttach() {
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
+    #ifdef __linux__
+        if (isWayland()) {
+            io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+        } else {
+            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        }
+    #else
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    #endif
 
     ImGui::StyleColorsDark();
 

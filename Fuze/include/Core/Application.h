@@ -36,6 +36,8 @@ class FUZE_API Application {
         return m_DeltaTime;
     }
 
+    void Close();
+
   private:
     bool OnWindowClose(WindowCloseEvent& event);
     bool OnWindowMinimized(WindowMinimizedEvent& event);

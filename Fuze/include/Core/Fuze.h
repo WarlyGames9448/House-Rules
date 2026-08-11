@@ -16,6 +16,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererCommand.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/Framebuffer.h"
 #include "Renderer/GraphicsContext.h"
 #include "Renderer/OrthographicCameraController.h"
 #include "Renderer/OrthographicCamera.h"

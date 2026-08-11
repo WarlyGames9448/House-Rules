@@ -18,6 +18,11 @@ void Sandbox2D::OnAttach() {
     m_CameraController->SetSpeed(5.0f, 180.0f, 0.2f);
     m_CameraController->InvertScroll(true);
 
+    FramebufferSpecification spec;
+    spec.Width = 1280;
+    spec.Height = 720;
+    m_FrameBuffer = Framebuffer::Create(spec);
+
     m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
     m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
     m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
@@ -35,6 +40,8 @@ void Sandbox2D::OnDetach() {
 }
 
 void Sandbox2D::OnUpdate(Timestep ts) {
+    m_FrameBuffer->Bind();
+
     RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
     RendererCommand::Clear();
 
@@ -61,9 +68,11 @@ void Sandbox2D::OnUpdate(Timestep ts) {
     Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
     Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
 
-    Renderer2D::DrawQuad({-5.0f, -5.0f},  {2.0f, 2.0f}, m_floor);
+    Renderer2D::DrawQuad({-5.0f, -5.0f}, {2.0f, 2.0f}, m_floor);
 
     Renderer2D::EndScene();
+
+    m_FrameBuffer->Unbind();
 
     if (Input::IsKeyPressed(FUZE_KEY_SPACE)) {
         m_ParticleSystem->AddParticle({0.0f, 0.0f},
@@ -82,11 +91,37 @@ void Sandbox2D::OnEvent(Event& e) {
 }
 
 void Sandbox2D::OnImGuiRender() {
-    if (0) { // for desactivate Imgui
-        ImGui::Begin("Stats");
-        ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
-        ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
-        ImGui::End();
+    if (1) { // 0 for desactivate Imgui
+
+        /* bool status = true;
+       ImGui::ShowDemoWindow(&status); */
+
+        if (1) {
+            bool p_open = true;
+            static int opt_demo_mode = 0;
+            static bool opt_demo_mode_changed = false;
+            ImGuiDockNodeFlags DockSpaceFlags = ImGuiDockNodeFlags_None;
+
+            if (opt_demo_mode_changed) ImGui::SetNextWindowFocus();
+            ImGui::Begin("Examples: Dockspace", &p_open, ImGuiWindowFlags_MenuBar);
+            opt_demo_mode_changed = false;
+
+            ImGui::SeparatorText("Stats");
+
+            ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
+            ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
+            ImGui::Image(m_FrameBuffer->GetColorAttachmentID(), ImVec2 {1080, 720}, ImVec2 {0, 1}, ImVec2 {1, 0});
+
+            if (ImGui::BeginMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
+
+            ImGui::End();
+        }
     }
 }
 

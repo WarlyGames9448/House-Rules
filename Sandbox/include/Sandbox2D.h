@@ -19,6 +19,8 @@ class Sandbox2D : public Layer {
 
     Ref<SubTexture2D> m_floor;
 
+    Ref<Framebuffer> m_FrameBuffer;
+
     Ref<OrthographicCameraController> m_CameraController;
 
     Ref<ParticleSystem> m_ParticleSystem;

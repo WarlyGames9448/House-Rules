@@ -15,7 +15,7 @@ Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
     }
 
     case RendererAPI::API::OpenGL: {
-        return std::make_shared<OpenGLVertexBuffer>(size);
+        return CreateRef<OpenGLVertexBuffer>(size);
     }
     }
 
@@ -32,7 +32,7 @@ Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
     }
 
     case RendererAPI::API::OpenGL: {
-        return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+        return CreateRef<OpenGLVertexBuffer>(vertices, size);
     }
     }
 
@@ -51,7 +51,7 @@ Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
     }
 
     case RendererAPI::API::OpenGL: {
-        return std::make_shared<OpenGLIndexBuffer>(indices, count);
+        return CreateRef<OpenGLIndexBuffer>(indices, count);
     }
     }
 

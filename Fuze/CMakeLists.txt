@@ -11,6 +11,7 @@ add_library(Fuze SHARED
     src/Plataform/Linux/LinuxWindow.cpp
     src/Plataform/OpenGL/OpenGLBuffer.cpp
     src/Plataform/OpenGL/OpenGLContext.cpp
+    src/Plataform/OpenGL/OpenGLFramebuffer.cpp
     src/Plataform/OpenGL/OpenGLRendererAPI.cpp
     src/Plataform/OpenGL/OpenGLShader.cpp
     src/Plataform/OpenGL/OpenGLTexture.cpp
@@ -18,6 +19,7 @@ add_library(Fuze SHARED
 
 
     src/Renderer/Buffer.cpp
+    src/Renderer/Framebuffer.cpp
     src/Renderer/OrthographicCamera.cpp
     src/Renderer/OrthographicCameraController.cpp
     src/Renderer/Renderer.cpp

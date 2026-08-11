@@ -85,6 +85,10 @@ void Application::Run() {
     }
 }
 
+void Application::Close(){
+    m_Running = false;
+}
+
 bool Application::OnWindowClose(WindowCloseEvent& event) {
     (void)event;
     m_Running = false;

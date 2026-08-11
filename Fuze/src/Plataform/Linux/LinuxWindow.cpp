@@ -51,9 +51,9 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     }
 
     // setting Wayland support
-    /* if (!glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
+    if (!glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
         glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
-    } */
+    }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
