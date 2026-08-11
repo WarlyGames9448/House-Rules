@@ -23,4 +23,5 @@ add_subdirectory(Fuze/vendor/glfw)
 
 find_package(Threads REQUIRED)
 add_subdirectory(Fuze)
+add_subdirectory(FuzeEditor)
 add_subdirectory(Sandbox)
