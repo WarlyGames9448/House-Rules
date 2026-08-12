@@ -13,6 +13,7 @@ class FUZE_API OrthographicCameraController {
 
     void OnUpdate(float ts);
     void OnEvent(Event& e);
+    void OnResize(float width, float height);
 
     inline const Ref<OrthographicCamera> GetCamera() const {
         return m_Camera;

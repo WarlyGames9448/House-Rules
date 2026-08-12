@@ -42,17 +42,15 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
 
     FUZE_CORE_INFO("Creating Window: {0}, ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
 
+    // Force X11 platform (Wayland not supported)
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+
     if (!s_GLFWInitialized) {
         FUZE_PROFILE_SCOPE("glfwInit")
         [[maybe_unused]] int success = glfwInit();
         FUZE_CORE_ASSERT(success, "Failed to initialize GFLW!")
 
         s_GLFWInitialized = true;
-    }
-
-    // setting Wayland support
-    if (!glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
-        glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -72,6 +70,7 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
 
     glfwSetErrorCallback(GLFWErrorCallback);
     glfwSetWindowUserPointer(m_Window, &m_Data);
+    glfwMaximizeWindow(m_Window);
     SetVSync(true);
 
     // Window Events ---------------------------------------------
@@ -136,29 +135,27 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     });
 
     // KeyBoard Events --------------------------------------------------
-    glfwSetKeyCallback(
-        m_Window,
-        [](GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
-            WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+    glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-            switch (action) {
-            case GLFW_PRESS: {
-                KeyPressedEvent event(key, 0);
-                data.EventCallback(event);
-                break;
-            }
-            case GLFW_RELEASE: {
-                KeyReleasedEvent event(key);
-                data.EventCallback(event);
-                break;
-            }
-            case GLFW_REPEAT: {
-                KeyPressedEvent event(key, 1);
-                data.EventCallback(event);
-                break;
-            }
-            }
-        });
+        switch (action) {
+        case GLFW_PRESS: {
+            KeyPressedEvent event(key, 0);
+            data.EventCallback(event);
+            break;
+        }
+        case GLFW_RELEASE: {
+            KeyReleasedEvent event(key);
+            data.EventCallback(event);
+            break;
+        }
+        case GLFW_REPEAT: {
+            KeyPressedEvent event(key, 1);
+            data.EventCallback(event);
+            break;
+        }
+        }
+    });
 
     glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int codepoint) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -218,7 +215,7 @@ void LinuxWindow::Shutdown() {
 }
 
 void LinuxWindow::OnUpdate() {
-    FUZE_PROFILE_SCOPE("PollEvents"){
+    FUZE_PROFILE_SCOPE("PollEvents") {
         glfwPollEvents();
     }
     m_Context->SwapBuffers();

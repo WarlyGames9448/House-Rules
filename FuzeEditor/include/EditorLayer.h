@@ -12,6 +12,7 @@ class EditorLayer : public Layer {
     void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
     void OnImGuiRender() override;
+
   private:
     Ref<Texture2D> m_Texture1;
     Ref<Texture2D> m_Texture2;
@@ -19,11 +20,13 @@ class EditorLayer : public Layer {
 
     Ref<SubTexture2D> m_floor;
 
-    Ref<Framebuffer> m_FrameBuffer;
+    Ref<Framebuffer> m_Framebuffer;
 
     Ref<OrthographicCameraController> m_CameraController;
 
     Ref<ParticleSystem> m_ParticleSystem;
+
+    glm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
     float m_Time = 0.0f;
 };

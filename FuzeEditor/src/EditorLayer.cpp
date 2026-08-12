@@ -21,7 +21,7 @@ void EditorLayer::OnAttach() {
     FramebufferSpecification spec;
     spec.Width = 1280;
     spec.Height = 720;
-    m_FrameBuffer = Framebuffer::Create(spec);
+    m_Framebuffer = Framebuffer::Create(spec);
 
     m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
     m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
@@ -40,7 +40,15 @@ void EditorLayer::OnDetach() {
 }
 
 void EditorLayer::OnUpdate(Timestep ts) {
-    m_FrameBuffer->Bind();
+
+    const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
+    if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
+        m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+
+        m_CameraController->OnResize(m_ViewportSize.x, m_ViewportSize.y);
+    }
+
+    m_Framebuffer->Bind();
 
     RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
     RendererCommand::Clear();
@@ -72,8 +80,6 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     Renderer2D::EndScene();
 
-    m_FrameBuffer->Unbind();
-
     if (Input::IsKeyPressed(FUZE_KEY_SPACE)) {
         m_ParticleSystem->AddParticle({0.0f, 0.0f},
                                       {0.0f, 0.0f},
@@ -84,6 +90,11 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     m_ParticleSystem->OnUpdate(ts);
     m_ParticleSystem->OnRender(m_CameraController->GetCamera());
+
+    m_Framebuffer->Unbind();
+
+    RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
+    RendererCommand::Clear();
 }
 
 void EditorLayer::OnEvent(Event& e) {
@@ -91,37 +102,58 @@ void EditorLayer::OnEvent(Event& e) {
 }
 
 void EditorLayer::OnImGuiRender() {
+    FUZE_PROFILE_FUNCTION();
     if (1) { // 0 for desactivate Imgui
 
-        /* bool status = true;
-       ImGui::ShowDemoWindow(&status); */
+        // Getting Viewport and root docking
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
 
-        if (1) {
-            bool p_open = true;
-            static int opt_demo_mode = 0;
-            static bool opt_demo_mode_changed = false;
-            ImGuiDockNodeFlags DockSpaceFlags = ImGuiDockNodeFlags_None;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                                        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 
-            if (opt_demo_mode_changed) ImGui::SetNextWindowFocus();
-            ImGui::Begin("Examples: Dockspace", &p_open, ImGuiWindowFlags_MenuBar);
-            opt_demo_mode_changed = false;
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-            ImGui::SeparatorText("Stats");
+        ImGui::Begin("RootDockSpace", nullptr, window_flags);
+        ImGui::PopStyleVar();
 
-            ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
-            ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
-            ImGui::Image(m_FrameBuffer->GetColorAttachmentID(), ImVec2 {1080, 720}, ImVec2 {0, 1}, ImVec2 {1, 0});
-
-            if (ImGui::BeginMenuBar()) {
-                if (ImGui::BeginMenu("File")) {
-                    if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
-                    ImGui::EndMenu();
-                }
-                ImGui::EndMenuBar();
-            }
-
-            ImGui::End();
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+            ImGuiID dockspace_id = ImGui::GetID("EngineDockSpace");
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
         }
+        ImGui::End();
+
+        // Stats scene ===========
+        ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_MenuBar);
+
+        ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
+        ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
+
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
+        ImGui::End();
+
+        // Viewport scene ===========
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("Viewport");
+
+        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+
+        m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+
+        ImGui::Image(m_Framebuffer->GetColorAttachmentID(), ImVec2 {m_ViewportSize.x, m_ViewportSize.y}, ImVec2 {0, 1}, ImVec2 {1, 0});
+        ImGui::End();
+        ImGui::PopStyleVar();
     }
 }
 

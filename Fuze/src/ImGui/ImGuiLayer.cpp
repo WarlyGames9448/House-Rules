@@ -46,23 +46,13 @@ void ImGuiLayer::OnAttach() {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
-    #ifdef __linux__
-        if (isWayland()) {
-            io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
-        } else {
-            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        }
-    #else
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    #endif
+    // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     ImGui::StyleColorsDark();
 
     ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
+    style.WindowRounding = 0.0f;
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 
     Application& app = Application::Get();
     GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
@@ -112,7 +102,8 @@ void ImGuiLayer::OnImGuiRender() {
 }
 
 void ImGuiLayer::OnEvent(Event& event) {
-    ImGuiIO& io = ImGui::GetIO();
+    (void)event;
+    /*ImGuiIO& io = ImGui::GetIO();
 
     if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
         event.handled = true;
@@ -122,6 +113,6 @@ void ImGuiLayer::OnEvent(Event& event) {
     if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
         event.handled = true;
         return;
-    }
+    } */
 }
 }
