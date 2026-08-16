@@ -38,6 +38,10 @@ class FUZE_API Application {
 
     void Close();
 
+    ImGuiLayer* GetImGuiLayer() {
+        return m_ImGuiLayer;
+    }
+
   private:
     bool OnWindowClose(WindowCloseEvent& event);
     bool OnWindowMinimized(WindowMinimizedEvent& event);

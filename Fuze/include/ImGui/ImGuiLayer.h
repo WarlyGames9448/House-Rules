@@ -19,7 +19,11 @@ class FUZE_API ImGuiLayer : public Layer {
     void Begin();
     void End();
 
+    void BlockEvents(bool block) {
+        m_BlockEvents = block;
+    }
+
   private:
-    [[maybe_unused]] float m_Time = 0;
+    bool m_BlockEvents = false;
 };
 }

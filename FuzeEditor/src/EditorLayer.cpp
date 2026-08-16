@@ -6,7 +6,7 @@
 
 namespace Fuze {
 EditorLayer::EditorLayer()
-    : Layer("2DGameEngine"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)), m_ParticleSystem(new ParticleSystem()) {
+    : Layer("FuzeEditor"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)), m_ParticleSystem(new ParticleSystem()) {
 }
 
 void EditorLayer::OnAttach() {
@@ -15,7 +15,7 @@ void EditorLayer::OnAttach() {
 
     Renderer2D::Init();
 
-    m_CameraController->SetSpeed(5.0f, 180.0f, 0.2f);
+    m_CameraController->SetSpeed(2.0f, 180.0f, 0.1f);
     m_CameraController->InvertScroll(true);
 
     FramebufferSpecification spec;
@@ -58,7 +58,9 @@ void EditorLayer::OnUpdate(Timestep ts) {
     int color = ((int)m_Time) % 255;
     // ---------------------------------------
 
-    m_CameraController->OnUpdate(ts);
+    if (m_ViewportFocused) {
+        m_CameraController->OnUpdate(ts);
+    }
 
     Renderer2D::ResetStats();
 
@@ -113,12 +115,20 @@ void EditorLayer::OnImGuiRender() {
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
                                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                                        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+                                        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
         ImGui::Begin("RootDockSpace", nullptr, window_flags);
         ImGui::PopStyleVar();
+
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
 
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
@@ -133,19 +143,16 @@ void EditorLayer::OnImGuiRender() {
         ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
         ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
 
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenuBar();
-        }
-
         ImGui::End();
 
         // Viewport scene ===========
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport");
+
+        m_ViewportFocused = ImGui::IsWindowFocused();
+        m_ViewportHovered = ImGui::IsWindowHovered();
+
+        Fuze::Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 

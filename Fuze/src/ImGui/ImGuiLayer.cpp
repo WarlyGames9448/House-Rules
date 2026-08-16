@@ -103,16 +103,19 @@ void ImGuiLayer::OnImGuiRender() {
 
 void ImGuiLayer::OnEvent(Event& event) {
     (void)event;
-    /*ImGuiIO& io = ImGui::GetIO();
 
-    if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
-        event.handled = true;
-        return;
+    if (m_BlockEvents) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
+            event.handled = true;
+            return;
+        }
+
+        if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
+            event.handled = true;
+            return;
+        }
     }
-
-    if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
-        event.handled = true;
-        return;
-    } */
 }
 }

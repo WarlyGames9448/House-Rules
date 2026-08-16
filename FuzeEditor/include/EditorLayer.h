@@ -24,6 +24,8 @@ class EditorLayer : public Layer {
 
     Ref<OrthographicCameraController> m_CameraController;
 
+    bool m_ViewportFocused = false, m_ViewportHovered = false;
+
     Ref<ParticleSystem> m_ParticleSystem;
 
     glm::vec2 m_ViewportSize = {0.0f, 0.0f};
