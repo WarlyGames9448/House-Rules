@@ -13,6 +13,7 @@ struct FramebufferSpecification {
 class FUZE_API Framebuffer {
   public:
     static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
+    virtual ~Framebuffer() = default;
 
     virtual void Invalidate() = 0;
     virtual void Bind() const = 0;

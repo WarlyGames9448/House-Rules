@@ -16,6 +16,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer() {
 }
 
 void OpenGLFramebuffer::Invalidate() {
+    FUZE_PROFILE_FUNCTION();
     // Clear old resources
     if (m_RendererID) {
         glDeleteFramebuffers(1, &m_RendererID);
@@ -54,6 +55,7 @@ void OpenGLFramebuffer::Unbind() const {
 
 void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height) {
     if (width == 0 || height == 0 || width > 8192 || height > 8192) {
+        FUZE_CORE_WARN("Attempted to resize framebuffer to {0}, {1}", width, height);
         return;
     }
 

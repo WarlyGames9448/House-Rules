@@ -35,6 +35,8 @@ class FUZE_API RendererAPI {
     };
 
   public:
+    virtual ~RendererAPI() = default;
+
     inline static API GetAPI() {
         return s_API;
     }
