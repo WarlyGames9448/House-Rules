@@ -1,8 +1,22 @@
 #pragma once
 #include "Fuze.h"
 #include "ParticleSystem.h"
+#include "Scene/Registry.h"
 
 namespace Fuze {
+struct Gravity {
+    float force;
+};
+
+struct RigidBody {
+    float velocity, acceleration;
+};
+
+class PhysicsSystem : public System {
+  public:
+    void Update(float dt);
+};
+
 class EditorLayer : public Layer {
   public:
     EditorLayer();
@@ -20,15 +34,18 @@ class EditorLayer : public Layer {
 
     Ref<SubTexture2D> m_floor;
 
-    Ref<Framebuffer> m_Framebuffer;
-
     Ref<OrthographicCameraController> m_CameraController;
 
+    Ref<Framebuffer> m_Framebuffer;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
+    glm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
     Ref<ParticleSystem> m_ParticleSystem;
 
-    glm::vec2 m_ViewportSize = {0.0f, 0.0f};
+    Entity A, B;
+    Ref<PhysicsSystem> m_PhysicsSystem;
+
+    Ref<Registry> m_Registry = CreateRef<Registry>();
 
     float m_Time = 0.0f;
 };

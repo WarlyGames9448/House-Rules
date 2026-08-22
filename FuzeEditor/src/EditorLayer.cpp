@@ -5,6 +5,16 @@
 #include "Random.h"
 
 namespace Fuze {
+
+void PhysicsSystem::Update(float dt) {
+    for (Entity entity : Entities) {
+        RigidBody& rigidBody = m_Registry->GetComponent<RigidBody>(entity);
+        Gravity& gravity = m_Registry->GetComponent<Gravity>(entity);
+
+        rigidBody.velocity += (rigidBody.acceleration + gravity.force) * dt;
+    }
+}
+
 EditorLayer::EditorLayer()
     : Layer("FuzeEditor"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)), m_ParticleSystem(new ParticleSystem()) {
 }
@@ -33,6 +43,30 @@ void EditorLayer::OnAttach() {
               RendererCommand::GetRenderCaps().GraphicsAPI,
               RendererCommand::GetRenderCaps().Vendor,
               RendererCommand::GetRenderCaps().Renderer);
+
+    A = m_Registry->CreateEntity();
+    B = m_Registry->CreateEntity();
+
+    m_Registry->RegisterComponent<Gravity>();
+    m_Registry->RegisterComponent<RigidBody>();
+    m_PhysicsSystem = m_Registry->RegisterSystem<PhysicsSystem>();
+
+    Signature signature;
+    signature.set(m_Registry->GetComponentType<Gravity>(), true);
+    signature.set(m_Registry->GetComponentType<RigidBody>(), true);
+
+    m_Registry->SetSystemSignature<PhysicsSystem>(signature);
+
+    m_Registry->AddComponent(A, RigidBody {20, 0.1});
+    m_Registry->AddComponent(A, Gravity {1});
+
+    m_Registry->AddComponent(B, RigidBody {20, 0.1});
+
+    FUZE_TRACE(m_PhysicsSystem->Entities.size());
+
+    m_Registry->DestroyEntity(A);
+
+    FUZE_TRACE(m_PhysicsSystem->Entities.size());
 }
 
 void EditorLayer::OnDetach() {
@@ -55,7 +89,9 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     // Test variables ------------------------
     m_Time += ts;
-    int color = ((int)m_Time) % 255;
+
+    m_PhysicsSystem->Update(ts);
+
     // ---------------------------------------
 
     if (m_ViewportFocused) {

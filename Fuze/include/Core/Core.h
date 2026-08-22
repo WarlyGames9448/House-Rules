@@ -26,15 +26,15 @@ static_assert("Fuze only works on Linux.");
     #define FUZE_DEBUGBREAK()
 #endif
 
-#ifdef FUZE_ENABLE_ASSERTS
+#if defined(__GNUC__) || defined(__clang__)
+    #define FUZE_FUNC_SIG __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+    #define FUZE_FUNC_SIG __FUNCSIG__
+#else
+    #define FUZE_FUNC_SIG __func__
+#endif
 
-    #if defined(__GNUC__) || defined(__clang__)
-        #define FUZE_FUNC_SIG __PRETTY_FUNCTION__
-    #elif defined(_MSC_VER)
-        #define FUZE_FUNC_SIG __FUNCSIG__
-    #else
-        #define FUZE_FUNC_SIG __func__
-    #endif
+#ifdef FUZE_ENABLE_ASSERTS
 
     #define FUZE_ASSERT(x, ...)                               \
         do {                                                  \
