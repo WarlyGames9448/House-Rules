@@ -100,6 +100,8 @@ void Renderer2D::Init() {
     // use switch case in fragment shader.
     s_Data.shader->SetIntArray("u_Textures", 32, samplers);
     s_Data.TextureSlots[0] = s_Data.whiteTexture;
+
+    s_Data.quadVertexBufferPtr = nullptr;
 }
 
 void Renderer2D::Shutdown() {
@@ -124,11 +126,12 @@ void Renderer2D::EndScene() {
     s_Data.vertexBuffer->SetData(s_Data.quadVertexBufferBase, dataSize);
 
     Flush();
+
+    s_Data.quadVertexBufferPtr = nullptr;
 }
 
 void Renderer2D::Flush() {
-    if (s_Data.quadIndexCount == 0)
-			return;
+    if (s_Data.quadIndexCount == 0) return;
 
     for (int i = 0; i < s_Data.TextureSlotIndex; i++) {
         s_Data.TextureSlots[i]->Bind(i);
@@ -156,6 +159,11 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, con
 
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
+
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
 
     s_Data.quadVertexBufferPtr->Position = position;
     s_Data.quadVertexBufferPtr->Color = color;
@@ -193,6 +201,11 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref
 void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<Texture2D> texture, float tilingFactor, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
 
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
+
     // Finding index of the texture
     float textureIndex = 0.0f;
     for (int index = 0; index < s_Data.TextureSlotIndex; index++) {
@@ -240,13 +253,16 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref
     stats.QuadCount++;
 }
 
-void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture,
-                          const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture, const glm::vec4& color) {
     DrawQuad({position.x, position.y, 0.0f}, scale, subtexture, color);
 }
-void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture,
-                          const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
+
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
 
     Ref<Texture2D> texture = subtexture->GetTexture();
     glm::vec2* texCoords = subtexture->GetTexCoords();
@@ -298,15 +314,13 @@ void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref
     stats.QuadCount++;
 }
 
-void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
-    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, color);
-}
-
-void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::mat4 transform, const glm::vec4 color) {
     FUZE_PROFILE_FUNCTION();
 
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
-                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
 
     s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[0];
     s_Data.quadVertexBufferPtr->Color = color;
@@ -337,14 +351,13 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
     stats.QuadCount++;
 }
 
-void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
-                                 const glm::vec4& color) {
-    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, texture, tilingFactor, color);
-}
-
-void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
-                                 const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::mat4 transform, Ref<Texture2D> texture, float tilingFactor, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
+
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
 
     // Finding index of the texture
     float textureIndex = 0.0f;
@@ -364,9 +377,6 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
         s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
         s_Data.TextureSlotIndex++;
     }
-
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
-                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
 
     s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[0];
     s_Data.quadVertexBufferPtr->Color = color;
@@ -396,14 +406,13 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
     stats.QuadCount++;
 }
 
-void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
-                                 const glm::vec4& color) {
-    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, subtexture, color);
-}
-
-void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
-                                 const glm::vec4& color) {
+void Renderer2D::DrawQuad(const glm::mat4 transform, Ref<SubTexture2D> subtexture, const glm::vec4& color) {
     FUZE_PROFILE_FUNCTION();
+
+    if(s_Data.quadVertexBufferPtr == nullptr){
+        FUZE_CORE_ASSERT(0, "Begin scene before draw quads.");
+        return;
+    }
 
     Ref<Texture2D> texture = subtexture->GetTexture();
     glm::vec2* texCoords = subtexture->GetTexCoords();
@@ -426,9 +435,6 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
         s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
         s_Data.TextureSlotIndex++;
     }
-
-    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
-                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
 
     s_Data.quadVertexBufferPtr->Position = transform * s_Data.VertexPositions[0];
     s_Data.quadVertexBufferPtr->Color = color;
@@ -456,6 +462,43 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& sca
     s_Data.quadIndexCount += 6;
 
     stats.QuadCount++;
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
+                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+
+    DrawQuad(transform, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
+                                 const glm::vec4& color) {
+    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, texture, tilingFactor, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<Texture2D> texture, float tilingFactor,
+                                 const glm::vec4& color) {
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
+                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+
+    DrawQuad(transform, texture, tilingFactor, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
+                                 const glm::vec4& color) {
+    DrawRotatedQuad({position.x, position.y, 0.0f}, scale, rotation, subtexture, color);
+}
+
+void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, Ref<SubTexture2D> subtexture,
+                                 const glm::vec4& color) {
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) *
+                          glm::scale(glm::mat4(1.0f), {scale, 1.0f});
+
+    DrawQuad(transform, subtexture, color);
 }
 
 Renderer2D::Statistics Renderer2D::GetStats() {

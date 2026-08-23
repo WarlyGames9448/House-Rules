@@ -29,6 +29,11 @@ class FUZE_API Renderer2D : public Renderer {
     static void DrawQuad(const glm::vec3& position, const glm::vec2& scale, Ref<SubTexture2D> subtexture,
                          const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
+    static void DrawQuad(const glm::mat4 transform, const glm::vec4 color);
+    static void DrawQuad(const glm::mat4 transform, Ref<Texture2D> texture, float tilingFactor = 1.0f,
+                         const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+    static void DrawQuad(const glm::mat4 transform, Ref<SubTexture2D> subtexture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+
     // Rotation in radians
     // Rotation is slower because use Matrix multiplication
     static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color);

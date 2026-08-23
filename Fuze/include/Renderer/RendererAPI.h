@@ -2,6 +2,7 @@
 
 #include "Renderer/VertexArray.h"
 #include "Renderer/Texture.h"
+#include <glm/glm.hpp>
 
 namespace Fuze {
 

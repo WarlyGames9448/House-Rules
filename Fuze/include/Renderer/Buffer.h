@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core.h"
+#include <cstdint>
+#include "Core/Log.h"
 
 namespace Fuze {
 
