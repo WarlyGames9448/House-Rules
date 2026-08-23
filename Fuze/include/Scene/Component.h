@@ -15,12 +15,12 @@ template <typename T> class ComponentArray : public IComponentArray {
   public:
     ComponentArray() {
         for (Entity i = 0; i < MAX_ENTITIES; i++) {
-            m_EntityToIndexMap[i] = -1;
+            m_EntityToIndexMap[i] = UINT32_MAX;
         }
     }
 
     void InsertData(Entity entity, T component) {
-        if (m_EntityToIndexMap[entity] != -1) {
+        if (m_EntityToIndexMap[entity] != UINT32_MAX) {
             FUZE_CORE_ASSERT(0, "Entity {0} already have this component", entity);
             return;
         }
@@ -33,7 +33,7 @@ template <typename T> class ComponentArray : public IComponentArray {
     }
 
     void RemoveData(Entity entity) {
-        if (m_EntityToIndexMap[entity] == -1) {
+        if (m_EntityToIndexMap[entity] == UINT32_MAX) {
             FUZE_CORE_WARN("Entity {0} does not have this component.", entity);
             return;
         }
@@ -46,13 +46,13 @@ template <typename T> class ComponentArray : public IComponentArray {
         m_EntityToIndexMap[lastEntity] = indexOfRemovedEntity;
         m_IndexToEntityMap[indexOfRemovedEntity] = lastEntity;
 
-        m_EntityToIndexMap[entity] = -1;
+        m_EntityToIndexMap[entity] = UINT32_MAX;
 
         m_ValidSize--;
     }
 
     T& GetData(Entity entity) {
-        if (m_EntityToIndexMap[entity] == -1) {
+        if (m_EntityToIndexMap[entity] == UINT32_MAX) {
             FUZE_CORE_ASSERT(0, "Entity {0} does not have this component.", entity);
         }
 
@@ -60,7 +60,7 @@ template <typename T> class ComponentArray : public IComponentArray {
     }
 
     void EntityDestroyed(Entity entity) override {
-        if (m_EntityToIndexMap[entity] != -1) {
+        if (m_EntityToIndexMap[entity] != UINT32_MAX) {
             RemoveData(entity);
         }
     }
@@ -83,7 +83,6 @@ class ComponentManager {
         const char* typeName = typeid(T).name();
 
         if (m_ComponentTypes.contains(typeName)) {
-            FUZE_CORE_WARN("ComponentManager Already has this component.");
             return;
         }
 
@@ -99,7 +98,7 @@ class ComponentManager {
 
         if (!m_ComponentTypes.contains(typeName)) {
             FUZE_CORE_ASSERT(0, "ComponentManager does not have this component.");
-            return -1;
+            return UINT8_MAX;
         }
 
         return m_ComponentTypes[typeName];
@@ -141,4 +140,32 @@ class ComponentManager {
 
     ComponentType m_NextComponentType = 0;
 };
+
+/// Components
+
+struct TransformComponent {
+    glm::mat4 Transform {1.0f};
+
+    TransformComponent() = default;
+    TransformComponent(const TransformComponent&) = default; // Copy
+    TransformComponent(const glm::mat4 transform): Transform(transform) {
+    }
+
+    operator glm::mat4() {
+        return Transform;
+    }
+    operator const glm::mat4() {
+        return Transform;
+    }
+};
+
+struct SpriteRendererComponent {
+    glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
+
+    SpriteRendererComponent() = default;
+    SpriteRendererComponent(const SpriteRendererComponent&) = default; // Copy
+    SpriteRendererComponent(const glm::vec4 color): Color(color) {
+    }
+};
+
 }

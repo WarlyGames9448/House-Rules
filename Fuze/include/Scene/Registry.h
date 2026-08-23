@@ -48,7 +48,7 @@ class Registry {
     }
 
     template <typename T> void AddComponent(Entity entity, T component) {
-        m_ComponentManager->InsertComponent(entity, component);
+        m_ComponentManager->InsertComponent<T>(entity, component);
 
         Signature signature = m_EntityManager->GetSignature(entity);
         signature.set(m_ComponentManager->GetComponentType<T>(), true);

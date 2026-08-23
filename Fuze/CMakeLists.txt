@@ -32,6 +32,7 @@ add_library(Fuze SHARED
     src/Renderer/VertexArray.cpp
 
     src/Scene/Entity.cpp
+    src/Scene/Scene.cpp
 
     src/Utils/FileUtils.cpp
 )

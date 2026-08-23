@@ -1,21 +1,9 @@
 #pragma once
 #include "Fuze.h"
 #include "ParticleSystem.h"
-#include "Scene/Registry.h"
+#include "Scene/Scene.h"
 
 namespace Fuze {
-struct Gravity {
-    float force;
-};
-
-struct RigidBody {
-    float velocity, acceleration;
-};
-
-class PhysicsSystem : public System {
-  public:
-    void Update(float dt);
-};
 
 class EditorLayer : public Layer {
   public:
@@ -42,10 +30,8 @@ class EditorLayer : public Layer {
 
     Ref<ParticleSystem> m_ParticleSystem;
 
-    Entity A, B;
-    Ref<PhysicsSystem> m_PhysicsSystem;
-
-    Ref<Registry> m_Registry = CreateRef<Registry>();
+    Entity m_Square;
+    Ref<Scene> m_Scene;
 
     float m_Time = 0.0f;
 };

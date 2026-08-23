@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene/Component.h"
+#include "Core/Timestep.h"
 
 #include <set>
 
@@ -10,13 +11,20 @@ class Registry;
 
 class System {
   public:
+    virtual ~System() = default;
+
     void SetRegistry(Registry* registry) {
         m_Registry = registry;
     }
 
     virtual void Init() {
     }
-    virtual void Update(float dt) {
+    virtual void OnUpdate([[maybe_unused]] Timestep ts) {
+    }
+
+    // TEMP
+    virtual Registry* Reg() {
+        return m_Registry;
     }
 
     // TODO:
@@ -24,7 +32,7 @@ class System {
 
   public:
     // TODO: change set to contiguos array
-    std::set<Entity> Entities;
+    std::set<Entity> m_Entities;
 
   protected:
     Registry* m_Registry;
@@ -40,9 +48,9 @@ class SystemManager {
             return nullptr;
         }
 
-        Ref<System> system = CreateRef<T>();
+        auto system = CreateRef<T>();
         m_Systems.insert({typeName, system});
-        return std::static_pointer_cast<T>(system);
+        return system;
     }
 
     template <typename T> void SetSignature(Signature signature) {
@@ -58,7 +66,7 @@ class SystemManager {
 
     void EntityDestroyed(Entity entity) {
         for (auto& [typeName, system] : m_Systems) {
-            system->Entities.erase(entity);
+            system->m_Entities.erase(entity);
         }
     }
 
@@ -66,9 +74,9 @@ class SystemManager {
         for (auto& [typeName, system] : m_Systems) {
             Signature systemSignature = m_Signatures[typeName];
             if ((entitySignature & systemSignature) == systemSignature) {
-                system->Entities.insert(entity);
+                system->m_Entities.insert(entity);
             } else {
-                system->Entities.erase(entity);
+                system->m_Entities.erase(entity);
             }
         }
     }

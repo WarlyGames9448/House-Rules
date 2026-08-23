@@ -6,15 +6,6 @@
 
 namespace Fuze {
 
-void PhysicsSystem::Update(float dt) {
-    for (Entity entity : Entities) {
-        RigidBody& rigidBody = m_Registry->GetComponent<RigidBody>(entity);
-        Gravity& gravity = m_Registry->GetComponent<Gravity>(entity);
-
-        rigidBody.velocity += (rigidBody.acceleration + gravity.force) * dt;
-    }
-}
-
 EditorLayer::EditorLayer()
     : Layer("FuzeEditor"), m_CameraController(new OrthographicCameraController(1280.0f / 720.0f, true)), m_ParticleSystem(new ParticleSystem()) {
 }
@@ -36,37 +27,18 @@ void EditorLayer::OnAttach() {
     m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
     m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
     m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
-
     m_floor = SubTexture2D::Create(m_Spritesheet, {24, 15}, {16, 16}, {1, 1});
+
+    m_Scene = CreateRef<Scene>();
+    Entity m_Square = m_Scene->GetRegistry()->CreateEntity();
+
+    m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
+    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Square, glm::vec4{1.0f, 0.0f, 1.0f, 1.0f});
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
               RendererCommand::GetRenderCaps().Vendor,
               RendererCommand::GetRenderCaps().Renderer);
-
-    A = m_Registry->CreateEntity();
-    B = m_Registry->CreateEntity();
-
-    m_Registry->RegisterComponent<Gravity>();
-    m_Registry->RegisterComponent<RigidBody>();
-    m_PhysicsSystem = m_Registry->RegisterSystem<PhysicsSystem>();
-
-    Signature signature;
-    signature.set(m_Registry->GetComponentType<Gravity>(), true);
-    signature.set(m_Registry->GetComponentType<RigidBody>(), true);
-
-    m_Registry->SetSystemSignature<PhysicsSystem>(signature);
-
-    m_Registry->AddComponent(A, RigidBody {20, 0.1});
-    m_Registry->AddComponent(A, Gravity {1});
-
-    m_Registry->AddComponent(B, RigidBody {20, 0.1});
-
-    FUZE_TRACE(m_PhysicsSystem->Entities.size());
-
-    m_Registry->DestroyEntity(A);
-
-    FUZE_TRACE(m_PhysicsSystem->Entities.size());
 }
 
 void EditorLayer::OnDetach() {
@@ -89,9 +61,6 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     // Test variables ------------------------
     m_Time += ts;
-
-    m_PhysicsSystem->Update(ts);
-
     // ---------------------------------------
 
     if (m_ViewportFocused) {
@@ -102,7 +71,8 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     Renderer2D::BeginScene(m_CameraController->GetCamera());
 
-    Renderer2D::DrawQuad({0.0f, 2.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+    m_Scene->OnUpdate(ts);
+    /* Renderer2D::DrawQuad({0.0f, 2.0f}, {2.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
     Renderer2D::DrawQuad({-1.0f, 2.0f}, {10.0f, 10.0f}, m_Texture2, 1.0f, {1.0f, 1.0f, 0.0f, 0.8f});
     Renderer2D::DrawQuad({-1.0f, 0.0f}, {2.0f, 3.0f}, {1.0f, 0.0f, 1.0f, 0.5f});
     Renderer2D::DrawQuad({3.0f, 1.0f}, {3.0f, 3.0f}, m_Texture1, 20.0f);
@@ -114,7 +84,7 @@ void EditorLayer::OnUpdate(Timestep ts) {
     Renderer2D::DrawRotatedQuad({3.0f, 1.0f}, {2.0f, 1.0f}, glm::radians(m_Time * 50.0f), {0.0f, 1.0f, 0.0f, 1.0f});
     Renderer2D::DrawRotatedQuad({5.0f, 1.0f}, {2.0f, 2.0f}, glm::radians(m_Time * 120.0f), m_Texture1, 2.0f);
 
-    Renderer2D::DrawQuad({-5.0f, -5.0f}, {2.0f, 2.0f}, m_floor);
+    Renderer2D::DrawQuad({-5.0f, -5.0f}, {2.0f, 2.0f}, m_floor); */
 
     Renderer2D::EndScene();
 
