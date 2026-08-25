@@ -2,6 +2,7 @@
 
 #include "fuzepch.h"
 #include "Scene/Entity.h"
+#include "Renderer/OrthographicCameraController.h"
 
 namespace Fuze {
 
@@ -15,12 +16,14 @@ template <typename T> class ComponentArray : public IComponentArray {
   public:
     ComponentArray() {
         for (Entity i = 0; i < MAX_ENTITIES; i++) {
-            m_EntityToIndexMap[i] = UINT32_MAX;
+            m_EntityToIndexMap[i] = NULL_ENTITY;
         }
     }
 
+    virtual ~ComponentArray() = default;
+
     void InsertData(Entity entity, T component) {
-        if (m_EntityToIndexMap[entity] != UINT32_MAX) {
+        if (m_EntityToIndexMap[entity] != NULL_ENTITY) {
             FUZE_CORE_ASSERT(0, "Entity {0} already have this component", entity);
             return;
         }
@@ -33,7 +36,7 @@ template <typename T> class ComponentArray : public IComponentArray {
     }
 
     void RemoveData(Entity entity) {
-        if (m_EntityToIndexMap[entity] == UINT32_MAX) {
+        if (m_EntityToIndexMap[entity] == NULL_ENTITY) {
             FUZE_CORE_WARN("Entity {0} does not have this component.", entity);
             return;
         }
@@ -46,13 +49,17 @@ template <typename T> class ComponentArray : public IComponentArray {
         m_EntityToIndexMap[lastEntity] = indexOfRemovedEntity;
         m_IndexToEntityMap[indexOfRemovedEntity] = lastEntity;
 
-        m_EntityToIndexMap[entity] = UINT32_MAX;
+        m_EntityToIndexMap[entity] = NULL_ENTITY;
 
         m_ValidSize--;
     }
 
     T& GetData(Entity entity) {
-        if (m_EntityToIndexMap[entity] == UINT32_MAX) {
+        if (entity >= MAX_ENTITIES) {
+            FUZE_CORE_ASSERT(0, "Entity {0} out-of bound", entity);
+        }
+
+        if (m_EntityToIndexMap[entity] == NULL_ENTITY) {
             FUZE_CORE_ASSERT(0, "Entity {0} does not have this component.", entity);
         }
 
@@ -60,7 +67,7 @@ template <typename T> class ComponentArray : public IComponentArray {
     }
 
     void EntityDestroyed(Entity entity) override {
-        if (m_EntityToIndexMap[entity] != UINT32_MAX) {
+        if (m_EntityToIndexMap[entity] != NULL_ENTITY) {
             RemoveData(entity);
         }
     }
@@ -147,7 +154,6 @@ struct TransformComponent {
     glm::mat4 Transform {1.0f};
 
     TransformComponent() = default;
-    TransformComponent(const TransformComponent&) = default; // Copy
     TransformComponent(const glm::mat4 transform): Transform(transform) {
     }
 
@@ -163,8 +169,27 @@ struct SpriteRendererComponent {
     glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
 
     SpriteRendererComponent() = default;
-    SpriteRendererComponent(const SpriteRendererComponent&) = default; // Copy
     SpriteRendererComponent(const glm::vec4 color): Color(color) {
+    }
+};
+
+struct TagComponent {
+    std::string Tag = "";
+
+    TagComponent() = default;
+    TagComponent(const std::string& tag): Tag(tag) {
+    }
+};
+
+struct CameraComponent {
+    // TODO: Implement an abstract camera class;
+    Ref<OrthographicCamera> Camera;
+    Ref<OrthographicCameraController> CameraController;
+    bool Primary = false;
+
+    CameraComponent() = default;
+    CameraComponent(Ref<OrthographicCamera> camera, Ref<OrthographicCameraController> cameraController)
+        : Camera(camera), CameraController(cameraController) {
     }
 };
 

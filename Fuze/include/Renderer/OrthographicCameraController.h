@@ -10,6 +10,7 @@ namespace Fuze {
 class FUZE_API OrthographicCameraController {
   public:
     OrthographicCameraController(float aspectRatio, bool rotationActiveted = false);
+    OrthographicCameraController(Ref<OrthographicCamera> camera, float aspectRatio, bool rotationActiveted = false);
 
     void OnUpdate(float ts);
     void OnEvent(Event& e);
@@ -40,7 +41,6 @@ class FUZE_API OrthographicCameraController {
     Ref<OrthographicCamera> m_Camera;
     glm::vec2 m_CameraPosition = {0.0f, 0.0f};
     float m_CameraRotation = 0.0f;
-
 
     bool m_RotationActiveted;
     bool m_InvertScroll = false;

@@ -10,6 +10,7 @@ namespace Fuze {
 
 using Entity = std::uint32_t;
 const Entity MAX_ENTITIES = 10000;
+#define NULL_ENTITY UINT32_MAX
 
 using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;

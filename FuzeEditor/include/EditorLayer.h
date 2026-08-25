@@ -22,17 +22,14 @@ class EditorLayer : public Layer {
 
     Ref<SubTexture2D> m_floor;
 
-    Ref<OrthographicCameraController> m_CameraController;
+    Entity m_Camera, m_Camera2;
+    bool m_ChangeCamera = false;
 
     Ref<Framebuffer> m_Framebuffer;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     glm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
-    Ref<ParticleSystem> m_ParticleSystem;
-
     Entity m_Square;
     Ref<Scene> m_Scene;
-
-    float m_Time = 0.0f;
 };
 }

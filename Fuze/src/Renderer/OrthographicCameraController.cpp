@@ -9,8 +9,11 @@
 namespace Fuze {
 OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotationActiveted)
     : m_AspectRatio(aspectRatio), m_RotationActiveted(rotationActiveted) {
-    m_Camera = std::make_shared<OrthographicCamera>(
-        -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+    m_Camera = CreateRef<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+}
+
+OrthographicCameraController::OrthographicCameraController(Ref<OrthographicCamera> camera, float aspectRatio, bool rotationActiveted)
+    :  m_AspectRatio(aspectRatio), m_Camera(camera), m_RotationActiveted(rotationActiveted) {
 }
 
 void OrthographicCameraController::OnUpdate(float ts) {
@@ -57,7 +60,7 @@ void OrthographicCameraController::OnEvent(Event& e) {
 
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<MouseScrolledEvent>(FUZE_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
-    //dispatcher.Dispatch<WindowResizedEvent>(FUZE_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
+    // dispatcher.Dispatch<WindowResizedEvent>(FUZE_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
 }
 
 void OrthographicCameraController::OnResize(float width, float height) {
