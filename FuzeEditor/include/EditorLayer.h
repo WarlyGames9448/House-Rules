@@ -5,6 +5,8 @@
 
 #include "Scene/ScriptableEntity.h"
 
+#include "Editor/SceneHierarchyPanel.h"
+
 namespace Fuze {
 
 class EditorLayer : public Layer {
@@ -34,5 +36,7 @@ class EditorLayer : public Layer {
     Entity m_Square, testEntity;
     Ref<Scene> m_Scene;
     Ref<NativeScriptSystem> m_NativeScriptSystem;
+
+    SceneHierarchyPanel m_SceneHierarchyPanel;
 };
 }

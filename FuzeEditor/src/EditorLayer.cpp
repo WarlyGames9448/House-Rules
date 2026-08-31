@@ -31,8 +31,8 @@ void EditorLayer::OnAttach() {
     m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
     m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Square, glm::vec4 {1.0f, 0.0f, 0.75f, 1.0f});
 
-    m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f);
-    m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f);
+    m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 1");
+    m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 2");
 
     class PlayerController : public ScriptableEntity {
       public:
@@ -46,7 +46,6 @@ void EditorLayer::OnAttach() {
             auto& component = GetComponent<SpriteRendererComponent>().Color;
             component.r += 0.1f;
             if (component.r > 1.0f) component.r = 0.0f;
-            FUZE_INFO("Updating Color: {0}", component.r);
         }
 
         ~PlayerController() {
@@ -62,12 +61,14 @@ void EditorLayer::OnAttach() {
     signature.set(m_Scene->GetRegistry()->GetComponentType<NativeScriptComponent>(), true);
     m_Scene->GetRegistry()->SetSystemSignature<NativeScriptSystem>(signature);
 
-    testEntity = m_Scene->GetRegistry()->CreateEntity();
+    testEntity = m_Scene->CreateEntity("Test Entity");
     m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(testEntity, glm::vec4 {0.6f, 0.7f, 0.8f, 0.9f});
     m_Scene->GetRegistry()->AddComponent<NativeScriptComponent>(testEntity, {});
 
     auto& nsc = m_Scene->GetRegistry()->GetComponent<NativeScriptComponent>(testEntity);
     nsc.Bind<PlayerController>();
+
+    m_SceneHierarchyPanel.SetContext(m_Scene);
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
@@ -143,6 +144,8 @@ void EditorLayer::OnImGuiRender() {
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
     }
     ImGui::End();
+
+    m_SceneHierarchyPanel.OnImGuiRenderer();
 
     // Stats scene ===========
     ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_MenuBar);

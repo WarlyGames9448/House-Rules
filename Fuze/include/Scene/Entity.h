@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <array>
 #include <bitset>
+#include <set>
 
 namespace Fuze {
 
@@ -25,6 +26,10 @@ class EntityManager {
     Entity CreateEntity();
     void DestroyEntity(Entity entity);
 
+    std::set<Entity> GetEntities(){
+      return m_Entities;
+    }
+
     void SetSignature(Entity entity, Signature signature);
     Signature GetSignature(Entity entity);
 
@@ -34,5 +39,6 @@ class EntityManager {
 
     std::array<Signature, MAX_ENTITIES> m_Signatures{};
 
+    std::set<Entity> m_Entities;
 };
 }

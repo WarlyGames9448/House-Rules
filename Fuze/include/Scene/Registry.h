@@ -24,6 +24,10 @@ class Registry {
         m_SystemManager->EntityDestroyed(entity);
     }
 
+    std::set<Entity> GetEntities() {
+        return m_EntityManager->GetEntities();
+    }
+
     template <typename T> Ref<T> RegisterSystem() {
         auto system = m_SystemManager->RegisterSystem<T>();
         system->SetRegistry(this);
@@ -42,7 +46,7 @@ class Registry {
         return m_ComponentManager->GetComponent<T>(entity);
     }
 
-    template <typename T> bool HasComponent(Entity entity){
+    template <typename T> bool HasComponent(Entity entity) {
         auto entitySignature = m_EntityManager->GetSignature(entity);
 
         return entitySignature.test(m_ComponentManager->GetComponentType<T>());

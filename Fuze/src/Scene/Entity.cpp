@@ -15,6 +15,8 @@ Entity EntityManager::CreateEntity() {
         m_FreeIDs.pop();
         m_EntitiesCount++;
 
+        m_Entities.insert(entity);
+
         return entity;
     }
 
@@ -34,6 +36,8 @@ void EntityManager::DestroyEntity(Entity entity) {
 
     m_FreeIDs.push(entity);
     m_EntitiesCount--;
+
+    m_Entities.erase(entity);
 
 }
 

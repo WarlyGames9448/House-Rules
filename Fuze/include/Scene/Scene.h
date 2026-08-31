@@ -47,7 +47,7 @@ class Scene {
     Scene();
     ~Scene();
 
-    Entity CreateEntity(const std::string& tag = "");
+    Entity CreateEntity(const std::string& tag = "Entity");
     Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera");
     void SetPrimaryCamera(Entity camera);
 
@@ -72,6 +72,8 @@ class Scene {
     Ref<Registry> m_Registry;
     Ref<RenderSystem> m_RenderSystem;
     Ref<CameraSystem> m_CameraSystem;
+
+    friend class SceneHierarchyPanel;
 
 };
 }
