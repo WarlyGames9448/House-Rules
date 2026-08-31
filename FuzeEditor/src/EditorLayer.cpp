@@ -34,6 +34,41 @@ void EditorLayer::OnAttach() {
     m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f);
     m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f);
 
+    class PlayerController : public ScriptableEntity {
+      public:
+        Entity m_CameraEntity;
+
+        PlayerController() {
+            FUZE_WARN("Created!");
+        }
+
+        void OnUpdate(Timestep ts) override {
+            auto& component = GetComponent<SpriteRendererComponent>().Color;
+            component.r += 0.1f;
+            if (component.r > 1.0f) component.r = 0.0f;
+            FUZE_INFO("Updating Color: {0}", component.r);
+        }
+
+        ~PlayerController() {
+            FUZE_WARN("Destroyed");
+        }
+    };
+
+    m_Scene->GetRegistry()->RegisterComponent<NativeScriptComponent>();
+
+    m_NativeScriptSystem = m_Scene->GetRegistry()->RegisterSystem<NativeScriptSystem>();
+
+    Signature signature;
+    signature.set(m_Scene->GetRegistry()->GetComponentType<NativeScriptComponent>(), true);
+    m_Scene->GetRegistry()->SetSystemSignature<NativeScriptSystem>(signature);
+
+    testEntity = m_Scene->GetRegistry()->CreateEntity();
+    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(testEntity, glm::vec4 {0.6f, 0.7f, 0.8f, 0.9f});
+    m_Scene->GetRegistry()->AddComponent<NativeScriptComponent>(testEntity, {});
+
+    auto& nsc = m_Scene->GetRegistry()->GetComponent<NativeScriptComponent>(testEntity);
+    nsc.Bind<PlayerController>();
+
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
               RendererCommand::GetRenderCaps().Vendor,
@@ -41,10 +76,15 @@ void EditorLayer::OnAttach() {
 }
 
 void EditorLayer::OnDetach() {
+    m_NativeScriptSystem->Cleanup();
     Renderer2D::Shutdown();
 }
 
 void EditorLayer::OnUpdate(Timestep ts) {
+
+    // Scripts Update
+    m_NativeScriptSystem->OnUpdate(ts);
+
     // TODO: Move this to cameraSystem
     const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {

@@ -183,6 +183,7 @@ struct TagComponent {
 
 struct CameraComponent {
     // TODO: Implement an abstract camera class;
+    // TODO: The Camera may have no controller
     Ref<OrthographicCamera> Camera;
     Ref<OrthographicCameraController> CameraController;
     bool Primary = false;

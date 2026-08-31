@@ -4,6 +4,7 @@
 #include "Renderer/Renderer2D.h"
 
 namespace Fuze {
+// TODO: Make a dispatcher for System call method of other Systems.
 // RenderSystem ============================
 void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
     Renderer2D::BeginScene(m_Camera);

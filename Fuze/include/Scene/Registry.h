@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Scene/Entity.h"
-#include "Scene/Component.h"
 #include "Scene/System.h"
 
 namespace Fuze {
@@ -41,6 +40,12 @@ class Registry {
 
     template <typename T> T& GetComponent(Entity entity) {
         return m_ComponentManager->GetComponent<T>(entity);
+    }
+
+    template <typename T> bool HasComponent(Entity entity){
+        auto entitySignature = m_EntityManager->GetSignature(entity);
+
+        return entitySignature.test(m_ComponentManager->GetComponentType<T>());
     }
 
     template <typename T> ComponentType GetComponentType() {
