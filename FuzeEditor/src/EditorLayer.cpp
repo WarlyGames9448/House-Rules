@@ -91,7 +91,6 @@ void EditorLayer::OnUpdate(Timestep ts) {
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
         m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 
-        // TODO: Resize when changing camera
         m_Scene->ResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
     }
 
@@ -156,9 +155,22 @@ void EditorLayer::OnImGuiRender() {
     auto& color = m_Scene->GetRegistry()->GetComponent<SpriteRendererComponent>(m_Square).Color;
     ImGui::ColorEdit3("Square Color", &color.x);
 
+    Entity ActiveCamera;
+    bool checked = m_ChangeCamera;
     ImGui::Checkbox("Change Camera", &m_ChangeCamera);
-    if (m_ChangeCamera) m_Scene->SetPrimaryCamera(m_Camera2);
-    else m_Scene->SetPrimaryCamera(m_Camera);
+    if (m_ChangeCamera) {
+        m_Scene->SetPrimaryCamera(m_Camera2);
+        ActiveCamera = m_Camera2;
+    } else {
+        m_Scene->SetPrimaryCamera(m_Camera);
+        ActiveCamera = m_Camera;
+    }
+
+    if (checked != m_ChangeCamera) {
+        if (!m_Scene->GetRegistry()->GetComponent<CameraComponent>(ActiveCamera).ViewportFixed) {
+            m_Scene->ResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+        }
+    }
 
     ImGui::End();
 

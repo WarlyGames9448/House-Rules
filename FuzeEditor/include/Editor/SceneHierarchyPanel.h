@@ -15,10 +15,11 @@ class SceneHierarchyPanel {
 
   protected:
     void DrawEntityNode(Entity entity);
+    void DrawEntityProperties(Entity entity);
 
   private:
     Ref<Scene> m_Context;
 
-    Entity m_ContextSelection;
+    Entity m_ContextSelection = NULL_ENTITY;
 };
 }

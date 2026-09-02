@@ -187,6 +187,7 @@ struct CameraComponent {
     Ref<OrthographicCamera> Camera;
     Ref<OrthographicCameraController> CameraController;
     bool Primary = false;
+    bool ViewportFixed = false;
 
     CameraComponent() = default;
     CameraComponent(Ref<OrthographicCamera> camera, Ref<OrthographicCameraController> cameraController)
