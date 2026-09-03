@@ -12,7 +12,7 @@ void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
         auto transform = m_Registry->GetComponent<TransformComponent>(entity);
         auto sprite = m_Registry->GetComponent<SpriteRendererComponent>(entity);
 
-        Renderer2D::DrawQuad(transform.Transform, sprite.Color);
+        Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
     }
     Renderer2D::EndScene();
 }

@@ -33,7 +33,7 @@ class EditorLayer : public Layer {
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     glm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
-    Entity m_Square, testEntity;
+    Entity m_Square, m_Player, testEntity;
     Ref<Scene> m_Scene;
     Ref<NativeScriptSystem> m_NativeScriptSystem;
 

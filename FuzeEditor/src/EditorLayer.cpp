@@ -31,6 +31,10 @@ void EditorLayer::OnAttach() {
     m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
     m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Square, glm::vec4 {1.0f, 0.0f, 0.75f, 1.0f});
 
+    m_Player = m_Scene->CreateEntity("Player");
+    m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Player, {1.0f});
+    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Player, glm::vec4 {0.0f, 1.0f, 0.0f, 1.0f});
+
     m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 1");
     m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 2");
 
