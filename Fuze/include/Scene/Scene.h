@@ -5,6 +5,7 @@
 #include "Core/Timestep.h"
 
 #include "Renderer/OrthographicCameraController.h"
+#include "Scene/CameraSystem.h"
 
 namespace Fuze {
 class RenderSystem : public System {
@@ -19,41 +20,18 @@ class RenderSystem : public System {
     Ref<OrthographicCamera> m_Camera;
 };
 
-class CameraSystem : public System {
-  public:
-    void OnUpdate(Timestep ts) override;
-    void OnEvent(Event& e) {
-        m_PrimaryCameraController->OnEvent(e);
-    }
-
-    void SetPrimaryCamera(Entity camera);
-
-    // TEMP
-    void ResizeViewport(float x, float y) {
-        m_PrimaryCameraController->OnResize(x, y);
-    }
-
-    Ref<OrthographicCamera> GetPrimaryCamera() {
-        return m_PrimaryCameraController->GetCamera();
-    }
-
-  private:
-    Entity m_PrimaryCamera = NULL_ENTITY;
-    Ref<OrthographicCameraController> m_PrimaryCameraController;
-};
-
 class Scene {
   public:
     Scene();
     ~Scene();
 
     Entity CreateEntity(const std::string& tag = "Entity");
-    Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera");
+    Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera", bool hasComponent = false);
     void SetPrimaryCamera(Entity camera);
 
     // TEMP
-    void ResizeViewport(float x, float y) {
-        m_CameraSystem->ResizeViewport(x, y);
+    void OnViewportResize(float width, float height) {
+        m_CameraSystem->OnViewportResize(width, height);
     }
 
     void OnUpdate(Timestep ts);

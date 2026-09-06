@@ -7,6 +7,8 @@ namespace Fuze {
 // TODO: Make a dispatcher for System call method of other Systems.
 // RenderSystem ============================
 void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
+    if (!m_Camera) return;
+
     Renderer2D::BeginScene(m_Camera);
     for (auto& entity : m_Entities) {
         auto transform = m_Registry->GetComponent<TransformComponent>(entity);
@@ -15,26 +17,6 @@ void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
         Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
     }
     Renderer2D::EndScene();
-}
-
-// CameraSystem =============================
-void CameraSystem::OnUpdate(Timestep ts) {
-    if (m_PrimaryCamera != NULL_ENTITY) m_PrimaryCameraController->OnUpdate(ts);
-}
-
-void CameraSystem::SetPrimaryCamera(Entity camera) {
-    if (m_Entities.contains(camera)) {
-        if (m_PrimaryCamera == NULL_ENTITY) {
-            m_PrimaryCamera = camera;
-        } else {
-            auto& oldPrimaryCamera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
-            oldPrimaryCamera.Primary = false;
-        }
-
-        auto& newPrimaryCamera = m_Registry->GetComponent<CameraComponent>(camera);
-        newPrimaryCamera.Primary = true;
-        m_PrimaryCameraController = newPrimaryCamera.CameraController;
-    }
 }
 
 // Scene ====================================
@@ -70,20 +52,23 @@ Entity Scene::CreateEntity(const std::string& tag) {
     return entity;
 }
 
-Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
+Entity Scene::CreateCamera(float aspectRatio, const std::string& tag, bool hasController) {
     auto entity = m_Registry->CreateEntity();
-    Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f);
-    Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
-
-    // TODO
-    cameraController->SetSpeed(2.0f, 180.0f, 0.1f);
-    cameraController->InvertScroll(true);
+    Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
     m_Registry->AddComponent<TagComponent>(entity, tag);
-    m_Registry->AddComponent<CameraComponent>(entity, {camera, cameraController});
+    m_Registry->AddComponent<CameraComponent>(entity, {camera, hasController});
 
-    m_CameraSystem->SetPrimaryCamera(entity);
-    m_RenderSystem->SetCamera(camera);
+    if (hasController) {
+        Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
+
+        // TODO
+        cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
+        cameraController->InvertScroll(true);
+
+        m_CameraSystem->AddCameraController(entity, cameraController);
+    }
+
     return entity;
 }
 
@@ -93,7 +78,8 @@ void Scene::SetPrimaryCamera(Entity camera) {
 }
 
 void Scene::OnUpdate(Timestep ts) {
-    if (m_ViewportFocused) m_CameraSystem->OnUpdate(ts);
+    m_CameraSystem->m_UpdateControllers = m_ViewportFocused;
+    m_CameraSystem->OnUpdate(ts);
     m_RenderSystem->OnUpdate(ts);
 }
 }

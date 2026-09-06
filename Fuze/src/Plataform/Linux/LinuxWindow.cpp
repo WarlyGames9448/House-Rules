@@ -73,6 +73,9 @@ void LinuxWindow::Init(const WindowProps& windowProps) {
     glfwMaximizeWindow(m_Window);
     SetVSync(true);
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
     // Window Events ---------------------------------------------
     glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);

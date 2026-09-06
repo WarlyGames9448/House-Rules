@@ -199,15 +199,24 @@ struct TagComponent {
 
 struct CameraComponent {
     // TODO: Implement an abstract camera class;
-    // TODO: The Camera may have no controller
     Ref<OrthographicCamera> Camera;
-    Ref<OrthographicCameraController> CameraController;
+    bool HasController = true;
     bool Primary = false;
-    bool ViewportFixed = false;
+    bool FixedAspectRatio = false;
+    bool SizeChanged = true;
+
+    float AspectRatio = 1.7778f;
+    float Size = 1.0f;
+    float NearClip = -100.0f;
+    float FarClip = 100.0f;
 
     CameraComponent() = default;
-    CameraComponent(Ref<OrthographicCamera> camera, Ref<OrthographicCameraController> cameraController)
-        : Camera(camera), CameraController(cameraController) {
+    CameraComponent(Ref<OrthographicCamera> camera, bool hasController = false)
+        : Camera(camera), HasController(hasController){
+    }
+
+    void RecalculateProjection() {
+        Camera->SetProjection(-AspectRatio * Size, AspectRatio * Size, -Size, Size, NearClip, FarClip);
     }
 };
 

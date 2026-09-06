@@ -9,48 +9,58 @@
 namespace Fuze {
 OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotationActiveted)
     : m_AspectRatio(aspectRatio), m_RotationActiveted(rotationActiveted) {
-    m_Camera = CreateRef<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+    m_Camera =
+        CreateRef<OrthographicCamera>(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel, m_NearClip, m_FarClip);
 }
 
 OrthographicCameraController::OrthographicCameraController(Ref<OrthographicCamera> camera, float aspectRatio, bool rotationActiveted)
-    :  m_AspectRatio(aspectRatio), m_Camera(camera), m_RotationActiveted(rotationActiveted) {
+    : m_AspectRatio(aspectRatio), m_Camera(camera), m_RotationActiveted(rotationActiveted) {
 }
 
 void OrthographicCameraController::OnUpdate(float ts) {
     FUZE_PROFILE_FUNCTION();
 
+    if (!m_Camera) return;
+
+    glm::vec3 cameraPosition = m_Camera->GetPosition();
+    float cameraRotation = m_Camera->GetRotation();
+
+    bool changed = false;
+
     if (Input::IsKeyPressed(FUZE_KEY_A)) {
-        m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_Camera->SetPosition(m_CameraPosition.x, m_CameraPosition.y);
+        cameraPosition.x -= cos(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        cameraPosition.y -= sin(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        changed = true;
     } else if (Input::IsKeyPressed(FUZE_KEY_D)) {
-        m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_Camera->SetPosition(m_CameraPosition.x, m_CameraPosition.y);
+        cameraPosition.x += cos(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        cameraPosition.y += sin(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        changed = true;
     }
 
     if (Input::IsKeyPressed(FUZE_KEY_W)) {
-        m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_Camera->SetPosition(m_CameraPosition.x, m_CameraPosition.y);
+        cameraPosition.x += -sin(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        cameraPosition.y += cos(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        changed = true;
     } else if (Input::IsKeyPressed(FUZE_KEY_S)) {
-        m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
-        m_Camera->SetPosition(m_CameraPosition.x, m_CameraPosition.y);
+        cameraPosition.x -= -sin(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        cameraPosition.y -= cos(glm::radians(cameraRotation)) * m_TranslationSpeed * m_ZoomLevel * ts;
+        changed = true;
     }
+
+    if (changed) m_Camera->SetPosition(cameraPosition);
 
     if (m_RotationActiveted) {
         if (Input::IsKeyPressed(FUZE_KEY_Q)) {
-            m_CameraRotation += m_RotationSpeed * ts;
-            if (m_CameraRotation > 180.0f) m_CameraRotation -= 360.0f;
-            else if (m_CameraRotation <= -180.0f) m_CameraRotation += 360.0f;
+            cameraRotation += m_RotationSpeed * ts;
+            if (cameraRotation > 180.0f) cameraRotation -= 360.0f;
+            else if (cameraRotation <= -180.0f) cameraRotation += 360.0f;
 
-            m_Camera->SetRotation(m_CameraRotation);
+            m_Camera->SetRotation(cameraRotation);
         } else if (Input::IsKeyPressed(FUZE_KEY_E)) {
-            m_CameraRotation -= m_RotationSpeed * ts;
-            if (m_CameraRotation > 180.0f) m_CameraRotation -= 360.0f;
-            else if (m_CameraRotation <= -180.0f) m_CameraRotation += 360.0f;
-            m_Camera->SetRotation(m_CameraRotation);
+            cameraRotation -= m_RotationSpeed * ts;
+            if (cameraRotation > 180.0f) cameraRotation -= 360.0f;
+            else if (cameraRotation <= -180.0f) cameraRotation += 360.0f;
+            m_Camera->SetRotation(cameraRotation);
         }
     }
 }
@@ -67,7 +77,7 @@ void OrthographicCameraController::OnResize(float width, float height) {
     FUZE_PROFILE_FUNCTION();
 
     m_AspectRatio = width / height;
-    m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+    CalculateView();
 }
 
 bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e) {
@@ -77,7 +87,7 @@ bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e) {
     else m_ZoomLevel -= e.GetYOffset() * m_ScrollSpeed;
 
     if (m_ZoomLevel < 0.1) m_ZoomLevel = 0.1;
-    m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+    CalculateView();
     return true;
 }
 
@@ -86,6 +96,10 @@ bool OrthographicCameraController::OnWindowResized(WindowResizedEvent& e) {
 
     OnResize((float)e.GetWidth(), (float)e.GetHeight());
     return true;
+}
+
+void OrthographicCameraController::CalculateView() {
+    m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel, m_NearClip, m_FarClip);
 }
 
 void OrthographicCameraController::SetSpeed(float translation, float rotation, float scroll) {

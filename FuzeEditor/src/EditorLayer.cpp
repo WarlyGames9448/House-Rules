@@ -35,8 +35,10 @@ void EditorLayer::OnAttach() {
     m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Player, {1.0f});
     m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Player, glm::vec4 {0.0f, 1.0f, 0.0f, 1.0f});
 
-    m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 1");
-    m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 2");
+    m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 1", true);
+    m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 2", false);
+
+    m_Scene->SetPrimaryCamera(m_Camera);
 
     class PlayerController : public ScriptableEntity {
       public:
@@ -90,12 +92,11 @@ void EditorLayer::OnUpdate(Timestep ts) {
     // Scripts Update
     m_NativeScriptSystem->OnUpdate(ts);
 
-    // TODO: Move this to cameraSystem
     const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
         m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 
-        m_Scene->ResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+        m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
     }
 
     m_Framebuffer->Bind();
@@ -161,18 +162,14 @@ void EditorLayer::OnImGuiRender() {
 
     Entity ActiveCamera;
     bool checked = m_ChangeCamera;
-    ImGui::Checkbox("Change Camera", &m_ChangeCamera);
-    if (m_ChangeCamera) {
-        m_Scene->SetPrimaryCamera(m_Camera2);
-        ActiveCamera = m_Camera2;
-    } else {
-        m_Scene->SetPrimaryCamera(m_Camera);
-        ActiveCamera = m_Camera;
-    }
+    ImGui::Checkbox("Activate Camera 2", &m_ChangeCamera);
+    if (m_ChangeCamera) ActiveCamera = m_Camera2;
+    else ActiveCamera = m_Camera;
 
     if (checked != m_ChangeCamera) {
-        if (!m_Scene->GetRegistry()->GetComponent<CameraComponent>(ActiveCamera).ViewportFixed) {
-            m_Scene->ResizeViewport(m_ViewportSize.x, m_ViewportSize.y);
+        m_Scene->SetPrimaryCamera(ActiveCamera);
+        if (!m_Scene->GetRegistry()->GetComponent<CameraComponent>(ActiveCamera).FixedAspectRatio) {
+            m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
         }
     }
 

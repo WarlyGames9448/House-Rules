@@ -24,11 +24,40 @@ class FUZE_API OrthographicCameraController {
     }
 
     void SetSpeed(float translation, float rotation, float scroll);
+    inline void RotationActive(bool active) {
+        m_RotationActiveted = active;
+    }
     inline void InvertScroll(bool invert) {
         m_InvertScroll = invert;
     }
 
+    float GetZoomLevel() const {
+        return m_ZoomLevel;
+    }
+    void SetZoomLevel(float zoomLevel) {
+        m_ZoomLevel = zoomLevel;
+        CalculateView();
+    }
+
+    float GetNearClip() const {
+        return m_NearClip;
+    }
+    void SetNearClip(float nearClip) {
+        m_NearClip = nearClip;
+        CalculateView();
+    }
+
+    float GetFarClip() const {
+        return m_FarClip;
+    }
+    void SetFarClip(float farClip) {
+        m_FarClip = farClip;
+        CalculateView();
+    }
+
   private:
+    void CalculateView();
+
     bool OnMouseScrolled(MouseScrolledEvent& e);
     bool OnWindowResized(WindowResizedEvent& e);
 
@@ -39,10 +68,11 @@ class FUZE_API OrthographicCameraController {
     float m_TranslationSpeed = 1.0f, m_RotationSpeed = 180.0f, m_ScrollSpeed = 0.5f;
 
     Ref<OrthographicCamera> m_Camera;
-    glm::vec2 m_CameraPosition = {0.0f, 0.0f};
-    float m_CameraRotation = 0.0f;
 
     bool m_RotationActiveted;
     bool m_InvertScroll = false;
+
+    float m_NearClip = -1.0f;
+    float m_FarClip = 1.0f;
 };
 }

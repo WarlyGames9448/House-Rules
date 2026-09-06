@@ -101,17 +101,46 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
         if (m_Context->m_Registry->HasComponent<TransformComponent>(entity)) {
             if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
                 auto& tc = m_Context->GetRegistry()->GetComponent<TransformComponent>(entity);
-                DrawVec3Control("Translation", tc.Translation);
-                DrawVec3Control("Rotation", tc.Rotation);
-                DrawVec3Control("Scale", tc.Scale);
+                DrawVec3Control("Translation", tc.Translation, 0.0f);
+                DrawVec3Control("Rotation", tc.Rotation, 0.0f);
+                DrawVec3Control("Scale", tc.Scale, 1.0f);
 
                 ImGui::TreePop();
             }
         }
 
         if (m_Context->m_Registry->HasComponent<SpriteRendererComponent>(entity)) {
-            auto& color = m_Context->GetRegistry()->GetComponent<SpriteRendererComponent>(entity).Color;
-            ImGui::ColorEdit4("Color", &color.x);
+            if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite")) {
+                auto& color = m_Context->GetRegistry()->GetComponent<SpriteRendererComponent>(entity).Color;
+                ImGui::ColorEdit4("Color", &color.x);
+
+                ImGui::TreePop();
+            }
+        }
+
+        if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
+            if (ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
+
+                auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
+                bool changed = false;
+
+                changed |= ImGui::DragFloat("Zoom", &cameraComp.Size, 0.1f, 0.1f, 100.0f);
+                changed |= ImGui::DragFloat("Near Clip", &cameraComp.NearClip, 0.1f);
+                changed |= ImGui::DragFloat("Far Clip", &cameraComp.FarClip, 0.1f);
+
+                glm::vec3 position = cameraComp.Camera->GetPosition();
+                float rotation = cameraComp.Camera->GetRotation();
+
+                DrawVec3Control("Position", position);
+                ImGui::DragFloat("Rotation", &rotation);
+                cameraComp.Camera->SetPositionAndRotation(position, rotation);
+
+                if (changed) {
+                    cameraComp.SizeChanged = true;
+                    cameraComp.RecalculateProjection();
+                }
+                ImGui::TreePop();
+            }
         }
     }
 }

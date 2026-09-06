@@ -25,14 +25,26 @@ void OrthographicCamera::RecalculateViewProjection() {
     m_ViewProjection = m_Projection * m_View;
 }
 
-void OrthographicCamera::SetPosition(float x, float y) {
-    m_Position = {x, y, 0.0f};
-    RecalculateViewProjection();
+void OrthographicCamera::SetPosition(const glm::vec3& position) {
+    if (m_Position != position) {
+        m_Position = position;
+        RecalculateViewProjection();
+    }
 }
 
 void OrthographicCamera::SetRotation(float degrees) {
-    m_rotation = degrees;
-    RecalculateViewProjection();
+    if (m_rotation != degrees) {
+        m_rotation = degrees;
+        RecalculateViewProjection();
+    }
+}
+
+void OrthographicCamera::SetPositionAndRotation(const glm::vec3& position, float degrees) {
+    if (m_Position != position || m_rotation != degrees) {
+        m_Position = position;
+        m_rotation = degrees;
+        RecalculateViewProjection();
+    }
 }
 
 void OrthographicCamera::SetProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
