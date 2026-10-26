@@ -26,7 +26,7 @@ template <typename T> class ComponentArray : public IComponentArray {
 
     void InsertData(Entity entity, T component) {
         if (m_EntityToIndexMap[entity] != NULL_ENTITY) {
-            FUZE_CORE_ASSERT(0, "Entity {0} already have this component", entity);
+            FUZE_CORE_WARN("Entity {0} already have this component", entity);
             return;
         }
         m_ComponentArray[m_ValidSize] = component;
@@ -210,7 +210,10 @@ struct CameraComponent {
     float NearClip = -100.0f;
     float FarClip = 100.0f;
 
-    CameraComponent() = default;
+    CameraComponent() {
+        Camera = CreateRef<OrthographicCamera>(-AspectRatio, AspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
+    }
+
     CameraComponent(Ref<OrthographicCamera> camera, bool hasController = false)
         : Camera(camera), HasController(hasController){
     }

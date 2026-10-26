@@ -13,12 +13,14 @@ class CameraSystem : public System {
     }
 
     void AddCameraController(Entity camera, Ref<OrthographicCameraController> cameraController);
+    //void RemoveCameraController(Entity camera);
 
     void SetPrimaryCamera(Entity camera);
 
     void OnViewportResize(float width, float height);
 
     Ref<OrthographicCamera> GetPrimaryCamera() {
+        if(m_PrimaryCamera == NULL_ENTITY) return nullptr;
         return m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera).Camera;
     }
 

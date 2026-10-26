@@ -18,14 +18,51 @@ void SceneHierarchyPanel::OnImGuiRenderer() {
         DrawEntityNode(entity);
     }
 
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0)) {
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0)) {
         m_ContextSelection = NULL_ENTITY;
+    }
+
+    // Right Click on blank space
+    if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
+        if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) {
     }
 
     ImGui::End();
 
     ImGui::Begin("Properties Panel");
-    DrawEntityProperties(m_ContextSelection);
+    if (m_ContextSelection != NULL_ENTITY) {
+        DrawEntityProperties(m_ContextSelection);
+
+        if (ImGui::Button("Add Component")) {
+            ImGui::OpenPopup("AddComponent");
+        }
+
+        // TODO Add Custom component Adding system
+        if (ImGui::BeginPopup("AddComponent")) {
+            if (ImGui::MenuItem("Camera")) {
+                float aspectRatio = 1280.0f / 720.0f;
+                Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
+                m_Context->m_Registry->AddComponent<CameraComponent>(m_ContextSelection, {camera, false});
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (ImGui::MenuItem("SpriteRenderer")) {
+                m_Context->m_Registry->AddComponent<SpriteRendererComponent>(m_ContextSelection, {});
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (ImGui::MenuItem("Transform")) {
+                m_Context->m_Registry->AddComponent<TransformComponent>(m_ContextSelection, {});
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
     ImGui::End();
 }
 
@@ -40,8 +77,20 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
         m_ContextSelection = entity;
     }
 
+    bool EntityDeleted = false;
+    if (ImGui::BeginPopupContextItem()) {
+        if (ImGui::MenuItem("Delete Entity")) EntityDeleted = true;
+
+        ImGui::EndPopup();
+    }
+
     if (opened) {
         ImGui::TreePop();
+    }
+
+    if (EntityDeleted) {
+        m_Context->DestroyEntity(entity);
+        if (m_ContextSelection == entity) m_ContextSelection = NULL_ENTITY;
     }
 }
 
@@ -98,8 +147,23 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
             tag = buffer;
         }
 
+        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowOverlap;
+
         if (m_Context->m_Registry->HasComponent<TransformComponent>(entity)) {
-            if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
+            bool open = ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), treeNodeFlags, "Transform");
+            ImGui::SameLine();
+            if (ImGui::Button("+")) {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings")) {
+                if (ImGui::MenuItem("Remove component")) removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open) {
                 auto& tc = m_Context->GetRegistry()->GetComponent<TransformComponent>(entity);
                 DrawVec3Control("Translation", tc.Translation, 0.0f);
                 DrawVec3Control("Rotation", tc.Rotation, 0.0f);
@@ -107,19 +171,49 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
 
                 ImGui::TreePop();
             }
+
+            if (removeComponent) m_Context->m_Registry->RemoveComponent<TransformComponent>(entity);
         }
 
         if (m_Context->m_Registry->HasComponent<SpriteRendererComponent>(entity)) {
-            if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite")) {
+            bool open = ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), treeNodeFlags, "Sprite");
+            ImGui::SameLine();
+            if (ImGui::Button("+")) {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings")) {
+                if (ImGui::MenuItem("Remove component")) removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open) {
                 auto& color = m_Context->GetRegistry()->GetComponent<SpriteRendererComponent>(entity).Color;
                 ImGui::ColorEdit4("Color", &color.x);
 
                 ImGui::TreePop();
             }
+
+            if (removeComponent) m_Context->m_Registry->RemoveComponent<SpriteRendererComponent>(entity);
         }
 
         if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
-            if (ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
+            bool open = ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), treeNodeFlags, "Camera");
+            ImGui::SameLine();
+            if (ImGui::Button("+")) {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings")) {
+                if (ImGui::MenuItem("Remove component")) removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open) {
 
                 auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
                 bool changed = false;
@@ -127,6 +221,17 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                 changed |= ImGui::DragFloat("Zoom", &cameraComp.Size, 0.1f, 0.1f, 100.0f);
                 changed |= ImGui::DragFloat("Near Clip", &cameraComp.NearClip, 0.1f);
                 changed |= ImGui::DragFloat("Far Clip", &cameraComp.FarClip, 0.1f);
+
+                bool isPrimary = cameraComp.Primary;
+                bool changePrimary = isPrimary;
+                ImGui::Checkbox("Set Primary", &changePrimary);
+
+                if (changePrimary && !isPrimary) {
+                    m_Context->SetPrimaryCamera(entity);
+                    if (!cameraComp.FixedAspectRatio) {
+                        m_Context->OnViewportResize();
+                    }
+                } else if (!changePrimary && isPrimary) m_Context->SetPrimaryCamera(NULL_ENTITY);
 
                 glm::vec3 position = cameraComp.Camera->GetPosition();
                 float rotation = cameraComp.Camera->GetRotation();
@@ -141,6 +246,8 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                 }
                 ImGui::TreePop();
             }
+
+            if (removeComponent) m_Context->m_Registry->RemoveComponent<CameraComponent>(entity);
         }
     }
 }

@@ -25,11 +25,24 @@ void CameraSystem::OnUpdate(Timestep ts) {
     }
 }
 
+// TODO: Activate and deactivate CameraController
+
 void CameraSystem::AddCameraController(Entity camera, Ref<OrthographicCameraController> cameraController) {
     m_CameraControllers[camera] = cameraController;
 }
 
 void CameraSystem::SetPrimaryCamera(Entity camera) {
+    if(camera == NULL_ENTITY){
+        if(m_PrimaryCamera != NULL_ENTITY){
+            auto& oldPrimaryCamera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
+            oldPrimaryCamera.Primary = false;
+        }
+
+        m_PrimaryCamera = NULL_ENTITY;
+
+        return;
+    }
+
     if (m_Entities.contains(camera)) {
         if (m_PrimaryCamera == NULL_ENTITY) {
             m_PrimaryCamera = camera;

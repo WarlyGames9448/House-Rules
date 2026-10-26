@@ -52,11 +52,14 @@ Entity Scene::CreateEntity(const std::string& tag) {
     return entity;
 }
 
+void Scene::DestroyEntity(Entity entity){
+    m_Registry->DestroyEntity(entity);
+}
+
 Entity Scene::CreateCamera(float aspectRatio, const std::string& tag, bool hasController) {
-    auto entity = m_Registry->CreateEntity();
+    auto entity = CreateEntity(tag);
     Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
-    m_Registry->AddComponent<TagComponent>(entity, tag);
     m_Registry->AddComponent<CameraComponent>(entity, {camera, hasController});
 
     if (hasController) {

@@ -157,22 +157,6 @@ void EditorLayer::OnImGuiRender() {
     ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
     ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
 
-    auto& color = m_Scene->GetRegistry()->GetComponent<SpriteRendererComponent>(m_Square).Color;
-    ImGui::ColorEdit3("Square Color", &color.x);
-
-    Entity ActiveCamera;
-    bool checked = m_ChangeCamera;
-    ImGui::Checkbox("Activate Camera 2", &m_ChangeCamera);
-    if (m_ChangeCamera) ActiveCamera = m_Camera2;
-    else ActiveCamera = m_Camera;
-
-    if (checked != m_ChangeCamera) {
-        m_Scene->SetPrimaryCamera(ActiveCamera);
-        if (!m_Scene->GetRegistry()->GetComponent<CameraComponent>(ActiveCamera).FixedAspectRatio) {
-            m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
-        }
-    }
-
     ImGui::End();
 
     // Viewport scene ===========
@@ -189,6 +173,7 @@ void EditorLayer::OnImGuiRender() {
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
     m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+    m_Scene->m_ViewportSize = m_ViewportSize;
 
     ImGui::Image(m_Framebuffer->GetColorAttachmentID(), ImVec2 {m_ViewportSize.x, m_ViewportSize.y}, ImVec2 {0, 1}, ImVec2 {1, 0});
     ImGui::End();

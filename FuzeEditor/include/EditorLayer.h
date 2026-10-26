@@ -38,5 +38,7 @@ class EditorLayer : public Layer {
     Ref<NativeScriptSystem> m_NativeScriptSystem;
 
     SceneHierarchyPanel m_SceneHierarchyPanel;
+
+    friend class Scene;
 };
 }

@@ -26,12 +26,17 @@ class Scene {
     ~Scene();
 
     Entity CreateEntity(const std::string& tag = "Entity");
+    void DestroyEntity(Entity entity);
     Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera", bool hasComponent = false);
     void SetPrimaryCamera(Entity camera);
 
     // TEMP
     void OnViewportResize(float width, float height) {
         m_CameraSystem->OnViewportResize(width, height);
+    }
+
+    void OnViewportResize() {
+        m_CameraSystem->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
     }
 
     void OnUpdate(Timestep ts);
@@ -45,6 +50,7 @@ class Scene {
 
   public:
     bool m_ViewportFocused = false;
+    glm::vec2 m_ViewportSize;
 
   private:
     Ref<Registry> m_Registry;
@@ -52,6 +58,5 @@ class Scene {
     Ref<CameraSystem> m_CameraSystem;
 
     friend class SceneHierarchyPanel;
-
 };
 }
