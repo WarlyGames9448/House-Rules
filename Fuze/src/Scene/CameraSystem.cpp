@@ -7,33 +7,41 @@ void CameraSystem::OnUpdate(Timestep ts) {
     for (Entity entity : m_Entities) {
         auto& camera = m_Registry->GetComponent<CameraComponent>(entity);
         if (camera.SizeChanged) {
-            if (camera.HasController) {
+            if (camera.ControllerActive) {
                 m_CameraControllers[entity]->SetZoomLevel(camera.Size);
                 m_CameraControllers[entity]->SetFarClip(camera.FarClip);
                 m_CameraControllers[entity]->SetNearClip(camera.NearClip);
-
             }
             camera.SizeChanged = false;
         }
     }
 
-    if (m_PrimaryCamera != NULL_ENTITY && m_UpdateControllers && m_IsControllerActive) {
+    if (m_PrimaryCamera != NULL_ENTITY && m_UpdateControllers) {
         auto& camera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
 
-        m_PrimaryCameraController->OnUpdate(ts);
-        camera.Size = m_PrimaryCameraController->GetZoomLevel();
+        if (camera.ControllerActive) {
+            m_CameraControllers[m_PrimaryCamera]->OnUpdate(ts);
+            camera.Size = m_CameraControllers[m_PrimaryCamera]->GetZoomLevel();
+        }
     }
 }
-
-// TODO: Activate and deactivate CameraController
 
 void CameraSystem::AddCameraController(Entity camera, Ref<OrthographicCameraController> cameraController) {
     m_CameraControllers[camera] = cameraController;
 }
 
+void CameraSystem::RemoveCameraController(Entity camera) {
+    m_CameraControllers.erase(camera);
+}
+
+void CameraSystem::ActivateCameraController(Entity camera, bool status) {
+    auto& cameraComp = m_Registry->GetComponent<CameraComponent>(camera);
+    cameraComp.ControllerActive = status;
+}
+
 void CameraSystem::SetPrimaryCamera(Entity camera) {
-    if(camera == NULL_ENTITY){
-        if(m_PrimaryCamera != NULL_ENTITY){
+    if (camera == NULL_ENTITY) {
+        if (m_PrimaryCamera != NULL_ENTITY) {
             auto& oldPrimaryCamera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
             oldPrimaryCamera.Primary = false;
         }
@@ -55,11 +63,7 @@ void CameraSystem::SetPrimaryCamera(Entity camera) {
         newPrimaryCamera.Primary = true;
         m_PrimaryCamera = camera;
 
-        if (newPrimaryCamera.HasController) m_PrimaryCameraController = m_CameraControllers[camera];
-
-        m_IsControllerActive = newPrimaryCamera.HasController;
-    }
-    else {
+    } else {
         FUZE_CORE_WARN("This camera does not exists.");
     }
 }
@@ -73,8 +77,7 @@ void CameraSystem::OnViewportResize(float width, float height) {
         auto& camera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
         camera.AspectRatio = aspectRatio;
         camera.RecalculateProjection();
+        m_CameraControllers[m_PrimaryCamera]->OnResize(width, height);
     }
-
-    if (m_PrimaryCameraController) m_PrimaryCameraController->OnResize(width, height);
 }
 }

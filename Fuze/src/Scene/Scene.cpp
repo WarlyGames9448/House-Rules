@@ -52,7 +52,7 @@ Entity Scene::CreateEntity(const std::string& tag) {
     return entity;
 }
 
-void Scene::DestroyEntity(Entity entity){
+void Scene::DestroyEntity(Entity entity) {
     m_Registry->DestroyEntity(entity);
 }
 
@@ -62,17 +62,29 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag, bool hasCo
 
     m_Registry->AddComponent<CameraComponent>(entity, {camera, hasController});
 
-    if (hasController) {
-        Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
+    Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
 
-        // TODO
-        cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-        cameraController->InvertScroll(true);
+    // TODO
+    cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
+    cameraController->InvertScroll(true);
 
-        m_CameraSystem->AddCameraController(entity, cameraController);
-    }
+    m_CameraSystem->AddCameraController(entity, cameraController);
 
     return entity;
+}
+
+void Scene::CreateCamera(Entity cameraEntity, float aspectRatio, bool hasController) {
+    Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
+
+    m_Registry->AddComponent<CameraComponent>(cameraEntity, {camera, hasController});
+
+    Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
+
+    // TODO
+    cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
+    cameraController->InvertScroll(true);
+
+    m_CameraSystem->AddCameraController(cameraEntity, cameraController);
 }
 
 void Scene::SetPrimaryCamera(Entity camera) {

@@ -27,7 +27,9 @@ class Scene {
 
     Entity CreateEntity(const std::string& tag = "Entity");
     void DestroyEntity(Entity entity);
-    Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera", bool hasComponent = false);
+    Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera", bool hasController = false);
+    // Add Camera to existing entity;
+    void CreateCamera(Entity cameraEntity, float aspectRatio, bool hasController = false);
     void SetPrimaryCamera(Entity camera);
 
     // TEMP

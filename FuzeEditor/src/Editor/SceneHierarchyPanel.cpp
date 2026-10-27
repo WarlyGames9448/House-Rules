@@ -45,8 +45,7 @@ void SceneHierarchyPanel::OnImGuiRenderer() {
         if (ImGui::BeginPopup("AddComponent")) {
             if (ImGui::MenuItem("Camera")) {
                 float aspectRatio = 1280.0f / 720.0f;
-                Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
-                m_Context->m_Registry->AddComponent<CameraComponent>(m_ContextSelection, {camera, false});
+                m_Context->CreateCamera(m_ContextSelection, aspectRatio);
                 ImGui::CloseCurrentPopup();
             }
 
@@ -89,6 +88,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     }
 
     if (EntityDeleted) {
+        if (m_Context->GetRegistry()->HasComponent<CameraComponent>(entity)) {
+            auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
+
+            if (cameraComp.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
+            m_Context->m_CameraSystem->RemoveCameraController(entity);
+        }
         m_Context->DestroyEntity(entity);
         if (m_ContextSelection == entity) m_ContextSelection = NULL_ENTITY;
     }
@@ -214,7 +219,6 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
             }
 
             if (open) {
-
                 auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
                 bool changed = false;
 
@@ -233,6 +237,11 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                     }
                 } else if (!changePrimary && isPrimary) m_Context->SetPrimaryCamera(NULL_ENTITY);
 
+                bool activateController = cameraComp.ControllerActive;
+                ImGui::Checkbox("Activate Controller", &activateController);
+                if (activateController != cameraComp.ControllerActive)
+                    m_Context->m_CameraSystem->ActivateCameraController(entity, activateController);
+
                 glm::vec3 position = cameraComp.Camera->GetPosition();
                 float rotation = cameraComp.Camera->GetRotation();
 
@@ -247,7 +256,13 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                 ImGui::TreePop();
             }
 
-            if (removeComponent) m_Context->m_Registry->RemoveComponent<CameraComponent>(entity);
+            if (removeComponent) {
+                auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
+
+                if (cameraComp.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
+                m_Context->m_CameraSystem->RemoveCameraController(entity);
+                m_Context->GetRegistry()->RemoveComponent<CameraComponent>(entity);
+            }
         }
     }
 }

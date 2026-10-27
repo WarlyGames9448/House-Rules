@@ -16,6 +16,8 @@ class IComponentArray {
 
 template <typename T> class ComponentArray : public IComponentArray {
   public:
+    using ComponentCallback = std::function<void(Entity)>;
+
     ComponentArray() {
         for (Entity i = 0; i < MAX_ENTITIES; i++) {
             m_EntityToIndexMap[i] = NULL_ENTITY;
@@ -23,6 +25,14 @@ template <typename T> class ComponentArray : public IComponentArray {
     }
 
     virtual ~ComponentArray() = default;
+
+    void RegisterOnAdd(ComponentCallback callback) {
+        m_OnAdd = callback;
+    }
+
+    void RegisterOnRemove(ComponentCallback callback) {
+        m_OnRemove = callback;
+    }
 
     void InsertData(Entity entity, T component) {
         if (m_EntityToIndexMap[entity] != NULL_ENTITY) {
@@ -35,6 +45,10 @@ template <typename T> class ComponentArray : public IComponentArray {
         m_IndexToEntityMap[m_ValidSize] = entity;
 
         m_ValidSize++;
+
+        if (m_OnAdd) {
+            m_OnAdd(entity);
+        }
     }
 
     void RemoveData(Entity entity) {
@@ -54,6 +68,10 @@ template <typename T> class ComponentArray : public IComponentArray {
         m_EntityToIndexMap[entity] = NULL_ENTITY;
 
         m_ValidSize--;
+
+        if (m_OnRemove) {
+            m_OnRemove(entity);
+        }
     }
 
     T& GetData(Entity entity) {
@@ -84,6 +102,9 @@ template <typename T> class ComponentArray : public IComponentArray {
     std::array<Entity, MAX_ENTITIES> m_IndexToEntityMap;
 
     size_t m_ValidSize = 0;
+
+    ComponentCallback m_OnAdd = nullptr;
+    ComponentCallback m_OnRemove = nullptr;
 };
 
 class ComponentManager {
@@ -111,6 +132,12 @@ class ComponentManager {
         }
 
         return m_ComponentTypes[typeName];
+    }
+
+    template <typename T> void RegisterComponentLifecycle(std::function<void(Entity)> onAdd, std::function<void(Entity)> onRemove) {
+        auto array = GetComponentArray<T>();
+        if (onAdd) array->RegisterOnAdd(onAdd);
+        if (onRemove) array->RegisterOnRemove(onRemove);
     }
 
     template <typename T> void InsertComponent(Entity entity, T component) {
@@ -200,7 +227,7 @@ struct TagComponent {
 struct CameraComponent {
     // TODO: Implement an abstract camera class;
     Ref<OrthographicCamera> Camera;
-    bool HasController = true;
+    bool ControllerActive = true;
     bool Primary = false;
     bool FixedAspectRatio = false;
     bool SizeChanged = true;
@@ -214,8 +241,7 @@ struct CameraComponent {
         Camera = CreateRef<OrthographicCamera>(-AspectRatio, AspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
     }
 
-    CameraComponent(Ref<OrthographicCamera> camera, bool hasController = false)
-        : Camera(camera), HasController(hasController){
+    CameraComponent(Ref<OrthographicCamera> camera, bool controllerActive = false): Camera(camera), ControllerActive(controllerActive) {
     }
 
     void RecalculateProjection() {

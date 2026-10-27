@@ -56,6 +56,11 @@ class Registry {
         return m_ComponentManager->GetComponentType<T>();
     }
 
+    template <typename T>
+    void RegisterComponentLifecycle(std::function<void(Entity)> onAdd = nullptr, std::function<void(Entity)> onRemove = nullptr) {
+        m_ComponentManager->RegisterComponentLifecycle<T>(onAdd, onRemove);
+    }
+
     template <typename T> void AddComponent(Entity entity, T component) {
         m_ComponentManager->InsertComponent<T>(entity, component);
 
