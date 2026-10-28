@@ -51,9 +51,11 @@ void EditorLayer::OnAttach() {
         }
 
         void OnUpdate(Timestep ts) override {
-            auto& component = GetComponent<SpriteRendererComponent>().Color;
-            component.r += 0.1f;
-            if (component.r > 1.0f) component.r = 0.0f;
+            if (HasComponent<SpriteRendererComponent>(GetID())) {
+                auto& component = GetComponent<SpriteRendererComponent>().Color;
+                component.r += 0.1f;
+                if (component.r > 1.0f) component.r = 0.0f;
+            }
         }
 
         ~PlayerController() {

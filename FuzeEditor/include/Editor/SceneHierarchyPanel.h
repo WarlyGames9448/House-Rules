@@ -14,12 +14,16 @@ class SceneHierarchyPanel {
     void OnImGuiRenderer();
 
   protected:
-    void DrawEntityNode(Entity entity);
+    void DrawEntityNode(Entity entity, std::vector<Entity>& pendingDeletion);
     void DrawEntityProperties(Entity entity);
 
   private:
     Ref<Scene> m_Context;
 
     Entity m_ContextSelection = NULL_ENTITY;
+
+    Entity m_RenamingEntity = NULL_ENTITY;
+    char m_RenameBuffer[256] = {};
+    bool m_RequestRenameFocus = false;
 };
 }

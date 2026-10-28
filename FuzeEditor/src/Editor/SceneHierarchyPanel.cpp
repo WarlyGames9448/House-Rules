@@ -4,6 +4,8 @@
 #include <imgui_internal.h>
 
 #include "Editor/EditorPanel.h"
+#include "Input.h"
+#include "KeyCodes.h"
 
 namespace Fuze {
 SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context): m_Context(context) {
@@ -11,25 +13,43 @@ SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context): m_Context(context)
 
 void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
     m_Context = context;
+    m_ContextSelection = NULL_ENTITY;
 }
 
 void SceneHierarchyPanel::OnImGuiRenderer() {
+    if (!m_Context) {
+        FUZE_ASSERT(0, "Context not setted!");
+        return;
+    }
+
+    std::vector<Entity> pendingDeletion;
+
     if (UI::BeginPanel("Hierarchy Panel")) {
-        for (auto entity : m_Context->m_Registry->GetEntities()) {
-            DrawEntityNode(entity);
-        }
+        for (auto entity : m_Context->m_Registry->GetEntities())
+            DrawEntityNode(entity, pendingDeletion);
 
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0)) {
-            m_ContextSelection = NULL_ENTITY;
-        }
+        for (Entity entity : pendingDeletion) {
+            if (!m_Context->m_Registry->HasComponent<TagComponent>(entity)) continue;
 
-        // Right Click on blank space
-        if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
-            if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
-            ImGui::EndPopup();
+            if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
+                auto& camera = m_Context->m_Registry->GetComponent<CameraComponent>(entity);
+                if (camera.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
+                m_Context->m_CameraSystem->RemoveCameraController(entity);
+            }
+
+            m_Context->DestroyEntity(entity);
+
+            if (m_ContextSelection == entity) m_ContextSelection = NULL_ENTITY;
         }
 
         if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) {
+            m_ContextSelection = NULL_ENTITY;
+        }
+
+        if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
+            if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
+
+            ImGui::EndPopup();
         }
     }
 
@@ -68,77 +88,96 @@ void SceneHierarchyPanel::OnImGuiRenderer() {
     UI::EndPanel();
 }
 
-void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
+void SceneHierarchyPanel::DrawEntityNode(Entity entity, std::vector<Entity>& pendingDeletion) {
     auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
 
     const bool selected = (m_ContextSelection == entity);
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
-    if(selected) flags |= ImGuiTreeNodeFlags_Selected;
+    if (selected) flags |= ImGuiTreeNodeFlags_Selected;
 
-    bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity, flags, "%s", tag.c_str());
+    // Start renaming the selected entity with F2.
+    if (selected && Input::IsKeyPressed(FUZE_KEY_F2)) {
+        m_RenamingEntity = entity;
+
+        std::snprintf(m_RenameBuffer, sizeof(m_RenameBuffer), "%s", tag.c_str());
+
+        m_RequestRenameFocus = true;
+    }
+
+    bool opened = false;
+
+    if (m_RenamingEntity == entity) {
+        ImGui::SetNextItemWidth(-1.0f);
+
+        if (m_RequestRenameFocus) {
+            ImGui::SetKeyboardFocusHere();
+            m_RequestRenameFocus = false;
+        }
+
+        bool commit = ImGui::InputText("##EntityRename", m_RenameBuffer, sizeof(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
+
+        if (Input::IsKeyPressed(FUZE_KEY_ESCAPE)) {
+            m_RenamingEntity = NULL_ENTITY;
+        } else if (commit) {
+            tag = m_RenameBuffer;
+            m_RenamingEntity = NULL_ENTITY;
+        }
+    } else {
+        opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uintptr_t>(entity)), flags, "%s", tag.c_str());
+
+        if (ImGui::IsItemClicked()) m_ContextSelection = entity;
+    }
 
     UI::DrawSelectionIndicator(selected);
 
-    if (ImGui::IsItemClicked()) {
-        m_ContextSelection = entity;
-    }
+    bool entityDeleted = false;
 
-    bool EntityDeleted = false;
     if (ImGui::BeginPopupContextItem()) {
-        if (ImGui::MenuItem("Delete Entity")) EntityDeleted = true;
+        if (ImGui::MenuItem("Delete Entity")) entityDeleted = true;
 
         ImGui::EndPopup();
     }
 
-    if (opened) {
-        ImGui::TreePop();
-    }
+    if (opened) ImGui::TreePop();
 
-    if (EntityDeleted) {
-        if (m_Context->GetRegistry()->HasComponent<CameraComponent>(entity)) {
-            auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
-
-            if (cameraComp.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
-            m_Context->m_CameraSystem->RemoveCameraController(entity);
-        }
-        m_Context->DestroyEntity(entity);
-        if (m_ContextSelection == entity) m_ContextSelection = NULL_ENTITY;
-    }
+    if (entityDeleted) pendingDeletion.push_back(entity);
 }
 
 template <typename T, typename UIFunction, typename OnRemoveFunction>
 void DrawComponent(const std::string& name, Entity entity, Ref<Registry>& registry, UIFunction uiFunction, OnRemoveFunction onRemoveFunction) {
 
-    if (registry->HasComponent<T>(entity)) {
-        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowOverlap;
+    if (!registry->HasComponent<T>(entity)) return;
 
-        bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
-        ImGui::SameLine();
+    ImGui::PushID(name.c_str());
 
-        if (ImGui::Button("+")) {
-            ImGui::OpenPopup("ComponentSettings");
-        }
+    const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowOverlap;
 
-        bool removeComponent = false;
-        if (ImGui::BeginPopup("ComponentSettings")) {
-            if (ImGui::MenuItem("Remove component")) removeComponent = true;
+    bool open = ImGui::TreeNodeEx("Component", treeNodeFlags, "%s", name.c_str());
+    ImGui::SameLine();
 
-            ImGui::EndPopup();
-        }
+    if (ImGui::Button("+")) ImGui::OpenPopup("ComponentSettings");
 
-        if (open) {
-            auto& component = registry->GetComponent<T>(entity);
-            uiFunction(component);
+    bool removeComponent = false;
+    if (ImGui::BeginPopup("ComponentSettings")) {
+        if (ImGui::MenuItem("Remove component")) removeComponent = true;
 
-            ImGui::TreePop();
-        }
-
-        if (removeComponent) {
-            onRemoveFunction();
-            registry->RemoveComponent<T>(entity);
-        }
+        ImGui::EndPopup();
     }
+
+    if (open) {
+        auto& component = registry->GetComponent<T>(entity);
+        uiFunction(component);
+
+        ImGui::TreePop();
+    }
+
+    if (removeComponent) {
+        onRemoveFunction();
+        registry->RemoveComponent<T>(entity);
+    }
+
+    ImGui::PopID();
 }
 
 template <typename T, typename UIFunction>
@@ -192,12 +231,12 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
         if (registry->HasComponent<TagComponent>(entity)) {
             auto& tag = registry->GetComponent<TagComponent>(entity).Tag;
 
-            char buffer[256];
-            memset(buffer, 0, sizeof(buffer));
-            strncpy(buffer, tag.c_str(), sizeof(buffer));
-            ImGui::InputText("Tag", buffer, sizeof(buffer));
+            char buffer[256] = {};
+            std::snprintf(buffer, sizeof(buffer), "%s", tag.c_str());
 
-            tag = buffer;
+            if (ImGui::InputText("Tag", buffer, sizeof(buffer))) {
+                tag = buffer;
+            }
         }
 
         DrawComponent<TransformComponent>("Transform", entity, registry, [](auto& component) {
@@ -248,7 +287,7 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                 }
             },
             [this, entity]() {
-                auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
+                auto& cameraComp = m_Context->m_Registry->GetComponent<CameraComponent>(entity);
 
                 if (cameraComp.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
                 m_Context->m_CameraSystem->RemoveCameraController(entity);
