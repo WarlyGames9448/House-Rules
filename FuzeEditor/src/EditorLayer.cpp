@@ -4,6 +4,8 @@
 #include "Utils/FileUtils.h"
 #include "Random.h"
 
+#include "Editor/EditorPanel.h"
+
 namespace Fuze {
 
 EditorLayer::EditorLayer(): Layer("FuzeEditor") {
@@ -151,32 +153,39 @@ void EditorLayer::OnImGuiRender() {
 
     m_SceneHierarchyPanel.OnImGuiRenderer();
 
+    UI::PanelOptions options;
+    options.Flags = ImGuiWindowFlags_MenuBar;
+
     // Stats scene ===========
-    ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_MenuBar);
+    if (Fuze::UI::BeginPanel("Stats", options)) {
+        ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
+        ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
+    }
 
-    ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
-    ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
-
-    ImGui::End();
+    UI::EndPanel();
 
     // Viewport scene ===========
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Viewport");
+    const ImVec2 zeroPadding(0.0f, 0.0f);
 
-    m_ViewportFocused = ImGui::IsWindowFocused();
-    m_ViewportHovered = ImGui::IsWindowHovered();
+    options.Flags = ImGuiWindowFlags_None;
+    options.Padding = &zeroPadding;
 
-    m_Scene->m_ViewportFocused = m_ViewportFocused;
+    if (UI::BeginPanel("Viewport", options)) {
+        m_ViewportFocused = ImGui::IsWindowFocused();
+        m_ViewportHovered = ImGui::IsWindowHovered();
 
-    Fuze::Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+        m_Scene->m_ViewportFocused = m_ViewportFocused;
 
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+        Fuze::Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
-    m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
-    m_Scene->m_ViewportSize = m_ViewportSize;
+        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
-    ImGui::Image(m_Framebuffer->GetColorAttachmentID(), ImVec2 {m_ViewportSize.x, m_ViewportSize.y}, ImVec2 {0, 1}, ImVec2 {1, 0});
-    ImGui::End();
-    ImGui::PopStyleVar();
+        m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+        m_Scene->m_ViewportSize = m_ViewportSize;
+
+        ImGui::Image(m_Framebuffer->GetColorAttachmentID(), ImVec2 {m_ViewportSize.x, m_ViewportSize.y}, ImVec2 {0, 1}, ImVec2 {1, 0});
+    }
+
+    UI::EndPanel();
 }
 }

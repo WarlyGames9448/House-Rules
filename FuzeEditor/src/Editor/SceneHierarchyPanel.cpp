@@ -3,6 +3,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include "Editor/EditorPanel.h"
+
 namespace Fuze {
 SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context): m_Context(context) {
 }
@@ -12,66 +14,71 @@ void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
 }
 
 void SceneHierarchyPanel::OnImGuiRenderer() {
-    ImGui::Begin("Hierarchy Panel");
-
-    for (auto entity : m_Context->m_Registry->GetEntities()) {
-        DrawEntityNode(entity);
-    }
-
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0)) {
-        m_ContextSelection = NULL_ENTITY;
-    }
-
-    // Right Click on blank space
-    if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
-        if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) {
-    }
-
-    ImGui::End();
-
-    ImGui::Begin("Properties Panel");
-    if (m_ContextSelection != NULL_ENTITY) {
-        DrawEntityProperties(m_ContextSelection);
-
-        if (ImGui::Button("Add Component")) {
-            ImGui::OpenPopup("AddComponent");
+    if (UI::BeginPanel("Hierarchy Panel")) {
+        for (auto entity : m_Context->m_Registry->GetEntities()) {
+            DrawEntityNode(entity);
         }
 
-        // TODO Add Custom component Adding system
-        if (ImGui::BeginPopup("AddComponent")) {
-            if (ImGui::MenuItem("Camera")) {
-                float aspectRatio = 1280.0f / 720.0f;
-                m_Context->CreateCamera(m_ContextSelection, aspectRatio);
-                ImGui::CloseCurrentPopup();
-            }
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0)) {
+            m_ContextSelection = NULL_ENTITY;
+        }
 
-            if (ImGui::MenuItem("SpriteRenderer")) {
-                m_Context->m_Registry->AddComponent<SpriteRendererComponent>(m_ContextSelection, {});
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (ImGui::MenuItem("Transform")) {
-                m_Context->m_Registry->AddComponent<TransformComponent>(m_ContextSelection, {});
-                ImGui::CloseCurrentPopup();
-            }
-
+        // Right Click on blank space
+        if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
+            if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
             ImGui::EndPopup();
         }
+
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) {
+        }
     }
-    ImGui::End();
+
+    UI::EndPanel();
+
+    if (UI::BeginPanel("Properties Panel")) {
+        if (m_ContextSelection != NULL_ENTITY) {
+            DrawEntityProperties(m_ContextSelection);
+
+            if (ImGui::Button("Add Component")) {
+                ImGui::OpenPopup("AddComponent");
+            }
+
+            // TODO Add Custom component Adding system
+            if (ImGui::BeginPopup("AddComponent")) {
+                if (ImGui::MenuItem("Camera")) {
+                    float aspectRatio = 1280.0f / 720.0f;
+                    m_Context->CreateCamera(m_ContextSelection, aspectRatio);
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::MenuItem("SpriteRenderer")) {
+                    m_Context->m_Registry->AddComponent<SpriteRendererComponent>(m_ContextSelection, {});
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::MenuItem("Transform")) {
+                    m_Context->m_Registry->AddComponent<TransformComponent>(m_ContextSelection, {});
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+        }
+    }
+    UI::EndPanel();
 }
 
 void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
 
-    ImGuiTreeNodeFlags flags = ((m_ContextSelection == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-    flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+    const bool selected = (m_ContextSelection == entity);
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
+    if(selected) flags |= ImGuiTreeNodeFlags_Selected;
 
     bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity, flags, "%s", tag.c_str());
+
+    UI::DrawSelectionIndicator(selected);
 
     if (ImGui::IsItemClicked()) {
         m_ContextSelection = entity;
