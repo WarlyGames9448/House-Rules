@@ -23,6 +23,9 @@ class FUZE_API ImGuiLayer : public Layer {
         m_BlockEvents = block;
     }
 
+    void SetThemeColors();
+    void ApplyComponentStyle();
+
   private:
     bool m_BlockEvents = false;
 };

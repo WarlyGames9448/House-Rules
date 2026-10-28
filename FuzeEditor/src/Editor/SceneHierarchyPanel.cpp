@@ -69,6 +69,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
 
     ImGuiTreeNodeFlags flags = ((m_ContextSelection == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+    flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
     bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity, flags, "%s", tag.c_str());
 
@@ -97,6 +98,45 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
         m_Context->DestroyEntity(entity);
         if (m_ContextSelection == entity) m_ContextSelection = NULL_ENTITY;
     }
+}
+
+template <typename T, typename UIFunction, typename OnRemoveFunction>
+void DrawComponent(const std::string& name, Entity entity, Ref<Registry>& registry, UIFunction uiFunction, OnRemoveFunction onRemoveFunction) {
+
+    if (registry->HasComponent<T>(entity)) {
+        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowOverlap;
+
+        bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
+        ImGui::SameLine();
+
+        if (ImGui::Button("+")) {
+            ImGui::OpenPopup("ComponentSettings");
+        }
+
+        bool removeComponent = false;
+        if (ImGui::BeginPopup("ComponentSettings")) {
+            if (ImGui::MenuItem("Remove component")) removeComponent = true;
+
+            ImGui::EndPopup();
+        }
+
+        if (open) {
+            auto& component = registry->GetComponent<T>(entity);
+            uiFunction(component);
+
+            ImGui::TreePop();
+        }
+
+        if (removeComponent) {
+            onRemoveFunction();
+            registry->RemoveComponent<T>(entity);
+        }
+    }
+}
+
+template <typename T, typename UIFunction>
+void DrawComponent(const std::string& name, Entity entity, Ref<Registry>& registry, UIFunction uiFunction) {
+    DrawComponent<T>(name, entity, registry, uiFunction, []() {});
 }
 
 static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetvalue = 0.0f, float columnWidth = 100.0f) {
@@ -141,8 +181,9 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values, float r
 
 void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
     if (entity != NULL_ENTITY) {
-        if (m_Context->m_Registry->HasComponent<TagComponent>(entity)) {
-            auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
+        Ref<Registry> registry = m_Context->m_Registry;
+        if (registry->HasComponent<TagComponent>(entity)) {
+            auto& tag = registry->GetComponent<TagComponent>(entity).Tag;
 
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
@@ -152,74 +193,19 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
             tag = buffer;
         }
 
-        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowOverlap;
+        DrawComponent<TransformComponent>("Transform", entity, registry, [](auto& component) {
+            DrawVec3Control("Translation", component.Translation, 0.0f);
+            DrawVec3Control("Rotation", component.Rotation, 0.0f);
+            DrawVec3Control("Scale", component.Scale, 1.0f);
+        });
 
-        if (m_Context->m_Registry->HasComponent<TransformComponent>(entity)) {
-            bool open = ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), treeNodeFlags, "Transform");
-            ImGui::SameLine();
-            if (ImGui::Button("+")) {
-                ImGui::OpenPopup("ComponentSettings");
-            }
+        DrawComponent<SpriteRendererComponent>("Sprite", entity, registry, [](auto& component) { ImGui::ColorEdit4("Color", &component.Color.x); });
 
-            bool removeComponent = false;
-            if (ImGui::BeginPopup("ComponentSettings")) {
-                if (ImGui::MenuItem("Remove component")) removeComponent = true;
-
-                ImGui::EndPopup();
-            }
-
-            if (open) {
-                auto& tc = m_Context->GetRegistry()->GetComponent<TransformComponent>(entity);
-                DrawVec3Control("Translation", tc.Translation, 0.0f);
-                DrawVec3Control("Rotation", tc.Rotation, 0.0f);
-                DrawVec3Control("Scale", tc.Scale, 1.0f);
-
-                ImGui::TreePop();
-            }
-
-            if (removeComponent) m_Context->m_Registry->RemoveComponent<TransformComponent>(entity);
-        }
-
-        if (m_Context->m_Registry->HasComponent<SpriteRendererComponent>(entity)) {
-            bool open = ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), treeNodeFlags, "Sprite");
-            ImGui::SameLine();
-            if (ImGui::Button("+")) {
-                ImGui::OpenPopup("ComponentSettings");
-            }
-
-            bool removeComponent = false;
-            if (ImGui::BeginPopup("ComponentSettings")) {
-                if (ImGui::MenuItem("Remove component")) removeComponent = true;
-
-                ImGui::EndPopup();
-            }
-
-            if (open) {
-                auto& color = m_Context->GetRegistry()->GetComponent<SpriteRendererComponent>(entity).Color;
-                ImGui::ColorEdit4("Color", &color.x);
-
-                ImGui::TreePop();
-            }
-
-            if (removeComponent) m_Context->m_Registry->RemoveComponent<SpriteRendererComponent>(entity);
-        }
-
-        if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
-            bool open = ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), treeNodeFlags, "Camera");
-            ImGui::SameLine();
-            if (ImGui::Button("+")) {
-                ImGui::OpenPopup("ComponentSettings");
-            }
-
-            bool removeComponent = false;
-            if (ImGui::BeginPopup("ComponentSettings")) {
-                if (ImGui::MenuItem("Remove component")) removeComponent = true;
-
-                ImGui::EndPopup();
-            }
-
-            if (open) {
-                auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
+        DrawComponent<CameraComponent>(
+            "Camera",
+            entity,
+            registry,
+            [this, entity](auto& cameraComp) {
                 bool changed = false;
 
                 changed |= ImGui::DragFloat("Zoom", &cameraComp.Size, 0.1f, 0.1f, 100.0f);
@@ -253,17 +239,13 @@ void SceneHierarchyPanel::DrawEntityProperties(Entity entity) {
                     cameraComp.SizeChanged = true;
                     cameraComp.RecalculateProjection();
                 }
-                ImGui::TreePop();
-            }
-
-            if (removeComponent) {
+            },
+            [this, entity]() {
                 auto& cameraComp = m_Context->GetRegistry()->GetComponent<CameraComponent>(entity);
 
                 if (cameraComp.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
                 m_Context->m_CameraSystem->RemoveCameraController(entity);
-                m_Context->GetRegistry()->RemoveComponent<CameraComponent>(entity);
-            }
-        }
+            });
     }
 }
 }
