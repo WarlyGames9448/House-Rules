@@ -4,6 +4,7 @@ add_executable(FuzeEditor
     src/ParticleSystem.cpp
 
     src/Editor/SceneHierarchyPanel.cpp
+    src/Editor/PropertiesPanel.cpp
     )
 
 target_link_libraries(FuzeEditor

@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Scene/Scene.h"
+#include "EditorPanel.h"
+#include "EditorSelectionContext.h"
 
 namespace Fuze {
 
-class SceneHierarchyPanel {
+class SceneHierarchyPanel : EditorPanel {
   public:
-    SceneHierarchyPanel() = default;
-    SceneHierarchyPanel(Ref<Scene> context);
+    SceneHierarchyPanel(EditorSelectionContext& selectionContext);
+    SceneHierarchyPanel(EditorSelectionContext& selectionContext, Ref<Scene> context);
 
     void SetContext(Ref<Scene> context);
 
@@ -15,12 +17,10 @@ class SceneHierarchyPanel {
 
   protected:
     void DrawEntityNode(Entity entity, std::vector<Entity>& pendingDeletion);
-    void DrawEntityProperties(Entity entity);
 
   private:
     Ref<Scene> m_Context;
-
-    Entity m_ContextSelection = NULL_ENTITY;
+    EditorSelectionContext& m_SelectionContext;
 
     Entity m_RenamingEntity = NULL_ENTITY;
     char m_RenameBuffer[256] = {};

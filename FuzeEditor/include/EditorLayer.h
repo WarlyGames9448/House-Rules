@@ -6,6 +6,8 @@
 #include "Scene/ScriptableEntity.h"
 
 #include "Editor/SceneHierarchyPanel.h"
+#include "Editor/PropertiesPanel.h"
+#include "Editor/EditorSelectionContext.h"
 
 namespace Fuze {
 
@@ -37,7 +39,11 @@ class EditorLayer : public Layer {
     Ref<Scene> m_Scene;
     Ref<NativeScriptSystem> m_NativeScriptSystem;
 
-    SceneHierarchyPanel m_SceneHierarchyPanel;
+    EditorSelectionContext m_SelectionContext;
+
+    SceneHierarchyPanel m_SceneHierarchyPanel{m_SelectionContext};
+    PropertiesPanel m_PropertiesPanel{m_SelectionContext};
+
 
     friend class Scene;
 };

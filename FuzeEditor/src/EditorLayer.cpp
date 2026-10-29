@@ -79,6 +79,7 @@ void EditorLayer::OnAttach() {
     nsc.Bind<PlayerController>();
 
     m_SceneHierarchyPanel.SetContext(m_Scene);
+    m_PropertiesPanel.SetContext(m_Scene);
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
@@ -154,6 +155,7 @@ void EditorLayer::OnImGuiRender() {
     ImGui::End();
 
     m_SceneHierarchyPanel.OnImGuiRenderer();
+    m_PropertiesPanel.OnImGuiRenderer();
 
     UI::PanelOptions options;
     options.Flags = ImGuiWindowFlags_MenuBar;

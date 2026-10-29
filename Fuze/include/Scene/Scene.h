@@ -50,6 +50,10 @@ class Scene {
         return m_Registry;
     }
 
+    inline Ref<CameraSystem> GetCameraSystem() {
+        return m_CameraSystem;
+    }
+
   public:
     bool m_ViewportFocused = false;
     glm::vec2 m_ViewportSize;

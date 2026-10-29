@@ -1,9 +1,31 @@
 #pragma once
 
+#include "Fuze.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
-namespace Fuze::UI {
+namespace Fuze {
+
+class EditorPanel {
+  public:
+    EditorPanel() = default;
+    explicit EditorPanel(std::string name): m_Name(std::move(name)) {
+    }
+
+    virtual ~EditorPanel() = default;
+
+    virtual void OnImGuiRenderer() = 0;
+
+    const std::string& GetName() const {
+        return m_Name;
+    }
+
+  private:
+    std::string m_Name;
+};
+
+namespace UI {
 struct PanelOptions {
     ImGuiWindowFlags Flags = ImGuiWindowFlags_None;
 
@@ -50,5 +72,6 @@ inline void DrawSelectionIndicator(bool selected, float width = 2.0f, float vert
 
     ImGui::GetWindowDrawList()->AddRectFilled(
         ImVec2(min.x, min.y + inset), ImVec2(min.x + width, max.y - inset), ImGui::GetColorU32(ImGuiCol_CheckMark));
+}
 }
 }
