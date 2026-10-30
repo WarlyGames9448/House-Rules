@@ -6,6 +6,8 @@
 
 #include "Editor/EditorPanel.h"
 
+#include "Scene/SceneSerializer.h"
+
 namespace Fuze {
 
 EditorLayer::EditorLayer(): Layer("FuzeEditor") {
@@ -22,12 +24,13 @@ void EditorLayer::OnAttach() {
     spec.Height = 720;
     m_Framebuffer = Framebuffer::Create(spec);
 
-    m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
-    m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
-    m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
-    m_floor = SubTexture2D::Create(m_Spritesheet, {24, 15}, {16, 16}, {1, 1});
+    // m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
+    // m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
+    // m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
+    // m_floor = SubTexture2D::Create(m_Spritesheet, {24, 15}, {16, 16}, {1, 1});
 
-    m_Scene = CreateRef<Scene>();
+    m_Scene = CreateRef<Scene>("Main");
+    m_Scene->Init();
     m_Square = m_Scene->CreateEntity("Square");
 
     m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
@@ -80,6 +83,9 @@ void EditorLayer::OnAttach() {
 
     m_SceneHierarchyPanel.SetContext(m_Scene);
     m_PropertiesPanel.SetContext(m_Scene);
+
+    SceneSerializer serializer{m_Scene};
+    serializer.SerializeText("Fuze/assets/scenes/Example.fuze");
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,

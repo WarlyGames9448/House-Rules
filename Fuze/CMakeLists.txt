@@ -34,6 +34,7 @@ add_library(Fuze SHARED
     src/Scene/CameraSystem.cpp
     src/Scene/Entity.cpp
     src/Scene/Scene.cpp
+    src/Scene/SceneSerializer.cpp
 
     src/Utils/FileUtils.cpp
 )
@@ -101,6 +102,16 @@ target_compile_definitions(imgui PRIVATE
 )
 
 # ═══════════════════════════════════════════════════════════
+# YAML-CPP
+# ═══════════════════════════════════════════════════════════
+
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Enable yaml-cpp tests" FORCE)
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "Enable yaml-cpp contrib" FORCE)
+set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "Build yaml-cpp as a shared library" FORCE)
+
+add_subdirectory(vendor/yaml-cpp)
+
+# ═══════════════════════════════════════════════════════════
 # TRACY
 # ═══════════════════════════════════════════════════════════
 
@@ -145,6 +156,7 @@ target_link_libraries(Fuze
         OpenGL::GL
         stb
         Threads::Threads
+        yaml-cpp::yaml-cpp
         ${CMAKE_DL_LIBS}
 )
 

@@ -23,7 +23,10 @@ class RenderSystem : public System {
 class Scene {
   public:
     Scene();
+    Scene(const std::string& name);
     ~Scene();
+
+    void Init();
 
     Entity CreateEntity(const std::string& tag = "Entity");
     void DestroyEntity(Entity entity);
@@ -54,15 +57,22 @@ class Scene {
         return m_CameraSystem;
     }
 
+    inline const std::string GetName() const {
+      return m_Name;
+    }
+
   public:
     bool m_ViewportFocused = false;
     glm::vec2 m_ViewportSize;
 
   private:
+    std::string m_Name;
+
     Ref<Registry> m_Registry;
     Ref<RenderSystem> m_RenderSystem;
     Ref<CameraSystem> m_CameraSystem;
 
     friend class SceneHierarchyPanel;
+    friend class SceneSerializer;
 };
 }

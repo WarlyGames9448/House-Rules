@@ -20,7 +20,16 @@ void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
 }
 
 // Scene ====================================
-Scene::Scene() {
+Scene::Scene(): m_Name("Untitled Scene") {
+}
+
+Scene::Scene(const std::string& name): m_Name(std::move(name)) {
+}
+
+Scene::~Scene() {
+}
+
+void Scene::Init() {
     m_Registry = CreateRef<Registry>();
 
     m_Registry->RegisterComponent<SpriteRendererComponent>();
@@ -40,9 +49,6 @@ Scene::Scene() {
     Signature cameraSignature;
     cameraSignature.set(m_Registry->GetComponentType<CameraComponent>());
     m_Registry->SetSystemSignature<CameraSystem>(cameraSignature);
-}
-
-Scene::~Scene() {
 }
 
 Entity Scene::CreateEntity(const std::string& tag) {

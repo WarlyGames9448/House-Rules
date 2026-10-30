@@ -20,4 +20,5 @@
 	ignore = dirty
 [submodule "Fuze/vendor/yaml-cpp"]
 	path = Fuze/vendor/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
+	ignore = dirty

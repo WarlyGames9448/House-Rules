@@ -42,4 +42,42 @@ std::filesystem::path FileUtils::GetSandboxAsset(const std::string& file){
 
     return dirPath / ".." / ".." / "Sandbox" / "assets" / file;
 }
+
+std::filesystem::path FileUtils::GetEditorAsset(const std::string& file){
+    std::filesystem::path dirPath = GetExecutablePath().parent_path();
+
+    return dirPath / ".." / ".." / "FuzeEditor" / "assets" / file;
+}
+
+bool FileUtils::WriteTextFile(const std::filesystem::path& filepath, const std::string& content) {
+    if (filepath.has_parent_path() && !std::filesystem::exists(filepath.parent_path())) {
+        std::filesystem::create_directories(filepath.parent_path());
+    }
+
+    std::ofstream file(filepath, std::ios::out | std::ios::trunc);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    file << content;
+    return file.good();
+}
+
+bool FileUtils::WriteBinaryFile(const std::filesystem::path& filepath, const char* data, size_t size) {
+    if (filepath.has_parent_path() && !std::filesystem::exists(filepath.parent_path())) {
+        std::filesystem::create_directories(filepath.parent_path());
+    }
+
+    std::ofstream file(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    file.write(data, size);
+    return file.good();
+}
+
+bool FileUtils::WriteBinaryFile(const std::filesystem::path& filepath, const std::vector<char>& data) {
+    return WriteBinaryFile(filepath, data.data(), data.size());
+}
 }
