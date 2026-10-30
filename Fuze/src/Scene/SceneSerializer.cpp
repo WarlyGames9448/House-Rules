@@ -74,8 +74,14 @@ void SerializeComponent(YAML::Emitter& out, CameraComponent& component) {
 }
 
 void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity) {
+    if(!m_Scene->GetRegistry()->HasComponent<IDComponent>(entity)){
+        FUZE_CORE_ASSERT(0, "Entity {0} need IDComponent", entity);
+        return;
+    }
+    auto& ID = m_Scene->GetRegistry()->GetComponent<IDComponent>(entity).ID;
+
     out << YAML::BeginMap;
-    out << YAML::Key << "Entity" << YAML::Value << entity;
+    out << YAML::Key << "Entity" << YAML::Value << ID.ToString();
 
     if (m_Scene->GetRegistry()->HasComponent<TagComponent>(entity)) {
         auto& component = m_Scene->GetRegistry()->GetComponent<TagComponent>(entity);

@@ -4,6 +4,8 @@
 #include "Scene/Entity.h"
 #include "Renderer/OrthographicCameraController.h"
 
+#include "UUID.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Fuze {
@@ -179,6 +181,22 @@ class ComponentManager {
 
 /// Components
 
+struct IDComponent {
+    UUID ID;
+
+    IDComponent() = default;
+    IDComponent(UUID id): ID(std::move(id)) {
+    }
+};
+
+struct TagComponent {
+    std::string Tag = "";
+
+    TagComponent() = default;
+    TagComponent(const std::string& tag): Tag(tag) {
+    }
+};
+
 struct TransformComponent {
     glm::vec3 Translation {0.0f, 0.0f, 0.0f};
     glm::vec3 Rotation {0.0f, 0.0f, 0.0f};
@@ -213,14 +231,6 @@ struct SpriteRendererComponent {
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const glm::vec4 color): Color(color) {
-    }
-};
-
-struct TagComponent {
-    std::string Tag = "";
-
-    TagComponent() = default;
-    TagComponent(const std::string& tag): Tag(tag) {
     }
 };
 

@@ -7,6 +7,8 @@
 #include "Renderer/OrthographicCameraController.h"
 #include "Scene/CameraSystem.h"
 
+#include "UUID.h"
+
 namespace Fuze {
 class RenderSystem : public System {
   public:
@@ -48,6 +50,8 @@ class Scene {
     void OnEvent(Event& e) {
         m_CameraSystem->OnEvent(e);
     }
+
+    UUID GetID(Entity entity);
 
     inline Ref<Registry> GetRegistry() {
         return m_Registry;

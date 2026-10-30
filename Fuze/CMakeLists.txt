@@ -4,6 +4,7 @@ add_library(Fuze SHARED
     src/Core/LayerStack.cpp
     src/Core/Log.cpp
     src/Core/Profiler.cpp
+    src/Core/UUID.cpp
 
     src/ImGui/ImGuiLayer.cpp
 
@@ -73,6 +74,17 @@ target_include_directories(glad
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
 )
+
+# ═══════════════════════════════════════════════════════════
+# stduuid
+# ═══════════════════════════════════════════════════════════
+
+add_library(stduuid STATIC
+    vendor/stduuid/uuid.cpp)
+
+target_include_directories(stduuid
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stduuid)
 
 # ═══════════════════════════════════════════════════════════
 # ImGui
@@ -155,6 +167,7 @@ target_link_libraries(Fuze
         imgui
         OpenGL::GL
         stb
+        stduuid
         Threads::Threads
         yaml-cpp::yaml-cpp
         ${CMAKE_DL_LIBS}

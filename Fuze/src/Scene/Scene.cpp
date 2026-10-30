@@ -32,9 +32,10 @@ Scene::~Scene() {
 void Scene::Init() {
     m_Registry = CreateRef<Registry>();
 
+    m_Registry->RegisterComponent<TagComponent>();
+    m_Registry->RegisterComponent<IDComponent>();
     m_Registry->RegisterComponent<SpriteRendererComponent>();
     m_Registry->RegisterComponent<TransformComponent>();
-    m_Registry->RegisterComponent<TagComponent>();
     m_Registry->RegisterComponent<CameraComponent>();
 
     m_RenderSystem = m_Registry->RegisterSystem<RenderSystem>();
@@ -53,6 +54,7 @@ void Scene::Init() {
 
 Entity Scene::CreateEntity(const std::string& tag) {
     Entity entity = m_Registry->CreateEntity();
+    m_Registry->AddComponent<IDComponent>(entity, {});
     m_Registry->AddComponent<TagComponent>(entity, tag);
 
     return entity;
@@ -102,5 +104,13 @@ void Scene::OnUpdate(Timestep ts) {
     m_CameraSystem->m_UpdateControllers = m_ViewportFocused;
     m_CameraSystem->OnUpdate(ts);
     m_RenderSystem->OnUpdate(ts);
+}
+
+UUID Scene::GetID(Entity entity){
+    if(GetRegistry()->HasComponent<IDComponent>(entity)){
+        FUZE_CORE_ASSERT(0, "Entity {0} need IDComponent", entity);
+    }
+    auto& ID = GetRegistry()->GetComponent<IDComponent>(entity).ID;
+    return ID;
 }
 }
