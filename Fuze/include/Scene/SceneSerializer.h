@@ -11,8 +11,8 @@ class SceneSerializer {
     void SerializeText(const std::string& filepath);
     void SerializeBinary(const std::string& filepath);
 
-    void DeserializeText(const std::string& filepath);
-    void DeserializeBinary(const std::string& filepath);
+    bool DeserializeText(const std::string& filepath);
+    bool DeserializeBinary(const std::string& filepath);
 
     void SerializeEntity(YAML::Emitter& out, Entity entity);
 

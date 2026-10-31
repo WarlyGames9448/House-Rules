@@ -4,6 +4,47 @@
 
 #include "Utils/FileUtils.h"
 
+namespace YAML {
+template <> struct convert<glm::vec3> {
+    static Node encode(const glm::vec3& rhs) {
+        Node node;
+        node.push_back(rhs.x);
+        node.push_back(rhs.y);
+        node.push_back(rhs.z);
+        return node;
+    }
+
+    static bool decode(const Node& node, glm::vec3& rhs) {
+        if (!node.IsSequence() || node.size() != 3) return false;
+
+        rhs.x = node[0].as<float>();
+        rhs.y = node[1].as<float>();
+        rhs.z = node[2].as<float>();
+        return true;
+    }
+};
+template <> struct convert<glm::vec4> {
+    static Node encode(const glm::vec4& rhs) {
+        Node node;
+        node.push_back(rhs.x);
+        node.push_back(rhs.y);
+        node.push_back(rhs.z);
+        node.push_back(rhs.w);
+        return node;
+    }
+
+    static bool decode(const Node& node, glm::vec4& rhs) {
+        if (!node.IsSequence() || node.size() != 4) return false;
+
+        rhs.x = node[0].as<float>();
+        rhs.y = node[1].as<float>();
+        rhs.z = node[2].as<float>();
+        rhs.w = node[3].as<float>();
+        return true;
+    }
+};
+}
+
 namespace Fuze {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene): m_Scene(scene) {
 }
@@ -74,7 +115,7 @@ void SerializeComponent(YAML::Emitter& out, CameraComponent& component) {
 }
 
 void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity) {
-    if(!m_Scene->GetRegistry()->HasComponent<IDComponent>(entity)){
+    if (!m_Scene->GetRegistry()->HasComponent<IDComponent>(entity)) {
         FUZE_CORE_ASSERT(0, "Entity {0} need IDComponent", entity);
         return;
     }
@@ -128,14 +169,83 @@ void SceneSerializer::SerializeBinary(const std::string& filepath) {
     return;
 }
 
-void SceneSerializer::DeserializeText(const std::string& filepath) {
-    (void)filepath;
-    return;
+bool SceneSerializer::DeserializeText(const std::string& filepath) {
+    std::ifstream stream(filepath);
+    std::stringstream strStream;
+    strStream << stream.rdbuf();
+
+    YAML::Node data = YAML::Load(strStream.str());
+    if (!data["Scene"]) return false;
+
+    std::string sceneName = data["Scene"].as<std::string>();
+    FUZE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
+
+    auto entities = data["Entities"];
+    if (entities) {
+        for (auto entity : entities) {
+            auto id = entity["Entity"].as<std::string>();
+
+            std::string name;
+            auto tagComponent = entity["TagComponent"];
+            if (tagComponent) name = tagComponent["Tag"].as<std::string>();
+
+            FUZE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", id, name);
+
+            Entity deserializedEntity = m_Scene->CreateEntityWithUUID(id, name);
+
+            auto transformComponent = entity["TransformComponent"];
+            if (transformComponent) {
+                auto transform = transformComponent["Translation"].as<glm::vec3>();
+                auto rotation = transformComponent["Rotation"].as<glm::vec3>();
+                auto scale = transformComponent["Scale"].as<glm::vec3>();
+
+                m_Scene->GetRegistry()->AddComponent<TransformComponent>(deserializedEntity, {transform, rotation, scale});
+            }
+
+            auto spriteComponent = entity["SpriteRendererComponent"];
+            if(spriteComponent) {
+                auto color = spriteComponent["Color"].as<glm::vec4>();
+
+                m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(deserializedEntity, color);
+            }
+
+            auto cameraComponent = entity["CameraComponent"];
+
+            if(cameraComponent) {
+                auto camera = cameraComponent["Camera"];
+                auto position = camera["Position"].as<glm::vec3>();
+                auto rotation = camera["Rotation"].as<float>();
+                auto aspectRatio = camera["AspectRatio"].as<float>();
+
+                m_Scene->CreateCamera(deserializedEntity, aspectRatio);
+
+                auto& cc = m_Scene->GetRegistry()->GetComponent<CameraComponent>(deserializedEntity);
+
+                cc.Size = camera["Size"].as<float>();
+                cc.NearClip = camera["NearClip"].as<float>();
+                cc.FarClip = camera["FarClip"].as<float>();
+
+                cc.Camera->SetPositionAndRotation(position, rotation);
+
+                cc.RecalculateProjection();
+
+                cc.ControllerActive = cameraComponent["ControllerActive"].as<bool>();
+                auto primary = cameraComponent["Primary"].as<bool>();
+                cc.Primary = primary;
+                cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+                cc.SizeChanged = cameraComponent["SizeChanged"].as<bool>();
+
+                if(primary) m_Scene->SetPrimaryCamera(deserializedEntity);
+            }
+        }
+    }
+
+    return true;
 }
 
-void SceneSerializer::DeserializeBinary(const std::string& filepath) {
+bool SceneSerializer::DeserializeBinary(const std::string& filepath) {
     (void)filepath;
-    return;
+    return false;
 }
 
 }

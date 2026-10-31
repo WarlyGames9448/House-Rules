@@ -60,15 +60,23 @@ Entity Scene::CreateEntity(const std::string& tag) {
     return entity;
 }
 
+Entity Scene::CreateEntityWithUUID(const std::string& id, const std::string& tag) {
+    Entity entity = m_Registry->CreateEntity();
+    m_Registry->AddComponent<IDComponent>(entity, UUID(id));
+    m_Registry->AddComponent<TagComponent>(entity, tag);
+
+    return entity;
+}
+
 void Scene::DestroyEntity(Entity entity) {
     m_Registry->DestroyEntity(entity);
 }
 
-Entity Scene::CreateCamera(float aspectRatio, const std::string& tag, bool hasController) {
+Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
     auto entity = CreateEntity(tag);
     Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
-    m_Registry->AddComponent<CameraComponent>(entity, {camera, hasController});
+    m_Registry->AddComponent<CameraComponent>(entity, {camera, false});
 
     Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
 
@@ -81,10 +89,10 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag, bool hasCo
     return entity;
 }
 
-void Scene::CreateCamera(Entity cameraEntity, float aspectRatio, bool hasController) {
+void Scene::CreateCamera(Entity cameraEntity, float aspectRatio) {
     Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
-    m_Registry->AddComponent<CameraComponent>(cameraEntity, {camera, hasController});
+    m_Registry->AddComponent<CameraComponent>(cameraEntity, {camera, false});
 
     Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
 
@@ -106,8 +114,8 @@ void Scene::OnUpdate(Timestep ts) {
     m_RenderSystem->OnUpdate(ts);
 }
 
-UUID Scene::GetID(Entity entity){
-    if(GetRegistry()->HasComponent<IDComponent>(entity)){
+UUID Scene::GetID(Entity entity) {
+    if (GetRegistry()->HasComponent<IDComponent>(entity)) {
         FUZE_CORE_ASSERT(0, "Entity {0} need IDComponent", entity);
     }
     auto& ID = GetRegistry()->GetComponent<IDComponent>(entity).ID;

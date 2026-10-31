@@ -31,6 +31,7 @@ void EditorLayer::OnAttach() {
 
     m_Scene = CreateRef<Scene>("Main");
     m_Scene->Init();
+#if 0
     m_Square = m_Scene->CreateEntity("Square");
 
     m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
@@ -81,11 +82,14 @@ void EditorLayer::OnAttach() {
     auto& nsc = m_Scene->GetRegistry()->GetComponent<NativeScriptComponent>(testEntity);
     nsc.Bind<PlayerController>();
 
+#endif
+
     m_SceneHierarchyPanel.SetContext(m_Scene);
     m_PropertiesPanel.SetContext(m_Scene);
 
     SceneSerializer serializer{m_Scene};
-    serializer.SerializeText("Fuze/assets/scenes/Example.fuze");
+    //serializer.SerializeText("Fuze/assets/scenes/Example.fuze");
+    serializer.DeserializeText("Fuze/assets/scenes/Example.fuze");
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
@@ -94,14 +98,14 @@ void EditorLayer::OnAttach() {
 }
 
 void EditorLayer::OnDetach() {
-    m_NativeScriptSystem->Cleanup();
+    //m_NativeScriptSystem->Cleanup();
     Renderer2D::Shutdown();
 }
 
 void EditorLayer::OnUpdate(Timestep ts) {
 
     // Scripts Update
-    m_NativeScriptSystem->OnUpdate(ts);
+    //m_NativeScriptSystem->OnUpdate(ts);
 
     const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
