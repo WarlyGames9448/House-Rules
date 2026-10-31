@@ -23,6 +23,6 @@
 	url = https://github.com/jbeder/yaml-cpp.git
 	ignore = dirty
 [submodule "nativefiledialog-extended"]
-	path = nativefiledialog-extended
+	path = Fuze/vendor/nativefiledialog
 	url = https://github.com/btzy/nativefiledialog-extended.git
 	ignore = dirty
