@@ -89,7 +89,7 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
     return entity;
 }
 
-void Scene::CreateCamera(Entity cameraEntity, float aspectRatio) {
+void Scene::CreateCamera(Entity cameraEntity, float aspectRatio, float zoomLevel) {
     Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
     m_Registry->AddComponent<CameraComponent>(cameraEntity, {camera, false});
@@ -98,7 +98,8 @@ void Scene::CreateCamera(Entity cameraEntity, float aspectRatio) {
 
     // TODO
     cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-    cameraController->InvertScroll(true);
+    cameraController->InvertScroll(false);
+    cameraController->SetZoomLevel(zoomLevel);
 
     m_CameraSystem->AddCameraController(cameraEntity, cameraController);
 }

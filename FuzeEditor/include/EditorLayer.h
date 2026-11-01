@@ -9,6 +9,8 @@
 #include "Editor/PropertiesPanel.h"
 #include "Editor/EditorSelectionContext.h"
 
+#include "Utils/FileUtils.h"
+
 namespace Fuze {
 
 class EditorLayer : public Layer {
@@ -22,28 +24,27 @@ class EditorLayer : public Layer {
     void OnImGuiRender() override;
 
   private:
-    Ref<Texture2D> m_Texture1;
-    Ref<Texture2D> m_Texture2;
-    Ref<Texture2D> m_Spritesheet;
+    void NewScene();
+    void OpenScene();
+    void SaveScene();
+    void SaveSceneAs();
 
-    Ref<SubTexture2D> m_floor;
+    bool OnKeyPressed(KeyPressedEvent& e);
 
-    Entity m_Camera, m_Camera2;
-    bool m_ChangeCamera = false;
-
+  private:
     Ref<Framebuffer> m_Framebuffer;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     glm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
-    Entity m_Square, m_Player, testEntity;
     Ref<Scene> m_Scene;
-    Ref<NativeScriptSystem> m_NativeScriptSystem;
+    std::filesystem::path m_ScenePath;
+    bool m_IsSceneDirty = false;
+    EditorFileContext m_FileContext;
 
     EditorSelectionContext m_SelectionContext;
 
-    SceneHierarchyPanel m_SceneHierarchyPanel{m_SelectionContext};
-    PropertiesPanel m_PropertiesPanel{m_SelectionContext};
-
+    SceneHierarchyPanel m_SceneHierarchyPanel {m_SelectionContext};
+    PropertiesPanel m_PropertiesPanel {m_SelectionContext};
 
     friend class Scene;
 };

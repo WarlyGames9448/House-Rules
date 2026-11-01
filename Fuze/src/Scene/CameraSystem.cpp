@@ -26,8 +26,19 @@ void CameraSystem::OnUpdate(Timestep ts) {
     }
 }
 
-void CameraSystem::AddCameraController(Entity camera, Ref<OrthographicCameraController> cameraController) {
+void CameraSystem::OnEvent(Event& e) {
+    if (m_PrimaryCamera != NULL_ENTITY) {
+        auto& camera = m_Registry->GetComponent<CameraComponent>(m_PrimaryCamera);
+        if (camera.ControllerActive && m_UpdateControllers) m_CameraControllers[m_PrimaryCamera]->OnEvent(e);
+    }
+}
+
+void CameraSystem::AddCameraController(Entity camera, Ref<OrthographicCameraController>& cameraController) {
     m_CameraControllers[camera] = cameraController;
+    auto& cc = m_Registry->GetComponent<CameraComponent>(camera);
+
+    cameraController->SetNearClip(cc.NearClip);
+    cameraController->SetFarClip(cc.FarClip);
 }
 
 void CameraSystem::RemoveCameraController(Entity camera) {

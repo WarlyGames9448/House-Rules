@@ -2,6 +2,8 @@
 
 #include "Utils/FileUtils.h"
 
+#include <nfd.h>
+
 namespace Fuze {
 std::filesystem::path FileUtils::GetExecutablePath() {
 #if defined(FUZE_PLATFORM_WINDOWS)
@@ -37,13 +39,13 @@ std::filesystem::path FileUtils::GetAppAsset(const std::string& file) {
     return dirPath / ".." / ".." / "Fuze" / "assets" / file;
 }
 
-std::filesystem::path FileUtils::GetSandboxAsset(const std::string& file){
+std::filesystem::path FileUtils::GetSandboxAsset(const std::string& file) {
     std::filesystem::path dirPath = GetExecutablePath().parent_path();
 
     return dirPath / ".." / ".." / "Sandbox" / "assets" / file;
 }
 
-std::filesystem::path FileUtils::GetEditorAsset(const std::string& file){
+std::filesystem::path FileUtils::GetEditorAsset(const std::string& file) {
     std::filesystem::path dirPath = GetExecutablePath().parent_path();
 
     return dirPath / ".." / ".." / "FuzeEditor" / "assets" / file;
@@ -79,5 +81,55 @@ bool FileUtils::WriteBinaryFile(const std::filesystem::path& filepath, const cha
 
 bool FileUtils::WriteBinaryFile(const std::filesystem::path& filepath, const std::vector<char>& data) {
     return WriteBinaryFile(filepath, data.data(), data.size());
+}
+
+std::optional<std::filesystem::path> FileUtils::OpenFile(const std::string& filter, const std::filesystem::path& initialDirectory) {
+    nfdu8char_t* outPath = nullptr;
+
+    nfdu8filteritem_t filters[] = {
+        {"Fuze Scene", filter.c_str()}
+    };
+
+    const std::string directory = initialDirectory.empty() ? std::string {} : initialDirectory.string();
+
+    const nfdresult_t result = NFD_OpenDialogU8(&outPath, filters, 1, directory.empty() ? nullptr : directory.c_str());
+
+    if (result == NFD_CANCEL) return std::nullopt;
+
+    if (result == NFD_ERROR) {
+        FUZE_CORE_ASSERT(0, "Error to Open File!");
+        return std::nullopt;
+    }
+
+    std::filesystem::path path = std::filesystem::path((const char8_t*)outPath);
+    NFD_FreePathU8(outPath);
+
+    return path;
+}
+
+std::optional<std::filesystem::path> FileUtils::SaveFile(const std::string& filter, const std::string& defaultName,
+                                                         const std::filesystem::path& initialDirectory) {
+    nfdu8char_t* outPath = nullptr;
+
+    nfdu8filteritem_t filters[] = {
+        {"Fuze Scene", filter.c_str()}
+    };
+
+    const std::string directory = initialDirectory.empty() ? std::string {} : initialDirectory.string();
+
+    const nfdresult_t result = NFD_SaveDialogU8(&outPath, filters, 1, directory.empty() ? nullptr : directory.c_str(), defaultName.c_str());
+
+    if (result == NFD_CANCEL) return std::nullopt;
+
+    if (result == NFD_ERROR) {
+        FUZE_CORE_ASSERT(0, "Error to Save File!");
+        return std::nullopt;
+    }
+
+    std::filesystem::path path = std::filesystem::path((const char8_t*)outPath);
+
+    NFD_FreePathU8(outPath);
+
+    return path;
 }
 }

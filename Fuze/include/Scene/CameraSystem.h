@@ -7,11 +7,9 @@ namespace Fuze {
 class CameraSystem : public System {
   public:
     void OnUpdate(Timestep ts) override;
-    void OnEvent(Event& e) {
-        if (m_PrimaryCamera != NULL_ENTITY) m_CameraControllers[m_PrimaryCamera]->OnEvent(e);
-    }
+    void OnEvent(Event& e);
 
-    void AddCameraController(Entity camera, Ref<OrthographicCameraController> cameraController);
+    void AddCameraController(Entity camera, Ref<OrthographicCameraController>& cameraController);
     void RemoveCameraController(Entity camera);
 
     void ActivateCameraController(Entity camera, bool status);

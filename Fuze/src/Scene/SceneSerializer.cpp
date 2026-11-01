@@ -147,26 +147,28 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::EndMap;
 }
 
-void SceneSerializer::SerializeText(const std::string& filepath) {
+bool SceneSerializer::SerializeText(const std::string& filepath) {
     YAML::Emitter out;
     out << YAML::BeginMap;
     out << YAML::Key << "Scene" << YAML::Value << m_Scene->GetName();
     out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
     for (Entity entity : m_Scene->GetRegistry()->GetEntities()) {
-        if (entity == NULL_ENTITY) return;
+        if (entity == NULL_ENTITY) return false;
 
         SerializeEntity(out, entity);
     }
 
     out << YAML::EndMap;
 
-    FileUtils::WriteTextFile(filepath, out.c_str());
+    bool status = FileUtils::WriteTextFile(filepath, out.c_str());
+
+    return status;
 }
 
-void SceneSerializer::SerializeBinary(const std::string& filepath) {
+bool SceneSerializer::SerializeBinary(const std::string& filepath) {
     (void)filepath;
-    return;
+    return false;
 }
 
 bool SceneSerializer::DeserializeText(const std::string& filepath) {
@@ -179,6 +181,7 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
 
     std::string sceneName = data["Scene"].as<std::string>();
     FUZE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
+    m_Scene->SetName(sceneName);
 
     auto entities = data["Entities"];
     if (entities) {
@@ -189,7 +192,7 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
             auto tagComponent = entity["TagComponent"];
             if (tagComponent) name = tagComponent["Tag"].as<std::string>();
 
-            FUZE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", id, name);
+            FUZE_CORE_TRACE("Deserializing entity with ID = {0}, name = {1}", id, name);
 
             Entity deserializedEntity = m_Scene->CreateEntityWithUUID(id, name);
 
@@ -203,7 +206,7 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
             }
 
             auto spriteComponent = entity["SpriteRendererComponent"];
-            if(spriteComponent) {
+            if (spriteComponent) {
                 auto color = spriteComponent["Color"].as<glm::vec4>();
 
                 m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(deserializedEntity, color);
@@ -211,17 +214,19 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
 
             auto cameraComponent = entity["CameraComponent"];
 
-            if(cameraComponent) {
+            if (cameraComponent) {
                 auto camera = cameraComponent["Camera"];
                 auto position = camera["Position"].as<glm::vec3>();
                 auto rotation = camera["Rotation"].as<float>();
                 auto aspectRatio = camera["AspectRatio"].as<float>();
+                auto size = camera["Size"].as<float>();
 
-                m_Scene->CreateCamera(deserializedEntity, aspectRatio);
+                m_Scene->CreateCamera(deserializedEntity, aspectRatio, size);
 
                 auto& cc = m_Scene->GetRegistry()->GetComponent<CameraComponent>(deserializedEntity);
 
-                cc.Size = camera["Size"].as<float>();
+                cc.AspectRatio = aspectRatio;
+                cc.Size = size;
                 cc.NearClip = camera["NearClip"].as<float>();
                 cc.FarClip = camera["FarClip"].as<float>();
 
@@ -235,7 +240,7 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
                 cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
                 cc.SizeChanged = cameraComponent["SizeChanged"].as<bool>();
 
-                if(primary) m_Scene->SetPrimaryCamera(deserializedEntity);
+                if (primary) m_Scene->SetPrimaryCamera(deserializedEntity);
             }
         }
     }

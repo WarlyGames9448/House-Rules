@@ -14,5 +14,23 @@ class FileUtils {
     static bool WriteTextFile(const std::filesystem::path& filepath, const std::string& content);
     static bool WriteBinaryFile(const std::filesystem::path& filepath, const char* data, size_t size);
     static bool WriteBinaryFile(const std::filesystem::path& filepath, const std::vector<char>& data);
+
+    static std::optional<std::filesystem::path> OpenFile(const std::string& filter, const std::filesystem::path& initialDirectory = {});
+    static std::optional<std::filesystem::path> SaveFile(const std::string& filter, const std::string& defaultName,
+                                                         const std::filesystem::path& initialDirectory = {});
+};
+
+class EditorFileContext {
+  public:
+    void SetLastDirectory(const std::filesystem::path& directory){
+      m_LastDirectory = directory;
+    }
+
+    const std::filesystem::path& GetLastDirectory() const {
+      return m_LastDirectory;
+    }
+
+  private:
+    std::filesystem::path m_LastDirectory;
 };
 }

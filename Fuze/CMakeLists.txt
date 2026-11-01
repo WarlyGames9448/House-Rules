@@ -145,6 +145,8 @@ endif()
 # OTHERS
 # ═══════════════════════════════════════════════════════════
 
+add_subdirectory(vendor/nativefiledialog)
+
 target_compile_definitions(Fuze
     PRIVATE
     FUZE_BUILD_DLL
@@ -165,6 +167,7 @@ target_link_libraries(Fuze
         glad
         glfw
         imgui
+        nfd
         OpenGL::GL
         stb
         stduuid

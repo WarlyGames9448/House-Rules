@@ -13,6 +13,8 @@
 
 #include <stb_image.h>
 
+#include <nfd.h>
+
 namespace Fuze {
 
 static bool s_GLFWInitialized = false;
@@ -27,10 +29,16 @@ Window* Window::Create(const WindowProps& windowProps) {
 
 LinuxWindow::LinuxWindow(const WindowProps& windowProps) {
     Init(windowProps);
+
+    if(NFD_Init() != NFD_OKAY){
+        FUZE_CORE_ASSERT(0, "NFD not initialized!");
+    }
 }
 
 LinuxWindow::~LinuxWindow() {
     Shutdown();
+
+    NFD_Quit();
 }
 
 void LinuxWindow::Init(const WindowProps& windowProps) {

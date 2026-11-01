@@ -24,72 +24,11 @@ void EditorLayer::OnAttach() {
     spec.Height = 720;
     m_Framebuffer = Framebuffer::Create(spec);
 
-    // m_Texture1 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/madruga.jpeg"));
-    // m_Texture2 = Texture2D::Create(FileUtils::GetSandboxAsset("textures/line.png"));
-    // m_Spritesheet = Texture2D::Create(FileUtils::GetSandboxAsset("spritesheets/IndoorTight.png"));
-    // m_floor = SubTexture2D::Create(m_Spritesheet, {24, 15}, {16, 16}, {1, 1});
-
     m_Scene = CreateRef<Scene>("Main");
     m_Scene->Init();
-#if 0
-    m_Square = m_Scene->CreateEntity("Square");
-
-    m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Square, {1.0f});
-    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Square, glm::vec4 {1.0f, 0.0f, 0.75f, 1.0f});
-
-    m_Player = m_Scene->CreateEntity("Player");
-    m_Scene->GetRegistry()->AddComponent<TransformComponent>(m_Player, {1.0f});
-    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(m_Player, glm::vec4 {0.0f, 1.0f, 0.0f, 1.0f});
-
-    m_Camera = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 1", true);
-    m_Camera2 = m_Scene->CreateCamera(1280.0f / 720.0f, "Camera 2", false);
-
-    m_Scene->SetPrimaryCamera(m_Camera);
-
-    class PlayerController : public ScriptableEntity {
-      public:
-        Entity m_CameraEntity;
-
-        PlayerController() {
-            FUZE_WARN("Created!");
-        }
-
-        void OnUpdate(Timestep ts) override {
-            if (HasComponent<SpriteRendererComponent>(GetID())) {
-                auto& component = GetComponent<SpriteRendererComponent>().Color;
-                component.r += 0.1f;
-                if (component.r > 1.0f) component.r = 0.0f;
-            }
-        }
-
-        ~PlayerController() {
-            FUZE_WARN("Destroyed");
-        }
-    };
-
-    m_Scene->GetRegistry()->RegisterComponent<NativeScriptComponent>();
-
-    m_NativeScriptSystem = m_Scene->GetRegistry()->RegisterSystem<NativeScriptSystem>();
-
-    Signature signature;
-    signature.set(m_Scene->GetRegistry()->GetComponentType<NativeScriptComponent>(), true);
-    m_Scene->GetRegistry()->SetSystemSignature<NativeScriptSystem>(signature);
-
-    testEntity = m_Scene->CreateEntity("Test Entity");
-    m_Scene->GetRegistry()->AddComponent<SpriteRendererComponent>(testEntity, glm::vec4 {0.6f, 0.7f, 0.8f, 0.9f});
-    m_Scene->GetRegistry()->AddComponent<NativeScriptComponent>(testEntity, {});
-
-    auto& nsc = m_Scene->GetRegistry()->GetComponent<NativeScriptComponent>(testEntity);
-    nsc.Bind<PlayerController>();
-
-#endif
 
     m_SceneHierarchyPanel.SetContext(m_Scene);
     m_PropertiesPanel.SetContext(m_Scene);
-
-    SceneSerializer serializer{m_Scene};
-    //serializer.SerializeText("Fuze/assets/scenes/Example.fuze");
-    serializer.DeserializeText("Fuze/assets/scenes/Example.fuze");
 
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
@@ -98,14 +37,10 @@ void EditorLayer::OnAttach() {
 }
 
 void EditorLayer::OnDetach() {
-    //m_NativeScriptSystem->Cleanup();
     Renderer2D::Shutdown();
 }
 
 void EditorLayer::OnUpdate(Timestep ts) {
-
-    // Scripts Update
-    //m_NativeScriptSystem->OnUpdate(ts);
 
     const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
@@ -129,6 +64,9 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
 void EditorLayer::OnEvent(Event& e) {
     m_Scene->OnEvent(e);
+
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<KeyPressedEvent>(FUZE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 }
 
 void EditorLayer::OnImGuiRender() {
@@ -151,6 +89,18 @@ void EditorLayer::OnImGuiRender() {
 
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("New Scene", "Ctrl+N")) NewScene();
+
+            if (ImGui::MenuItem("Open Scene...", "Ctrl+O")) OpenScene();
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Save", "Ctrl+S")) SaveScene();
+
+            if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) SaveSceneAs();
+
+            ImGui::Separator();
+
             if (ImGui::MenuItem("Exit")) Fuze::Application::Get().Close();
             ImGui::EndMenu();
         }
@@ -197,9 +147,102 @@ void EditorLayer::OnImGuiRender() {
         m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
         m_Scene->m_ViewportSize = m_ViewportSize;
 
+        if (m_IsSceneDirty) {
+            m_Scene->OnViewportResize();
+            m_IsSceneDirty = false;
+        }
+
         ImGui::Image(m_Framebuffer->GetColorAttachmentID(), ImVec2 {m_ViewportSize.x, m_ViewportSize.y}, ImVec2 {0, 1}, ImVec2 {1, 0});
     }
 
     UI::EndPanel();
 }
+
+void EditorLayer::NewScene() {
+    SaveScene();
+
+    m_Scene = CreateRef<Scene>();
+    m_Scene->Init();
+    m_SceneHierarchyPanel.SetContext(m_Scene);
+    m_PropertiesPanel.SetContext(m_Scene);
+
+    m_ScenePath.clear();
+
+    m_IsSceneDirty = true;
+}
+
+void EditorLayer::OpenScene() {
+    auto filepath = FileUtils::OpenFile("fuze", m_FileContext.GetLastDirectory());
+
+    if (!filepath) return;
+
+    m_Scene = CreateRef<Scene>();
+    m_Scene->Init();
+    m_SceneHierarchyPanel.SetContext(m_Scene);
+    m_PropertiesPanel.SetContext(m_Scene);
+
+    SceneSerializer sceneSerializer {m_Scene};
+    sceneSerializer.DeserializeText(filepath->string());
+    m_ScenePath = *filepath;
+
+    m_FileContext.SetLastDirectory(filepath->parent_path());
+
+    m_IsSceneDirty = true;
+}
+
+void EditorLayer::SaveScene() {
+    if (m_ScenePath.empty()) {
+        SaveSceneAs();
+        return;
+    }
+
+    SceneSerializer serializer(m_Scene);
+
+    if (serializer.SerializeText(m_ScenePath.string())) m_IsSceneDirty = false;
+}
+
+void EditorLayer::SaveSceneAs() {
+    auto filepath = FileUtils::SaveFile("fuze", "Untitled.fuze", m_FileContext.GetLastDirectory());
+
+    if (!filepath) return;
+
+    SceneSerializer serializer(m_Scene);
+
+    if (serializer.SerializeText(filepath->string())) {
+        m_ScenePath = *filepath;
+        m_IsSceneDirty = false;
+    }
+
+    m_FileContext.SetLastDirectory(filepath->parent_path());
+}
+
+bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+
+    // Shortcuts
+    if (e.GetRepeatCount() > 1) return true;
+
+    bool control = Input::IsKeyPressed(FUZE_KEY_LEFT_CONTROL) || Input::IsKeyPressed(FUZE_KEY_RIGHT_CONTROL);
+    bool shift = Input::IsKeyPressed(FUZE_KEY_LEFT_SHIFT) || Input::IsKeyPressed(FUZE_KEY_RIGHT_SHIFT);
+
+    if(control) FUZE_ERROR("CONTROLLLLL");
+
+    switch (e.GetKeyCode()) {
+    case FUZE_KEY_S: {
+        if (control && shift) SaveSceneAs();
+        if (control && !shift) SaveScene();
+        break;
+    }
+    case FUZE_KEY_O: {
+        if (control && !shift) OpenScene();
+        break;
+    }
+    case FUZE_KEY_N: {
+        if (control && !shift) NewScene();
+        break;
+    }
+    }
+
+    return true;
+}
+
 }

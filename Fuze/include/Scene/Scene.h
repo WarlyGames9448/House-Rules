@@ -35,7 +35,7 @@ class Scene {
     void DestroyEntity(Entity entity);
 
     Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera");
-    void CreateCamera(Entity cameraEntity, float aspectRatio);
+    void CreateCamera(Entity cameraEntity, float aspectRatio, float zoomLevel = 1.0f);
     void SetPrimaryCamera(Entity camera);
 
     // TEMP
@@ -60,6 +60,10 @@ class Scene {
 
     inline Ref<CameraSystem> GetCameraSystem() {
         return m_CameraSystem;
+    }
+
+    inline void SetName(const std::string& name){
+      m_Name = name;
     }
 
     inline const std::string GetName() const {
