@@ -38,8 +38,8 @@ class Registry {
         m_SystemManager->SetSignature<T>(signature);
     }
 
-    template <typename T> void RegisterComponent() {
-        m_ComponentManager->RegisterComponent<T>();
+    template <typename T> void RegisterComponent(typename ComponentArray<T>::CloneFunction cloneFunction = nullptr) {
+        m_ComponentManager->RegisterComponent<T>(std::move(cloneFunction));
     }
 
     template <typename T> T& GetComponent(Entity entity) {
@@ -79,6 +79,10 @@ class Registry {
         m_EntityManager->SetSignature(entity, signature);
 
         m_SystemManager->EntitySignatureChanged(entity, signature);
+    }
+
+    void CopyComponents(Entity source, Entity destination) {
+        m_ComponentManager->CopyComponents(source, destination);
     }
 
   private:

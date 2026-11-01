@@ -33,7 +33,7 @@ void Scene::Init() {
     m_Registry = CreateRef<Registry>();
 
     m_Registry->RegisterComponent<TagComponent>();
-    m_Registry->RegisterComponent<IDComponent>();
+    m_Registry->RegisterComponent<IDComponent>([](const IDComponent&) { return IDComponent {}; });
     m_Registry->RegisterComponent<SpriteRendererComponent>();
     m_Registry->RegisterComponent<TransformComponent>();
     m_Registry->RegisterComponent<CameraComponent>();
@@ -57,6 +57,8 @@ Entity Scene::CreateEntity(const std::string& tag) {
     m_Registry->AddComponent<IDComponent>(entity, {});
     m_Registry->AddComponent<TagComponent>(entity, tag);
 
+    m_EntityCount++;
+
     return entity;
 }
 
@@ -65,11 +67,27 @@ Entity Scene::CreateEntityWithUUID(const std::string& id, const std::string& tag
     m_Registry->AddComponent<IDComponent>(entity, UUID(id));
     m_Registry->AddComponent<TagComponent>(entity, tag);
 
+    m_EntityCount++;
+
     return entity;
 }
 
 void Scene::DestroyEntity(Entity entity) {
     m_Registry->DestroyEntity(entity);
+    m_EntityCount--;
+}
+
+Entity Scene::DuplicateEntity(Entity source) {
+    Entity destination = m_Registry->CreateEntity();
+    m_EntityCount++;
+
+    m_Registry->CopyComponents(source, destination);
+
+    return destination;
+}
+
+std::set<Entity> Scene::GetAllEntites() const {
+    return m_Registry->GetEntities();
 }
 
 Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
@@ -85,6 +103,8 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
     cameraController->InvertScroll(true);
 
     m_CameraSystem->AddCameraController(entity, cameraController);
+
+    m_EntityCount++;
 
     return entity;
 }

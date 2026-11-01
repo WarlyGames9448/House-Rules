@@ -27,41 +27,36 @@ void SceneHierarchyPanel::OnImGuiRenderer() {
         return;
     }
 
-    std::vector<Entity> pendingDeletion;
-
     if (UI::BeginPanel("Hierarchy Panel")) {
-        for (auto entity : m_Context->m_Registry->GetEntities())
-            DrawEntityNode(entity, pendingDeletion);
-
-        for (Entity entity : pendingDeletion) {
-            if (!m_Context->m_Registry->HasComponent<TagComponent>(entity)) continue;
-
-            if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
-                auto& camera = m_Context->m_Registry->GetComponent<CameraComponent>(entity);
-                if (camera.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
-                m_Context->m_CameraSystem->RemoveCameraController(entity);
-            }
-
-            m_Context->DestroyEntity(entity);
-
-            if (m_SelectionContext.GetSelectedEntity() == entity) m_SelectionContext.ClearSelection();
-        }
-
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) {
-            m_SelectionContext.ClearSelection();
-        }
-
-        if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
-            if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
-
-            ImGui::EndPopup();
-        }
+        DrawHierarchy();
+        DrawBackgroundContextMenu();
     }
 
     UI::EndPanel();
+
+    for (Entity entity : m_PendingDeletion)
+        DeleteEntity(entity);
+
+    m_PendingDeletion.clear();
 }
 
-void SceneHierarchyPanel::DrawEntityNode(Entity entity, std::vector<Entity>& pendingDeletion) {
+void SceneHierarchyPanel::DrawHierarchy() {
+    for (auto entity : m_Context->m_Registry->GetEntities())
+        DrawEntityNode(entity);
+
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered()) m_SelectionContext.ClearSelection();
+}
+
+void SceneHierarchyPanel::DrawBackgroundContextMenu() {
+    if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)) {
+
+        if (ImGui::MenuItem("Create Empty Entity")) CreateEntity();
+
+        ImGui::EndPopup();
+    }
+}
+
+void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
 
     const bool selected = (m_SelectionContext.GetSelectedEntity() == entity);
@@ -69,14 +64,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity, std::vector<Entity>& pen
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
     if (selected) flags |= ImGuiTreeNodeFlags_Selected;
 
-    // Start renaming the selected entity with F2.
-    if (selected && Input::IsKeyPressed(FUZE_KEY_F2)) {
-        m_RenamingEntity = entity;
-
-        std::snprintf(m_RenameBuffer, sizeof(m_RenameBuffer), "%s", tag.c_str());
-
-        m_RequestRenameFocus = true;
-    }
+    // Keyboard Shortcut F2: Rename
+    if (selected && ImGui::IsWindowHovered() && Input::IsKeyPressed(FUZE_KEY_F2)) BeginRename(entity);
 
     bool opened = false;
 
@@ -91,7 +80,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity, std::vector<Entity>& pen
         bool commit = ImGui::InputText("##EntityRename", m_RenameBuffer, sizeof(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
 
         if (Input::IsKeyPressed(FUZE_KEY_ESCAPE)) {
-            m_RenamingEntity = NULL_ENTITY;
+            CancelRename();
         } else if (commit) {
             tag = m_RenameBuffer;
             m_RenamingEntity = NULL_ENTITY;
@@ -100,20 +89,74 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity, std::vector<Entity>& pen
         opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uintptr_t>(entity)), flags, "%s", tag.c_str());
 
         if (ImGui::IsItemClicked()) m_SelectionContext.SelectEntity(entity);
+
+        DrawEntityContextMenu(entity);
     }
 
     UI::DrawSelectionIndicator(selected);
 
-    bool entityDeleted = false;
-
-    if (ImGui::BeginPopupContextItem()) {
-        if (ImGui::MenuItem("Delete Entity")) entityDeleted = true;
-
-        ImGui::EndPopup();
-    }
-
     if (opened) ImGui::TreePop();
 
-    if (entityDeleted) pendingDeletion.push_back(entity);
+    if (selected && ImGui::IsWindowHovered() && Input::IsKeyPressed(FUZE_KEY_DELETE)) {
+
+        m_PendingDeletion.push_back(entity);
+    }
 }
+
+void SceneHierarchyPanel::CreateEntity() {
+    Entity entity = m_Context->CreateEntity("Empty Entity");
+
+    m_SelectionContext.SelectEntity(entity);
+}
+
+void SceneHierarchyPanel::DuplicateEntity(Entity entity) {
+}
+
+void SceneHierarchyPanel::DeleteEntity(Entity entity) {
+    if (!m_Context->m_Registry->HasComponent<TagComponent>(entity)) return;
+
+    if (m_Context->m_Registry->HasComponent<CameraComponent>(entity)) {
+        auto& camera = m_Context->m_Registry->GetComponent<CameraComponent>(entity);
+        if (camera.Primary) m_Context->SetPrimaryCamera(NULL_ENTITY);
+        m_Context->m_CameraSystem->RemoveCameraController(entity);
+    }
+
+    if (m_RenamingEntity == entity) CancelRename();
+
+    if (m_SelectionContext.GetSelectedEntity() == entity) m_SelectionContext.ClearSelection();
+
+    m_Context->DestroyEntity(entity);
+}
+
+void SceneHierarchyPanel::BeginRename(Entity entity) {
+    auto& tag = m_Context->m_Registry->GetComponent<TagComponent>(entity).Tag;
+
+    m_RenamingEntity = entity;
+
+    std::snprintf(m_RenameBuffer, sizeof(m_RenameBuffer), "%s", tag.c_str());
+
+    m_RequestRenameFocus = true;
+}
+
+void SceneHierarchyPanel::CancelRename() {
+    m_RenamingEntity = NULL_ENTITY;
+    m_RequestRenameFocus = false;
+}
+
+void SceneHierarchyPanel::DrawEntityContextMenu(Entity entity) {
+    if (!ImGui::BeginPopupContextItem()) return;
+
+    if (ImGui::MenuItem("Create Empty Entity")) CreateEntity();
+
+    if (ImGui::MenuItem("Duplicate", "Ctrl+D")) DuplicateEntity(entity);
+
+    if (ImGui::MenuItem("Rename", "F2")) BeginRename(entity);
+
+    ImGui::Separator();
+
+    if (ImGui::MenuItem("Delete", "Delete")) m_PendingDeletion.push_back(entity);
+
+    ImGui::EndPopup();
+}
+
 }

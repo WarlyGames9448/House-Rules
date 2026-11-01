@@ -8,12 +8,15 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <typeindex>
+
 namespace Fuze {
 
 class IComponentArray {
   public:
     virtual void EntityDestroyed(Entity entity) = 0;
-    ~IComponentArray() = default;
+    virtual void CopyData(Entity source, Entity destination) = 0;
+    virtual ~IComponentArray() = default;
 };
 
 template <typename T> class ComponentArray : public IComponentArray {
@@ -94,6 +97,21 @@ template <typename T> class ComponentArray : public IComponentArray {
         }
     }
 
+    using CloneFunction = std::function<T(const T&)>;
+
+    void SetCloneFunction(CloneFunction function) {
+        m_CloneFunction = std::move(function);
+    }
+
+    void CopyData(Entity source, Entity destination) override {
+        if (m_EntityToIndexMap[source] == NULL_ENTITY) return;
+
+        const T& original = GetData(source);
+
+        if (m_CloneFunction) InsertData(destination, m_CloneFunction(original));
+        else if constexpr (std::is_copy_constructible_v<T>) InsertData(destination, original);
+    }
+
     size_t GetSize() {
         return m_ValidSize;
     }
@@ -107,26 +125,31 @@ template <typename T> class ComponentArray : public IComponentArray {
 
     ComponentCallback m_OnAdd = nullptr;
     ComponentCallback m_OnRemove = nullptr;
+
+    CloneFunction m_CloneFunction;
 };
 
 class ComponentManager {
   public:
-    template <typename T> void RegisterComponent() {
-        const char* typeName = typeid(T).name();
+    template <typename T> void RegisterComponent(typename ComponentArray<T>::CloneFunction cloneFunction = nullptr) {
+        const std::type_index typeName = typeid(T);
 
         if (m_ComponentTypes.contains(typeName)) {
             return;
         }
 
         m_ComponentTypes.insert({typeName, m_NextComponentType});
-        Ref<IComponentArray> componentArray = CreateRef<ComponentArray<T>>();
+        Ref<ComponentArray<T>> componentArray = CreateRef<ComponentArray<T>>();
+
+        if (cloneFunction) componentArray->SetCloneFunction(std::move(cloneFunction));
+
         m_ComponentArrays.insert({typeName, componentArray});
 
         m_NextComponentType++;
     }
 
     template <typename T> ComponentType GetComponentType() {
-        const char* typeName = typeid(T).name();
+        const std::type_index typeName = typeid(T);
 
         if (!m_ComponentTypes.contains(typeName)) {
             FUZE_CORE_ASSERT(0, "ComponentManager does not have this component.");
@@ -160,9 +183,15 @@ class ComponentManager {
         }
     }
 
+    void CopyComponents(Entity source, Entity destination) {
+        for (const auto& [typeName, componentArray] : m_ComponentArrays) {
+            componentArray->CopyData(source, destination);
+        }
+    }
+
   private:
     template <typename T> const Ref<ComponentArray<T>> GetComponentArray() {
-        const char* typeName = typeid(T).name();
+        const std::type_index typeName = typeid(T);
 
         if (!m_ComponentTypes.contains(typeName)) {
             FUZE_CORE_ASSERT(0, "ComponentManager does not have this component.");
@@ -173,8 +202,8 @@ class ComponentManager {
     }
 
   private:
-    std::unordered_map<const char*, ComponentType> m_ComponentTypes;
-    std::unordered_map<const char*, Ref<IComponentArray>> m_ComponentArrays;
+    std::unordered_map<std::type_index, ComponentType> m_ComponentTypes;
+    std::unordered_map<std::type_index, Ref<IComponentArray>> m_ComponentArrays;
 
     ComponentType m_NextComponentType = 0;
 };

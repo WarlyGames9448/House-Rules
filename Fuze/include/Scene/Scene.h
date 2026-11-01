@@ -34,6 +34,13 @@ class Scene {
     Entity CreateEntityWithUUID(const std::string& id, const std::string& tag = "Entity");
     void DestroyEntity(Entity entity);
 
+    Entity DuplicateEntity(Entity source);
+    std::set<Entity> GetAllEntites() const;
+
+    inline int GetEntityCount() const {
+        return m_EntityCount;
+    }
+
     Entity CreateCamera(float aspectRatio, const std::string& tag = "Camera");
     void CreateCamera(Entity cameraEntity, float aspectRatio, float zoomLevel = 1.0f);
     void SetPrimaryCamera(Entity camera);
@@ -62,12 +69,12 @@ class Scene {
         return m_CameraSystem;
     }
 
-    inline void SetName(const std::string& name){
-      m_Name = name;
+    inline void SetName(const std::string& name) {
+        m_Name = name;
     }
 
     inline const std::string GetName() const {
-      return m_Name;
+        return m_Name;
     }
 
   public:
@@ -80,6 +87,8 @@ class Scene {
     Ref<Registry> m_Registry;
     Ref<RenderSystem> m_RenderSystem;
     Ref<CameraSystem> m_CameraSystem;
+
+    int m_EntityCount = 0;
 
     friend class SceneHierarchyPanel;
     friend class SceneSerializer;

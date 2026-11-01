@@ -124,6 +124,7 @@ void EditorLayer::OnImGuiRender() {
     if (Fuze::UI::BeginPanel("Stats", options)) {
         ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
         ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
+        ImGui::Text("Entity Count: %d", m_Scene->GetEntityCount());
     }
 
     UI::EndPanel();
@@ -223,8 +224,6 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
 
     bool control = Input::IsKeyPressed(FUZE_KEY_LEFT_CONTROL) || Input::IsKeyPressed(FUZE_KEY_RIGHT_CONTROL);
     bool shift = Input::IsKeyPressed(FUZE_KEY_LEFT_SHIFT) || Input::IsKeyPressed(FUZE_KEY_RIGHT_SHIFT);
-
-    if(control) FUZE_ERROR("CONTROLLLLL");
 
     switch (e.GetKeyCode()) {
     case FUZE_KEY_S: {

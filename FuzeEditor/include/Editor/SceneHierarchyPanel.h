@@ -15,9 +15,25 @@ class SceneHierarchyPanel : EditorPanel {
 
     void OnImGuiRenderer();
 
-  protected:
-    void DrawEntityNode(Entity entity, std::vector<Entity>& pendingDeletion);
+    // Rendering
+    void DrawHierarchy();
+    void DrawEntityNode(Entity entity);
 
+    // Context Menus
+    void DrawEntityContextMenu(Entity entity);
+    void DrawBackgroundContextMenu();
+
+    // Entity Operations
+    void CreateEntity();
+    void DuplicateEntity(Entity entity);
+    void DeleteEntity(Entity entity);
+
+    // Rename
+    void BeginRename(Entity entity);
+    void CancelRename();
+
+    // Input
+    void HandleKeyboardNavigation();
   private:
     Ref<Scene> m_Context;
     EditorSelectionContext& m_SelectionContext;
@@ -25,5 +41,7 @@ class SceneHierarchyPanel : EditorPanel {
     Entity m_RenamingEntity = NULL_ENTITY;
     char m_RenameBuffer[256] = {};
     bool m_RequestRenameFocus = false;
+
+    std::vector<Entity> m_PendingDeletion;
 };
 }
