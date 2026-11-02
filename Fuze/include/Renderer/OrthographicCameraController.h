@@ -35,24 +35,30 @@ class FUZE_API OrthographicCameraController {
         return m_ZoomLevel;
     }
     void SetZoomLevel(float zoomLevel) {
-        m_ZoomLevel = zoomLevel;
-        CalculateView();
+        if (m_ZoomLevel != zoomLevel) {
+            m_ZoomLevel = zoomLevel;
+            CalculateView();
+        }
     }
 
     float GetNearClip() const {
         return m_NearClip;
     }
     void SetNearClip(float nearClip) {
-        m_NearClip = nearClip;
-        CalculateView();
+        if (m_NearClip != nearClip) {
+            m_NearClip = nearClip;
+            CalculateView();
+        }
     }
 
     float GetFarClip() const {
         return m_FarClip;
     }
     void SetFarClip(float farClip) {
-        m_FarClip = farClip;
-        CalculateView();
+        if (m_FarClip != farClip) {
+            m_FarClip = farClip;
+            CalculateView();
+        }
     }
 
   private:

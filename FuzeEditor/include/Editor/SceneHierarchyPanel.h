@@ -43,5 +43,7 @@ class SceneHierarchyPanel : EditorPanel {
     bool m_RequestRenameFocus = false;
 
     std::vector<Entity> m_PendingDeletion;
+
+    bool m_KeyReleased = true;
 };
 }

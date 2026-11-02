@@ -67,6 +67,15 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     // Keyboard Shortcut F2: Rename
     if (selected && ImGui::IsWindowHovered() && Input::IsKeyPressed(FUZE_KEY_F2)) BeginRename(entity);
 
+    bool control = Input::IsKeyPressed(FUZE_KEY_LEFT_CONTROL) || Input::IsKeyPressed(FUZE_KEY_RIGHT_CONTROL);
+
+    if (selected && ImGui::IsWindowHovered() && Input::IsKeyPressed(FUZE_KEY_D) && control && m_KeyReleased) {
+        DuplicateEntity(entity);
+        m_KeyReleased = false;
+    }
+
+    if (Input::IsKeyReleased(FUZE_KEY_D)) m_KeyReleased = true;
+
     bool opened = false;
 
     if (m_RenamingEntity == entity) {
@@ -110,6 +119,7 @@ void SceneHierarchyPanel::CreateEntity() {
 }
 
 void SceneHierarchyPanel::DuplicateEntity(Entity entity) {
+    Entity duplicated = m_Context->DuplicateEntity(entity);
 }
 
 void SceneHierarchyPanel::DeleteEntity(Entity entity) {

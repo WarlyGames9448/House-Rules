@@ -101,8 +101,8 @@ void SerializeComponent(YAML::Emitter& out, CameraComponent& component) {
     out << YAML::Key << "Rotation" << YAML::Value << component.Camera->GetRotation();
     out << YAML::Key << "AspectRatio" << YAML::Value << component.AspectRatio;
     out << YAML::Key << "Size" << YAML::Value << component.Size;
-    out << YAML::Key << "NearClip" << YAML::Value << component.FarClip;
-    out << YAML::Key << "FarClip" << YAML::Value << component.NearClip;
+    out << YAML::Key << "NearClip" << YAML::Value << component.NearClip;
+    out << YAML::Key << "FarClip" << YAML::Value << component.FarClip;
 
     out << YAML::EndMap;
 

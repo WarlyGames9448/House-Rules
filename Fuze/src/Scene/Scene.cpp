@@ -9,6 +9,14 @@ namespace Fuze {
 void RenderSystem::OnUpdate(Timestep ts [[maybe_unused]]) {
     if (!m_Camera) return;
 
+    std::vector<Entity> sortedEntities(m_Entities.begin(), m_Entities.end());
+
+    std::sort(sortedEntities.begin(), sortedEntities.end(), [this](Entity a, Entity b) {
+        auto& transformA = m_Registry->GetComponent<TransformComponent>(a);
+        auto& transformB = m_Registry->GetComponent<TransformComponent>(b);
+        return transformA.Translation.z < transformB.Translation.z;
+    });
+
     Renderer2D::BeginScene(m_Camera);
     for (auto& entity : m_Entities) {
         auto transform = m_Registry->GetComponent<TransformComponent>(entity);
@@ -36,7 +44,27 @@ void Scene::Init() {
     m_Registry->RegisterComponent<IDComponent>([](const IDComponent&) { return IDComponent {}; });
     m_Registry->RegisterComponent<SpriteRendererComponent>();
     m_Registry->RegisterComponent<TransformComponent>();
-    m_Registry->RegisterComponent<CameraComponent>();
+    m_Registry->RegisterComponent<CameraComponent>([](const CameraComponent& source) {
+        CameraComponent clone;
+
+        clone.ControllerActive = source.ControllerActive;
+        clone.Primary = false;
+        clone.FixedAspectRatio = source.FixedAspectRatio;
+        clone.SizeChanged = source.SizeChanged;
+
+        clone.AspectRatio = source.AspectRatio;
+        clone.Size = source.Size;
+        clone.NearClip = source.NearClip;
+        clone.FarClip = source.FarClip;
+
+        clone.Camera = CreateRef<OrthographicCamera>(
+            -clone.AspectRatio * clone.Size, clone.AspectRatio * clone.Size, -clone.Size, clone.Size, clone.NearClip, clone.FarClip);
+
+        clone.Camera->SetPosition(source.Camera->GetPosition());
+        clone.Camera->SetRotation(source.Camera->GetRotation());
+
+        return clone;
+    });
 
     m_RenderSystem = m_Registry->RegisterSystem<RenderSystem>();
 
@@ -50,6 +78,26 @@ void Scene::Init() {
     Signature cameraSignature;
     cameraSignature.set(m_Registry->GetComponentType<CameraComponent>());
     m_Registry->SetSystemSignature<CameraSystem>(cameraSignature);
+
+    // Camera lifecycle
+    m_Registry->RegisterComponentLifecycle<CameraComponent>(
+        // On Add
+        [this](Entity entity) {
+            auto& cameraComponent = m_Registry->GetComponent<CameraComponent>(entity);
+
+            Ref<OrthographicCameraController> controller =
+                CreateRef<OrthographicCameraController>(cameraComponent.Camera, cameraComponent.AspectRatio, true);
+
+            controller->SetSpeed(2.0f, 180.0f, 0.3f);
+            controller->InvertScroll(true);
+            controller->SetZoomLevel(cameraComponent.Size);
+            controller->SetNearClip(cameraComponent.NearClip);
+            controller->SetFarClip(cameraComponent.FarClip);
+
+            m_CameraSystem->AddCameraController(entity, controller);
+        },
+        // On Remove
+        [this](Entity entity) { m_CameraSystem->RemoveCameraController(entity); });
 }
 
 Entity Scene::CreateEntity(const std::string& tag) {
@@ -73,6 +121,12 @@ Entity Scene::CreateEntityWithUUID(const std::string& id, const std::string& tag
 }
 
 void Scene::DestroyEntity(Entity entity) {
+    if (m_Registry->HasComponent<CameraComponent>(entity)) {
+        auto& camera = m_Registry->GetComponent<CameraComponent>(entity);
+
+        if (camera.Primary) SetPrimaryCamera(NULL_ENTITY);
+    }
+
     m_Registry->DestroyEntity(entity);
     m_EntityCount--;
 }
@@ -96,13 +150,13 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
 
     m_Registry->AddComponent<CameraComponent>(entity, {camera, false});
 
-    Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
+    // Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
 
-    // TODO
-    cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-    cameraController->InvertScroll(true);
+    // // TODO
+    // cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
+    // cameraController->InvertScroll(true);
 
-    m_CameraSystem->AddCameraController(entity, cameraController);
+    // m_CameraSystem->AddCameraController(entity, cameraController);
 
     m_EntityCount++;
 
@@ -110,18 +164,22 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
 }
 
 void Scene::CreateCamera(Entity cameraEntity, float aspectRatio, float zoomLevel) {
-    Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
+    CameraComponent cameraComponent;
+    cameraComponent.Camera = CreateRef<OrthographicCamera>(-aspectRatio, aspectRatio, -1.0f, 1.0f, -100.0f, 100.0f);
 
-    m_Registry->AddComponent<CameraComponent>(cameraEntity, {camera, false});
+    cameraComponent.AspectRatio = aspectRatio;
+    cameraComponent.Size = zoomLevel;
 
-    Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
+    m_Registry->AddComponent<CameraComponent>(cameraEntity, cameraComponent);
 
-    // TODO
-    cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-    cameraController->InvertScroll(false);
-    cameraController->SetZoomLevel(zoomLevel);
+    // Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
 
-    m_CameraSystem->AddCameraController(cameraEntity, cameraController);
+    // // TODO
+    // cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
+    // cameraController->InvertScroll(false);
+    // cameraController->SetZoomLevel(zoomLevel);
+
+    // m_CameraSystem->AddCameraController(cameraEntity, cameraController);
 }
 
 void Scene::SetPrimaryCamera(Entity camera) {

@@ -83,6 +83,11 @@ class Registry {
 
     void CopyComponents(Entity source, Entity destination) {
         m_ComponentManager->CopyComponents(source, destination);
+
+        Signature signature = m_EntityManager->GetSignature(source);
+
+        m_EntityManager->SetSignature(destination, signature);
+        m_SystemManager->EntitySignatureChanged(destination, signature);
     }
 
   private:
