@@ -28,6 +28,7 @@ void SceneHierarchyPanel::OnImGuiRenderer() {
     }
 
     if (UI::BeginPanel("Hierarchy Panel")) {
+        DrawToolbar();
         DrawHierarchy();
         DrawBackgroundContextMenu();
     }
@@ -54,6 +55,14 @@ void SceneHierarchyPanel::DrawBackgroundContextMenu() {
 
         ImGui::EndPopup();
     }
+}
+
+void SceneHierarchyPanel::DrawToolbar() {
+    if (ImGui::Button("+")) {
+        CreateEntity();
+    }
+
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Create Entity");
 }
 
 void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
@@ -105,6 +114,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
     UI::DrawSelectionIndicator(selected);
 
     if (opened) ImGui::TreePop();
+
+    if (ImGui::IsItemFocused() && Input::IsKeyPressed(FUZE_KEY_ENTER)) m_SelectionContext.SelectEntity(entity);
 
     if (selected && ImGui::IsWindowHovered() && Input::IsKeyPressed(FUZE_KEY_DELETE)) {
 

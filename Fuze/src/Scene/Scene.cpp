@@ -150,14 +150,6 @@ Entity Scene::CreateCamera(float aspectRatio, const std::string& tag) {
 
     m_Registry->AddComponent<CameraComponent>(entity, {camera, false});
 
-    // Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
-
-    // // TODO
-    // cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-    // cameraController->InvertScroll(true);
-
-    // m_CameraSystem->AddCameraController(entity, cameraController);
-
     m_EntityCount++;
 
     return entity;
@@ -171,15 +163,6 @@ void Scene::CreateCamera(Entity cameraEntity, float aspectRatio, float zoomLevel
     cameraComponent.Size = zoomLevel;
 
     m_Registry->AddComponent<CameraComponent>(cameraEntity, cameraComponent);
-
-    // Ref<OrthographicCameraController> cameraController = CreateRef<OrthographicCameraController>(camera, aspectRatio, true);
-
-    // // TODO
-    // cameraController->SetSpeed(2.0f, 180.0f, 0.3f);
-    // cameraController->InvertScroll(false);
-    // cameraController->SetZoomLevel(zoomLevel);
-
-    // m_CameraSystem->AddCameraController(cameraEntity, cameraController);
 }
 
 void Scene::SetPrimaryCamera(Entity camera) {

@@ -22,6 +22,7 @@ class SceneHierarchyPanel : EditorPanel {
     // Context Menus
     void DrawEntityContextMenu(Entity entity);
     void DrawBackgroundContextMenu();
+    void DrawToolbar();
 
     // Entity Operations
     void CreateEntity();
