@@ -5,6 +5,23 @@
 #include "Utils/FileUtils.h"
 
 namespace YAML {
+template <> struct convert<glm::vec2> {
+    static Node encode(const glm::vec2& rhs) {
+        Node node;
+        node.push_back(rhs.x);
+        node.push_back(rhs.y);
+        return node;
+    }
+
+    static bool decode(const Node& node, glm::vec2& rhs) {
+        if (!node.IsSequence() || node.size() != 2) return false;
+
+        rhs.x = node[0].as<float>();
+        rhs.y = node[1].as<float>();
+        return true;
+    }
+};
+
 template <> struct convert<glm::vec3> {
     static Node encode(const glm::vec3& rhs) {
         Node node;
@@ -23,6 +40,7 @@ template <> struct convert<glm::vec3> {
         return true;
     }
 };
+
 template <> struct convert<glm::vec4> {
     static Node encode(const glm::vec4& rhs) {
         Node node;
@@ -47,6 +65,12 @@ template <> struct convert<glm::vec4> {
 
 namespace Fuze {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene): m_Scene(scene) {
+}
+
+YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v) {
+    out << YAML::Flow;
+    out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+    return out;
 }
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
@@ -147,10 +171,16 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::EndMap;
 }
 
-bool SceneSerializer::SerializeText(const std::string& filepath) {
+bool SceneSerializer::SerializeText(const std::string& filepath, EditorCamera& editorCamera) {
     YAML::Emitter out;
     out << YAML::BeginMap;
     out << YAML::Key << "Scene" << YAML::Value << m_Scene->GetName();
+
+    out << YAML::Key << "EditorCamera" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Position" << YAML::Value << editorCamera.GetPosition();
+    out << YAML::Key << "Zoom" << YAML::Value << editorCamera.GetZoom();
+    out << YAML::EndMap;
+
     out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
     for (Entity entity : m_Scene->GetRegistry()->GetEntities()) {
@@ -166,12 +196,13 @@ bool SceneSerializer::SerializeText(const std::string& filepath) {
     return status;
 }
 
-bool SceneSerializer::SerializeBinary(const std::string& filepath) {
+bool SceneSerializer::SerializeBinary(const std::string& filepath, EditorCamera& editorCamera) {
     (void)filepath;
+    (void)editorCamera;
     return false;
 }
 
-bool SceneSerializer::DeserializeText(const std::string& filepath) {
+bool SceneSerializer::DeserializeText(const std::string& filepath, EditorCamera& editorCamera) {
     std::ifstream stream(filepath);
     std::stringstream strStream;
     strStream << stream.rdbuf();
@@ -182,6 +213,12 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
     std::string sceneName = data["Scene"].as<std::string>();
     FUZE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
     m_Scene->SetName(sceneName);
+
+    auto editorCameraOpt = data["EditorCamera"];
+    if (editorCameraOpt) {
+        editorCamera.SetPosition(editorCameraOpt["Position"].as<glm::vec2>());
+        editorCamera.SetZoom(editorCameraOpt["Zoom"].as<float>());
+    }
 
     auto entities = data["Entities"];
     if (entities) {
@@ -248,8 +285,9 @@ bool SceneSerializer::DeserializeText(const std::string& filepath) {
     return true;
 }
 
-bool SceneSerializer::DeserializeBinary(const std::string& filepath) {
+bool SceneSerializer::DeserializeBinary(const std::string& filepath, EditorCamera& editorCamera) {
     (void)filepath;
+    (void)editorCamera;
     return false;
 }
 

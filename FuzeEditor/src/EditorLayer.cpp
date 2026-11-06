@@ -30,6 +30,8 @@ void EditorLayer::OnAttach() {
     m_SceneHierarchyPanel.SetContext(m_Scene);
     m_PropertiesPanel.SetContext(m_Scene);
 
+    LoadOptions();
+
     FUZE_INFO("{0} {1} {2}",
               RendererCommand::GetRenderCaps().GraphicsAPI,
               RendererCommand::GetRenderCaps().Vendor,
@@ -198,12 +200,14 @@ void EditorLayer::OpenScene() {
     m_PropertiesPanel.SetContext(m_Scene);
 
     SceneSerializer sceneSerializer {m_Scene};
-    sceneSerializer.DeserializeText(filepath->string());
+    sceneSerializer.DeserializeText(filepath->string(), m_EditorCamera);
     m_ScenePath = *filepath;
 
     m_FileContext.SetLastDirectory(filepath->parent_path());
 
     m_IsSceneDirty = true;
+
+    SaveOptions();
 }
 
 void EditorLayer::SaveScene() {
@@ -214,7 +218,7 @@ void EditorLayer::SaveScene() {
 
     SceneSerializer serializer(m_Scene);
 
-    if (serializer.SerializeText(m_ScenePath.string())) m_IsSceneDirty = false;
+    if (serializer.SerializeText(m_ScenePath.string(), m_EditorCamera)) m_IsSceneDirty = false;
 }
 
 void EditorLayer::SaveSceneAs() {
@@ -224,12 +228,14 @@ void EditorLayer::SaveSceneAs() {
 
     SceneSerializer serializer(m_Scene);
 
-    if (serializer.SerializeText(filepath->string())) {
+    if (serializer.SerializeText(filepath->string(), m_EditorCamera)) {
         m_ScenePath = *filepath;
         m_IsSceneDirty = false;
     }
 
     m_FileContext.SetLastDirectory(filepath->parent_path());
+
+    SaveOptions();
 }
 
 bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
@@ -257,6 +263,42 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
     }
 
     return true;
+}
+
+void EditorLayer::SaveOptions(){
+    YAML::Emitter out;
+    out << YAML::BeginMap;
+    out << YAML::Key << "LastOpened" << YAML::Value << m_ScenePath.string();
+    out << YAML::EndMap;
+
+    FileUtils::WriteTextFile(FileUtils::GetAppAsset("fuze.ini"), out.c_str());
+}
+
+void EditorLayer::LoadOptions(){
+    std::filesystem::path filepath = FileUtils::GetAppAsset("fuze.ini");
+    if(!std::filesystem::exists(filepath)) return;
+
+    std::ifstream stream(filepath);
+    std::stringstream strStream;
+    strStream << stream.rdbuf();
+
+    YAML::Node data = YAML::Load(strStream.str());
+    if(!data["LastOpened"]) return;
+    std::string lastOpened = data["LastOpened"].as<std::string>();
+    std::filesystem::path lastOpenedFilepath = std::filesystem::path(lastOpened);
+
+    m_Scene = CreateRef<Scene>();
+    m_Scene->Init();
+    m_SceneHierarchyPanel.SetContext(m_Scene);
+    m_PropertiesPanel.SetContext(m_Scene);
+
+    SceneSerializer sceneSerializer {m_Scene};
+    sceneSerializer.DeserializeText(lastOpenedFilepath.string(), m_EditorCamera);
+    m_ScenePath = lastOpenedFilepath;
+
+    m_FileContext.SetLastDirectory(lastOpenedFilepath.parent_path());
+
+    m_IsSceneDirty = true;
 }
 
 }

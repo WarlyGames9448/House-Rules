@@ -8,11 +8,11 @@ class SceneSerializer {
   public:
     SceneSerializer(const Ref<Scene>& scene);
 
-    bool SerializeText(const std::string& filepath);
-    bool SerializeBinary(const std::string& filepath);
+    bool SerializeText(const std::string& filepath, EditorCamera& editorCamera);
+    bool SerializeBinary(const std::string& filepath, EditorCamera& editorCamera);
 
-    bool DeserializeText(const std::string& filepath);
-    bool DeserializeBinary(const std::string& filepath);
+    bool DeserializeText(const std::string& filepath, EditorCamera& editorCamera);
+    bool DeserializeBinary(const std::string& filepath, EditorCamera& editorCamera);
 
     void SerializeEntity(YAML::Emitter& out, Entity entity);
 

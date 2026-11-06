@@ -31,6 +31,9 @@ class EditorLayer : public Layer {
 
     bool OnKeyPressed(KeyPressedEvent& e);
 
+    void SaveOptions();
+    void LoadOptions();
+
   private:
     Ref<Framebuffer> m_Framebuffer;
     bool m_ViewportFocused = false, m_ViewportHovered = false;

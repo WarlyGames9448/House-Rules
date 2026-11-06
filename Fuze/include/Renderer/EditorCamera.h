@@ -19,8 +19,16 @@ class EditorCamera {
         return m_Position;
     }
 
+    inline void SetPosition(const glm::vec2& position) {
+        m_Position = position;
+    }
+
     inline float GetZoom() const {
-      return m_Zoom;
+        return m_Zoom;
+    }
+
+    inline void SetZoom(float zoom) {
+        m_Zoom = zoom;
     }
 
   private:
