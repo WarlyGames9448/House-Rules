@@ -170,7 +170,12 @@ void Scene::SetPrimaryCamera(Entity camera) {
     m_RenderSystem->SetCamera(m_CameraSystem->GetPrimaryCamera());
 }
 
-void Scene::OnUpdate(Timestep ts) {
+void Scene::OnUpdateEditor(Timestep ts, EditorCamera &editorCamera){
+    m_RenderSystem->SetCamera(editorCamera.GetCamera());
+    m_RenderSystem->OnUpdate(ts);
+}
+
+void Scene::OnUpdateRuntime(Timestep ts) {
     m_CameraSystem->m_UpdateControllers = m_ViewportFocused;
     m_CameraSystem->OnUpdate(ts);
     m_RenderSystem->OnUpdate(ts);

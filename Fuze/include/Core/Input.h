@@ -9,6 +9,7 @@ class FUZE_API Input {
     static bool IsKeyReleased(int keycode);
 
     static bool IsMouseButtonPressed(int button);
+    static bool IsMouseButtonReleased(int button);
     static std::pair<float, float> GetMousePosition();
     static float GetMouseX();
     static float GetMouseY();

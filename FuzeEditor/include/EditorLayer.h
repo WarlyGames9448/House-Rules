@@ -46,6 +46,8 @@ class EditorLayer : public Layer {
     SceneHierarchyPanel m_SceneHierarchyPanel {m_SelectionContext};
     PropertiesPanel m_PropertiesPanel {m_SelectionContext};
 
+    EditorCamera m_EditorCamera;
+
     friend class Scene;
 };
 }

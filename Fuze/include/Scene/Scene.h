@@ -9,6 +9,8 @@
 
 #include "UUID.h"
 
+#include "Renderer/EditorCamera.h"
+
 namespace Fuze {
 class RenderSystem : public System {
   public:
@@ -54,7 +56,8 @@ class Scene {
         m_CameraSystem->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
     }
 
-    void OnUpdate(Timestep ts);
+    void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
+    void OnUpdateRuntime(Timestep ts);
     void OnEvent(Event& e) {
         m_CameraSystem->OnEvent(e);
     }

@@ -10,7 +10,7 @@
 
 namespace Fuze {
 
-EditorLayer::EditorLayer(): Layer("FuzeEditor") {
+EditorLayer::EditorLayer(): Layer("FuzeEditor"), m_EditorCamera(1280.0f / 720.0f, -100.0f, 100.0f) {
 }
 
 void EditorLayer::OnAttach() {
@@ -41,7 +41,6 @@ void EditorLayer::OnDetach() {
 }
 
 void EditorLayer::OnUpdate(Timestep ts) {
-
     const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
     if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
         m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
@@ -55,7 +54,7 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
     Renderer2D::ResetStats();
 
-    m_Scene->OnUpdate(ts);
+    m_Scene->OnUpdateEditor(ts, m_EditorCamera);
 
     m_Framebuffer->Unbind();
     RendererCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
@@ -64,6 +63,7 @@ void EditorLayer::OnUpdate(Timestep ts) {
 
 void EditorLayer::OnEvent(Event& e) {
     m_Scene->OnEvent(e);
+    m_EditorCamera.OnEvent(e);
 
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<KeyPressedEvent>(FUZE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -125,6 +125,8 @@ void EditorLayer::OnImGuiRender() {
         ImGui::Text("Draw Calls: %d", Renderer2D::GetStats().DrawCalls);
         ImGui::Text("Quad Count: %d", Renderer2D::GetStats().QuadCount);
         ImGui::Text("Entity Count: %d", m_Scene->GetEntityCount());
+        ImGui::Text("Camera Position: %.3f %.3f", m_EditorCamera.GetPosition().x, m_EditorCamera.GetPosition().y);
+        ImGui::Text("Zoom: %.2f", m_EditorCamera.GetZoom());
     }
 
     UI::EndPanel();
@@ -135,6 +137,12 @@ void EditorLayer::OnImGuiRender() {
     options.Flags = ImGuiWindowFlags_None;
     options.Padding = &zeroPadding;
 
+    ImGuiWindowClass windowClass {};
+
+    windowClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+
+    ImGui::SetNextWindowClass(&windowClass);
+
     if (UI::BeginPanel("Viewport", options)) {
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
@@ -143,10 +151,17 @@ void EditorLayer::OnImGuiRender() {
 
         Fuze::Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
+        ImVec2 viewportPanelPos = ImGui::GetCursorScreenPos();
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+
+        if (viewportPanelSize.x < 1.0f) viewportPanelSize.x = 1.0f;
+        if (viewportPanelSize.y < 1.0f) viewportPanelSize.y = 1.0f;
 
         m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
         m_Scene->m_ViewportSize = m_ViewportSize;
+
+        m_EditorCamera.UpdateProperties();
+        m_EditorCamera.OnUpdate(0);
 
         if (m_IsSceneDirty) {
             m_Scene->OnViewportResize();

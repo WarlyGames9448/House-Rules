@@ -25,6 +25,12 @@ bool Input::IsMouseButtonPressed(int button) {
     return state == GLFW_PRESS;
 }
 
+bool Input::IsMouseButtonReleased(int button) {
+    auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+    auto state = glfwGetMouseButton(window, button);
+    return state == GLFW_RELEASE;
+}
+
 std::pair<float, float> Input::GetMousePosition() {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
     double xpos, ypos;
