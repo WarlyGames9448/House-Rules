@@ -9,7 +9,7 @@ EditorCamera::EditorCamera(float aspectRatio, float nearClip, float FarClip)
 
 void EditorCamera::OnUpdate([[maybe_unused]] Timestep ts) {
 
-    if (Input::IsKeyPressed(FUZE_KEY_LEFT_ALT) && Input::IsMouseButtonPressed(FUZE_MOUSE_BUTTON_2)) {
+    if (ImGui::IsWindowHovered() && Input::IsMouseButtonPressed(FUZE_MOUSE_BUTTON_2)) {
         const glm::vec2 mousePosition {Input::GetMouseX(), Input::GetMouseY()};
 
         if (!m_IsRightButtonPressed) {

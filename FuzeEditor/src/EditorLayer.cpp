@@ -20,6 +20,7 @@ void EditorLayer::OnAttach() {
     Renderer2D::Init();
 
     FramebufferSpecification spec;
+    spec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth};
     spec.Width = 1280;
     spec.Height = 720;
     m_Framebuffer = Framebuffer::Create(spec);
@@ -265,7 +266,7 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
     return true;
 }
 
-void EditorLayer::SaveOptions(){
+void EditorLayer::SaveOptions() {
     YAML::Emitter out;
     out << YAML::BeginMap;
     out << YAML::Key << "LastOpened" << YAML::Value << m_ScenePath.string();
@@ -274,16 +275,16 @@ void EditorLayer::SaveOptions(){
     FileUtils::WriteTextFile(FileUtils::GetAppAsset("fuze.ini"), out.c_str());
 }
 
-void EditorLayer::LoadOptions(){
+void EditorLayer::LoadOptions() {
     std::filesystem::path filepath = FileUtils::GetAppAsset("fuze.ini");
-    if(!std::filesystem::exists(filepath)) return;
+    if (!std::filesystem::exists(filepath)) return;
 
     std::ifstream stream(filepath);
     std::stringstream strStream;
     strStream << stream.rdbuf();
 
     YAML::Node data = YAML::Load(strStream.str());
-    if(!data["LastOpened"]) return;
+    if (!data["LastOpened"]) return;
     std::string lastOpened = data["LastOpened"].as<std::string>();
     std::filesystem::path lastOpenedFilepath = std::filesystem::path(lastOpened);
 
